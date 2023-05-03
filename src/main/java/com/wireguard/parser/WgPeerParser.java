@@ -4,7 +4,6 @@ import com.wireguard.DTO.WgPeer;
 import org.springframework.util.Assert;
 
 import java.net.InetSocketAddress;
-import java.sql.Array;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
