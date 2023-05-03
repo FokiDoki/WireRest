@@ -5,7 +5,6 @@ import lombok.Data;
 
 import java.net.InetSocketAddress;
 import java.sql.Timestamp;
-import java.util.List;
 
 @Data
 @AllArgsConstructor
