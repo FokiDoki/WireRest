@@ -1,10 +1,10 @@
-package com.wireguard.DTO;
+package com.wireguard.external.wireguard.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.net.InetSocketAddress;
-import java.sql.Timestamp;
+import java.time.Instant;
 
 @Data
 @AllArgsConstructor
@@ -13,7 +13,7 @@ public class WgPeer {
     public String presharedKey;
     public InetSocketAddress endpoint;
     public String allowedIps;
-    public Timestamp latestHandshake;
+    public Instant latestHandshake;
     public long transferRx;
     public long transferTx;
     public int persistentKeepalive;
