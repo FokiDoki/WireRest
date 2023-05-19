@@ -1,6 +1,6 @@
-package com.wireguard.containers;
+package com.wireguard.external.wireguard;
 
-import com.wireguard.DTO.WgPeer;
+import com.wireguard.external.wireguard.dto.WgPeer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

@@ -1,12 +1,14 @@
 package com.wireguard.containers;
 
-import com.wireguard.DTO.WgPeer;
+import com.wireguard.external.wireguard.WgPeerContainer;
+import com.wireguard.external.wireguard.dto.WgPeer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.net.InetSocketAddress;
 import java.sql.Timestamp;
+import java.time.Instant;
 
 public class WgPeerContainerTest {
     WgPeerContainer wgPeerContainer = new WgPeerContainer();
@@ -14,11 +16,11 @@ public class WgPeerContainerTest {
     public void setUp() {
         wgPeerContainer.addPeer(new WgPeer("publicKey1",
                 "presharedKey1", new InetSocketAddress("192.168.0.1", 2222),
-                "allowedIps1", new Timestamp(12345678),
+                "allowedIps1", Instant.ofEpochSecond(12345678),
                 2222, 1111, 0));
         wgPeerContainer.addPeer(new WgPeer("publi+c/Key=2",
                 "presharedKey2", new InetSocketAddress("192.168.0.2", 2222),
-                "allowedIps1", new Timestamp(12345678),
+                "allowedIps1", Instant.ofEpochSecond(12345678),
                 2222, 1111, 0));
     }
 
