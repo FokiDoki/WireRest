@@ -16,7 +16,7 @@ public class WgTool {
     private static final String WG_SHOW_DUMP_COMMAND = "wg show %s dump";
     private static final String WG_GENKEY_COMMAND = "wg genkey";
     private static final String WG_PUBKEY_COMMAND = "wg pubkey | echo %s";
-    private ShellRunner shell;
+    private final ShellRunner shell = new ShellRunner();
 
 
     public WgShowDump showDump(String interfaceName) throws IOException {
