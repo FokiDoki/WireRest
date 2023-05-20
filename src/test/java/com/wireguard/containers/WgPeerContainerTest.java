@@ -1,7 +1,7 @@
 package com.wireguard.containers;
 
 import com.wireguard.external.wireguard.WgPeerContainer;
-import com.wireguard.external.wireguard.dto.WgPeer;
+import com.wireguard.external.wireguard.WgPeer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,12 +15,12 @@ public class WgPeerContainerTest {
     @BeforeEach
     public void setUp() {
         wgPeerContainer.addPeer(new WgPeer("publicKey1",
-                "presharedKey1", new InetSocketAddress("192.168.0.1", 2222),
-                "allowedIps1", Instant.ofEpochSecond(12345678),
+                "presharedKey1", "192.168.0.1:2222",
+                "allowedIps1", 12345678,
                 2222, 1111, 0));
         wgPeerContainer.addPeer(new WgPeer("publi+c/Key=2",
-                "presharedKey2", new InetSocketAddress("192.168.0.2", 2222),
-                "allowedIps1", Instant.ofEpochSecond(12345678),
+                "presharedKey2", "192.168.0.2:2222",
+                "allowedIps1", 12345678,
                 2222, 1111, 0));
     }
 

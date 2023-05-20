@@ -1,14 +1,15 @@
 package com.wireguard.external.wireguard;
 
 import com.wireguard.external.shell.ShellRunner;
-import com.wireguard.external.wireguard.dto.WgInterface;
-import com.wireguard.external.wireguard.dto.WgShowDump;
+import com.wireguard.external.wireguard.WgInterface;
+import com.wireguard.external.wireguard.WgShowDump;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.List;
 
 @Component
 public class WgManager {
@@ -25,13 +26,20 @@ public class WgManager {
 
 
 
-    public WgInterface getInterface() throws BadInterfaceException {
+    public WgInterface getInterface() throws ParsingException {
+        return getDump().getWgInterface();
+    }
+
+    public List<WgPeer> getPeers() throws ParsingException {
+        return getDump().getPeers();
+    }
+
+    private WgShowDump getDump() throws ParsingException {
         try{
-            WgShowDump wgShowDump = wgTool.showDump(interfaceName);
-            return wgShowDump.getWgInterface();
+            return wgTool.showDump(interfaceName);
         } catch (IOException e) {
             logger.error("Error getting dump", e);
-            throw new BadInterfaceException("Error while getting interface", e);
+            throw new ParsingException("Error while getting dump", e);
         }
     }
 

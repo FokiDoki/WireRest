@@ -1,6 +1,6 @@
 package com.wireguard.parser;
 
-import com.wireguard.external.wireguard.dto.WgInterface;
+import com.wireguard.external.wireguard.WgInterface;
 import org.springframework.util.Assert;
 
 import java.io.UnsupportedEncodingException;

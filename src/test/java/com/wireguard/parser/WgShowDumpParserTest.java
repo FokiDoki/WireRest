@@ -3,8 +3,8 @@ package com.wireguard.parser;
 
 import com.wireguard.converters.StreamToStringConverter;
 import com.wireguard.external.wireguard.WgPeerContainer;
-import com.wireguard.external.wireguard.dto.WgPeer;
-import com.wireguard.external.wireguard.dto.WgShowDump;
+import com.wireguard.external.wireguard.WgPeer;
+import com.wireguard.external.wireguard.WgShowDump;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,7 +19,7 @@ class WgShowDumpParserTest {
     private static final String FIRST_PEER_ALLOWED_IPS = "10.66.66.2/32,fd42:42:42::2/128";
     private static final String FIRST_PEER_ENDPOINT = "90.255.84.234:62517";
     private static final int FIRST_PEER_PERSISTENT_KEEPALIVE = 0;
-    private static final Instant FIRST_PEER_LAST_HANDSHAKE_TIME = Instant.ofEpochSecond(1683030306);
+    private static final Long FIRST_PEER_LAST_HANDSHAKE_TIME = 1683030306L;
     @BeforeEach
     void setUp() throws FileNotFoundException {
         File wgshowdumpFile = new File("src/test/resources/wg_show_dump.txt");
@@ -41,7 +41,7 @@ class WgShowDumpParserTest {
         WgPeerContainer wgPeers = new WgPeerContainer(dump.getPeers());
         Assertions.assertEquals(11, wgPeers.size());
         WgPeer peer = dump.getPeers().get(0);
-        Assertions.assertEquals(FIRST_PEER_ENDPOINT, peer.getEndpoint().getHostName()+":"+peer.getEndpoint().getPort());
+        Assertions.assertEquals(FIRST_PEER_ENDPOINT, peer.getEndpoint());
         Assertions.assertEquals(FIRST_PEER_ALLOWED_IPS, peer.getAllowedIps());
         Assertions.assertEquals(FIRST_PEER_PERSISTENT_KEEPALIVE, peer.getPersistentKeepalive());
         Assertions.assertEquals(FIRST_PEER_LAST_HANDSHAKE_TIME, peer.getLatestHandshake());

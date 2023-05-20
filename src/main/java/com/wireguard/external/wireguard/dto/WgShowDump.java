@@ -1,4 +1,4 @@
-package com.wireguard.external.wireguard.dto;
+package com.wireguard.external.wireguard;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
