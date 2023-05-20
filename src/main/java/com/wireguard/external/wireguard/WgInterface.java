@@ -1,4 +1,4 @@
-package com.wireguard.external.wireguard.dto;
+package com.wireguard.external.wireguard;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;

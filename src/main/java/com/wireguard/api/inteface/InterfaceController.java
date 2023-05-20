@@ -1,9 +1,9 @@
 package com.wireguard.api.inteface;
 
 import com.wireguard.api.AppError;
-import com.wireguard.external.wireguard.BadInterfaceException;
+import com.wireguard.external.wireguard.ParsingException;
 import com.wireguard.external.wireguard.WgManager;
-import com.wireguard.external.wireguard.dto.WgInterface;
+import com.wireguard.external.wireguard.WgInterface;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -32,7 +32,7 @@ public class InterfaceController {
                     content = { @Content(mediaType = "application/json",
                             schema = @Schema(implementation = AppError.class)) }) })
     @GetMapping("/interface")
-    public WgInterface getInterface() throws BadInterfaceException {
+    public WgInterface getInterface() throws ParsingException {
         return wgManager.getInterface();
     }
 }

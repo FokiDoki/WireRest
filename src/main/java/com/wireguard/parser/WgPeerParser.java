@@ -1,6 +1,6 @@
 package com.wireguard.parser;
 
-import com.wireguard.external.wireguard.dto.WgPeer;
+import com.wireguard.external.wireguard.WgPeer;
 import org.springframework.util.Assert;
 
 import java.net.InetSocketAddress;
@@ -44,23 +44,17 @@ public class WgPeerParser {
         return Validator.validateKey(presharedKey);
     }
 
-    private static InetSocketAddress parseEndpoint(String endpoint){
+    private static String  parseEndpoint(String endpoint){
         if (endpoint.equals("(none)")) return null;
-        Assert.doesNotContain(":", endpoint, "WgPeerParser.parseEndpoint: invalid endpoint "+endpoint);
-        int endpointPort = Integer.parseInt(endpoint.split(":")[1].trim());
-        return new InetSocketAddress(
-                endpoint.split(":")[0],
-                endpointPort
-        );
+        return endpoint;
     }
 
     private static String parseAndValidateAllowedIps(String allowedIps){
         return allowedIps; //TODO: do validation mechanism
     }
 
-    private static Instant parseAndValidateLatestHandshake(String latestHandshake){
-        long latestHandshakeLong = Long.parseLong(latestHandshake);
-        return Instant.ofEpochSecond(latestHandshakeLong);
+    private static Long parseAndValidateLatestHandshake(String latestHandshake){
+        return Long.parseLong(latestHandshake);
     }
 
     private static long parseAndValidateTransferRx(String transferRx){

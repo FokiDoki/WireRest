@@ -1,7 +1,7 @@
 package com.wireguard.external.wireguard;
 
 import com.wireguard.external.shell.ShellRunner;
-import com.wireguard.external.wireguard.dto.WgShowDump;
+import com.wireguard.external.wireguard.WgShowDump;
 import com.wireguard.parser.WgShowDumpParser;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;

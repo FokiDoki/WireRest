@@ -1,9 +1,9 @@
 package com.wireguard.parser;
 
 
-import com.wireguard.external.wireguard.dto.WgInterface;
-import com.wireguard.external.wireguard.dto.WgPeer;
-import com.wireguard.external.wireguard.dto.WgShowDump;
+import com.wireguard.external.wireguard.WgInterface;
+import com.wireguard.external.wireguard.WgPeer;
+import com.wireguard.external.wireguard.WgShowDump;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

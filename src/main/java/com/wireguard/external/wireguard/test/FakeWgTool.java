@@ -2,7 +2,7 @@ package com.wireguard.external.wireguard.test;
 
 import com.wireguard.converters.StreamToStringConverter;
 import com.wireguard.external.wireguard.WgTool;
-import com.wireguard.external.wireguard.dto.WgShowDump;
+import com.wireguard.external.wireguard.WgShowDump;
 import com.wireguard.parser.WgShowDumpParser;
 import lombok.SneakyThrows;
 import org.springframework.context.annotation.Profile;

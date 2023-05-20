@@ -1,6 +1,6 @@
 package com.wireguard.parser;
 
-import com.wireguard.external.wireguard.dto.WgInterface;
+import com.wireguard.external.wireguard.WgInterface;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
