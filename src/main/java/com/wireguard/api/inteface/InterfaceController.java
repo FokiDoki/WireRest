@@ -23,7 +23,6 @@ public class InterfaceController {
     }
 
 
-
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK",
                     content = { @Content(mediaType = "application/json",
