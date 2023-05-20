@@ -11,7 +11,7 @@ public class Validator {
         int portInt;
         portInt = Integer.parseInt(port);
         if (portInt < 1 || portInt > 65535){
-            throw new RuntimeException("WgInterfaceParser.validateListenPort: port value out of range");
+            throw new IllegalArgumentException("WgInterfaceParser.validateListenPort: port value out of range");
         }
         return portInt;
     }

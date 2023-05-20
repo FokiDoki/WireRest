@@ -7,7 +7,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 public class WgInterfaceParser {
-//private-key, public-key, listen-port, fwmark
 
     public static WgInterface parse(String wgShowStringWithInterfaceData, String splitter){
         String[] splitInterfaceData = wgShowStringWithInterfaceData.split(splitter);

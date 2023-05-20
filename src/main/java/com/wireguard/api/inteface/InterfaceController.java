@@ -1,4 +1,4 @@
-package com.wireguard.api.controllers;
+package com.wireguard.api.inteface;
 
 import com.wireguard.api.AppError;
 import com.wireguard.external.wireguard.BadInterfaceException;
@@ -13,12 +13,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class PeersAPIController {
+public class InterfaceController {
 
     WgManager wgManager;
 
     @Autowired
-    public PeersAPIController(WgManager wgManager) {
+    public InterfaceController(WgManager wgManager) {
         this.wgManager = wgManager;
     }
 
