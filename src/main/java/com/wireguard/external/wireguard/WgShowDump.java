@@ -9,7 +9,7 @@ import java.util.List;
 @AllArgsConstructor
 public class WgShowDump {
     private final WgInterface wgInterface;
-    private List<WgPeer> peers;
+    private final List<WgPeer> peers;
 
 
 }
