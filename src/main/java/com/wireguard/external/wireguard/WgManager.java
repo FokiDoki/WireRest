@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class WgManager {
@@ -41,6 +42,13 @@ public class WgManager {
             logger.error("Error getting dump", e);
             throw new ParsingException("Error while getting dump", e);
         }
+    }
+
+    public Optional<WgPeer> getPeerByPublicKey(String publicKey) throws ParsingException {
+        List<WgPeer> peers = getPeers();
+        WgPeerContainer wgPeerContainer = new WgPeerContainer(peers);
+        WgPeer wgPeer = wgPeerContainer.getByPublicKey(publicKey);
+        return Optional.ofNullable(wgPeer);
     }
 
 
