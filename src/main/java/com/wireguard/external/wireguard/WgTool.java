@@ -16,6 +16,7 @@ public class WgTool {
     private static final String WG_SHOW_DUMP_COMMAND = "wg show %s dump";
     private static final String WG_GENKEY_COMMAND = "wg genkey";
     private static final String WG_PUBKEY_COMMAND = "wg pubkey | echo %s";
+    private static final String WG_PRESHARED_KEY_COMMAND = "wg genpsk";
     private final ShellRunner shell = new ShellRunner();
 
 
@@ -33,6 +34,10 @@ public class WgTool {
     public String generatePublicKey(String privateKey) {
         String command = String.format(WG_PUBKEY_COMMAND, privateKey);
         return shell.execute(command);
+    }
+
+    public String generatePresharedKey() {
+        return shell.execute(WG_PRESHARED_KEY_COMMAND);
     }
 
 
