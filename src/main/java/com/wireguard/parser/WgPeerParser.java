@@ -24,15 +24,16 @@ public class WgPeerParser {
         List<String> WgShowPeerDump = Utils.trimAll(wgShowPeerDumpSource);
 
 
-        return new WgPeer(
-                parseAndValidatePublicKey(WgShowPeerDump.get(0)),
-                parseAndValidatePresharedKey(WgShowPeerDump.get(1)),
-                parseEndpoint(WgShowPeerDump.get(2)),
-                parseAndValidateAllowedIps(WgShowPeerDump.get(3)),
-                parseAndValidateLatestHandshake(WgShowPeerDump.get(4)),
-                parseAndValidateTransferRx(WgShowPeerDump.get(5)),
-                parseAndValidateTransferTx(WgShowPeerDump.get(6)),
-                parsePersistentKeepalive(WgShowPeerDump.get(7)));
+        return WgPeer.
+                withPublicKey(parseAndValidatePublicKey( WgShowPeerDump.get(0) ))
+                .presharedKey(parseAndValidatePresharedKey(WgShowPeerDump.get(1)))
+                .endpoint(parseEndpoint(WgShowPeerDump.get(2)))
+                .allowedIps(parseAndValidateAllowedIps(WgShowPeerDump.get(3)))
+                .latestHandshake(parseAndValidateLatestHandshake(WgShowPeerDump.get(4)))
+                .transferRx(parseAndValidateTransferRx(WgShowPeerDump.get(5)))
+                .transferTx(parseAndValidateTransferTx(WgShowPeerDump.get(6)))
+                .persistentKeepalive(parsePersistentKeepalive(WgShowPeerDump.get(7)))
+                .build();
     }
 
 

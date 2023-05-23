@@ -14,14 +14,26 @@ public class WgPeerContainerTest {
     WgPeerContainer wgPeerContainer = new WgPeerContainer();
     @BeforeEach
     public void setUp() {
-        wgPeerContainer.addPeer(new WgPeer("publicKey1",
-                "presharedKey1", "192.168.0.1:2222",
-                "allowedIps1", 12345678,
-                2222, 1111, 0));
-        wgPeerContainer.addPeer(new WgPeer("publi+c/Key=2",
-                "presharedKey2", "192.168.0.2:2222",
-                "allowedIps1", 12345678,
-                2222, 1111, 0));
+        WgPeer peer1 = WgPeer.withPublicKey("publicKey1")
+                        .presharedKey("presharedKey1")
+                        .endpoint("192.168.0.1:2222")
+                        .allowedIps("allowedIps1")
+                        .latestHandshake(12345678)
+                        .transferRx(2222)
+                        .transferTx(1111)
+                        .persistentKeepalive(0)
+                        .build();
+        WgPeer peer2 = WgPeer.withPublicKey("publi+c/Key=2")
+                        .presharedKey("presharedKey2")
+                        .endpoint("192.168.0.1:2222")
+                        .allowedIps("allowedIps1")
+                        .latestHandshake(12345678)
+                        .transferRx(2222)
+                        .transferTx(1111)
+                        .persistentKeepalive(0)
+                        .build();
+        wgPeerContainer.addPeer(peer1);
+        wgPeerContainer.addPeer(peer2);
     }
 
     @Test

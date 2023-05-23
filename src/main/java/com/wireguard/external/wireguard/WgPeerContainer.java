@@ -1,6 +1,5 @@
 package com.wireguard.external.wireguard;
 
-import com.wireguard.external.wireguard.WgPeer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
