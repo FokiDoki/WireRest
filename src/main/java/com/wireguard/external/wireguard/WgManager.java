@@ -1,11 +1,10 @@
 package com.wireguard.external.wireguard;
 
 import com.wireguard.external.shell.ShellRunner;
-import com.wireguard.external.wireguard.WgInterface;
-import com.wireguard.external.wireguard.WgShowDump;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -16,15 +15,29 @@ import java.util.Optional;
 public class WgManager {
 
     private static final Logger logger = LoggerFactory.getLogger(ShellRunner.class);
+    @Value("${wg.interface.name}")
     private String interfaceName = "wg0";
+    @Value("${wg.interface.new_cient_subnet_mask}")
+    private int defaultMask;
+    private final IpResolver wgIpResolver;
+
     private static WgTool wgTool;
 
     @Autowired
-    public WgManager(WgTool wgTool) {
+    public WgManager(WgTool wgTool,
+                     @Value("${wg.interface.subnet}") String subnet,
+                     @Value("${wg.interface.ip") String interfaceIp) {
         WgManager.wgTool = wgTool;
+        Subnet allowedSubnet = Subnet.fromString(subnet);
+        wgIpResolver = new IpResolver(allowedSubnet);
+        configureIpResolver(List.of(allowedSubnet.getIpString(), interfaceIp));
     }
 
-
+    private void configureIpResolver(List<String> ipsToExclude){
+        for (String ip : ipsToExclude){
+            wgIpResolver.takeSubnet(Subnet.fromString(ip+"/32"));
+        }
+    }
 
 
     public WgInterface getInterface() throws ParsingException {
@@ -52,4 +65,14 @@ public class WgManager {
     }
 
 
+    public WgPeer createPeer(){
+        String privateKey = wgTool.generatePrivateKey();
+        String publicKey = wgTool.generatePublicKey(privateKey);
+        String presharedKey = wgTool.generatePresharedKey();
+        Subnet address = wgIpResolver.takeFreeSubnet(defaultMask);
+        return WgPeer.withPublicKey(publicKey)
+                .presharedKey(presharedKey)
+                .allowedIps(address.toString())
+                .build();
+    }
 }
