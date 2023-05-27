@@ -26,25 +26,26 @@ public class ShellRunner {
     REF: https://github.com/spring-projects/spring-boot/blob/main/spring-boot-project/spring-boot-docker-compose/src/main/java/org/springframework/boot/docker/compose/core/ProcessRunner.java#L101
      */
 
-    public String execute(String command) {
+    public String execute(String[] command) {
         Process process = startProcess(command);
         int exitCode = waitForProcess(process);
         String stdout = readInputStream(process.getInputStream());
         String stderr = readInputStream(process.getErrorStream());
         if (exitCode != 0) {
-            throw new CommandExecutionException(command, exitCode, stdout, stderr);
+            throw new CommandExecutionException(String.join(" ", command), exitCode, stdout, stderr);
         }
         return stdout;
     }
 
-    private Process startProcess(String command) {
-        logger.trace("Executing command: %s".formatted(command));
+    private Process startProcess(String[] command) {
+        String stringCommand = String.join(" ", command);
+        logger.trace("Executing command: %s".formatted(stringCommand));
         Runtime runtime = Runtime.getRuntime();
         try {
             return runtime.exec(command);
         } catch (IOException e) {
-            logger.error("Error executing command: %s".formatted(command), e);
-            throw new ProcessStartException(command, e);
+            logger.error("Error executing command: %s".formatted(stringCommand), e);
+            throw new ProcessStartException(stringCommand, e);
         }
     }
 
