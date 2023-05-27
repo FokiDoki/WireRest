@@ -10,11 +10,13 @@ class SubnetTest {
         Subnet subnet = Subnet.fromString("0.1.0.0/24");
         assertEquals(65536L, subnet.getFirstIpNumeric(), ".getIpNumeric()");
     }
+
     @Test
     public void numericIpConvertTest3() {
         Subnet subnet = Subnet.fromString("0.0.1.0/24");
         assertEquals(256L, subnet.getFirstIpNumeric(), ".getIpNumeric()");
     }
+
     @Test
     public void testFromString() {
         Subnet subnet = Subnet.fromString("192.168.0.3/24");
@@ -62,6 +64,10 @@ class SubnetTest {
         assertThrows(IllegalArgumentException.class, () -> Subnet.fromString("192.168.0.1/33"));
     }
 
-
+    @Test
+    public void testGetLastIpNumeric() {
+        Subnet subnet = Subnet.fromString("0.0.0.0/17");
+        assertEquals(32767L, subnet.getLastIpNumeric(), ".getLastIpNumeric()");
+    }
 
 }

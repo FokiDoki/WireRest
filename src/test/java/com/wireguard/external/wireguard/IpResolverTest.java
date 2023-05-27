@@ -1,5 +1,6 @@
 package com.wireguard.external.wireguard;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
@@ -7,57 +8,145 @@ import java.time.Instant;
 import static org.junit.jupiter.api.Assertions.*;
 
 class IpResolverTest {
-        private static final Subnet SUBNET = Subnet.fromString("0.0.128.0/16");
-        @Test
-        void testResolve() {
-            IpResolver ipResolver = new IpResolver(SUBNET);
-            ipResolver.takeSubnet(Subnet.fromString("0.0.128.1/32"));
-           // assertEquals(32767, ipResolver.());
-        }
+    private static final Subnet SUBNET = Subnet.fromString("0.0.0.0/16");
+    IpResolver ipResolver;
+    @BeforeEach
+    void setUp() {
+        ipResolver = new IpResolver(SUBNET);
+    }
 
-        @Test
-        //fill IpResolver with 100000 real ips and check speed of resolve
-        void testResolve2() {
-            IpResolver ipResolver = new IpResolver(Subnet.fromString("0.0.0.0/8"));
-            Instant start = Instant.now();
-            for (int i = 0; i < 13; i += 7) {
-                System.out.println(i);
-                for (int j = 0; j < 250; j += 2) {
-                    for (int k = 0; k < 250; k += 2) {
-                        ipResolver.takeSubnet(Subnet.fromString("0." + j + "." + k + "." + i + "/32"));
-                    }
-                }
-            }
-            Instant end = Instant.now();
-            System.out.println("Time: " + (end.toEpochMilli() - start.toEpochMilli()));
-            System.out.println("Size: " + ipResolver.freeRanges.size());
-            findFirstGreaterSpeedTest(0         , ipResolver);
-            findFirstGreaterSpeedTest(2221      , ipResolver);
-            findFirstGreaterSpeedTest(23333     , ipResolver);
-            findFirstGreaterSpeedTest(333333    , ipResolver);
-            findFirstGreaterSpeedTest(4124124   , ipResolver);
+    @Test
+    void testTake() {
+        ipResolver.takeSubnet(Subnet.fromString("0.0.128.1/32"));
+        assertEquals(65535L, ipResolver.getAvailableIpsCount(), ".getAvailableIpCount()");
+        assertEquals(1L, ipResolver.getTakenIpsCount(), ".getTakenIpCount()");
+        assertEquals(32768L, ipResolver.getAvailableRanges().get(0).getBiggest(), ".get(0).getBiggest()");
+        assertEquals(0L, ipResolver.getAvailableRanges().get(0).getLeast(), ".get(0).getSmallest()");
+    }
 
-            findFirstGreaterSpeedTest(16316424   , ipResolver);
-            findFirstGreaterSpeedTest(123123123 , ipResolver);
-            findFirstGreaterSpeedTest(1231231231, ipResolver);
-            findFirstGreaterSpeedTest(1231231232, ipResolver);
+    @Test
+    void testTakeOutOfRange() {
+        assertThrows(IllegalArgumentException.class, () -> ipResolver.takeSubnet(Subnet.fromString("0.1.0.0/32")));
+    }
+
+    @Test
+    void testTakeTaken() {
+        ipResolver.takeSubnet(Subnet.fromString("0.0.0.1/32"));
+        assertThrows(NoFreeIpException.class, () -> ipResolver.takeSubnet(Subnet.fromString("0.0.0.1/32")));
+    }
+
+    @Test
+    void testTakeTakenTouching() {
+        ipResolver.takeSubnet(Subnet.fromString("0.0.0.1/28"));
+        assertThrows(NoFreeIpException.class, () -> ipResolver.takeSubnet(Subnet.fromString("0.0.0.15/29")));
+    }
+
+    @Test
+    void testCountWhenNoFreeIp() {
+        IpResolver ipResolver = new IpResolver(Subnet.fromString("0.0.0.0/32"));
+        ipResolver.takeSubnet(Subnet.fromString("0.0.0.0/32"));
+        assertEquals(0L, ipResolver.getAvailableIpsCount(), ".getAvailableIpCount()");
+        assertEquals(1L, ipResolver.getTakenIpsCount(), ".getTakenIpCount()");
+    }
+
+    @Test
+    void testTakeWhenNoFreeIp() {
+        IpResolver ipResolver = new IpResolver(Subnet.fromString("0.0.0.0/32"));
+        ipResolver.takeSubnet(Subnet.fromString("0.0.0.0/32"));
+        assertThrows(NoFreeIpException.class, () -> ipResolver.takeSubnet(Subnet.fromString("0.0.0.0/32")));
+        assertThrows(IllegalArgumentException.class, () -> ipResolver.takeSubnet(Subnet.fromString("0.1.0.0/32")));
+    }
+
+    @Test
+    void testTakeWith17Mask(){
+        ipResolver.takeSubnet(Subnet.fromString("0.0.0.0/17"));
+        assertEquals(32768L, ipResolver.getTakenIpsCount(), ".getTakenIpCount()");
+        assertEquals(32768L, ipResolver.getAvailableRanges().get(0).getLeast());
+    }
+
+    @Test
+    void testFree() {
+        ipResolver.takeSubnet(Subnet.fromString("0.0.0.1/27"));
+        ipResolver.freeSubnet(Subnet.fromString("0.0.0.1/27"));
+        assertEquals(65536L, ipResolver.getAvailableIpsCount(), ".getAvailableIpCount()");
+        assertEquals(65535L, ipResolver.getAvailableRanges().get(0).getBiggest(), ".get(0).getBiggest()");
+        assertEquals(0L, ipResolver.getAvailableRanges().get(0).getLeast(), ".get(0).getSmallest()");
+    }
+
+    @Test
+    void testFreeWhenNoIpTaken() {
+        assertThrows(IllegalArgumentException.class, () -> ipResolver.freeSubnet(Subnet.fromString("")));
+    }
+
+    @Test
+    void testFreeWhenNoIpLeft(){
+        IpResolver ipResolver = new IpResolver(Subnet.fromString("0.0.0.0/32"));
+        ipResolver.takeSubnet(Subnet.fromString("0.0.0.0/32"));
+        ipResolver.freeSubnet(Subnet.fromString("0.0.0.0/32"));
+        assertEquals(1L, ipResolver.getAvailableIpsCount(), ".getAvailableIpCount()");
+    }
+
+    @Test
+    void testFreeWhenNoIpLeftAndOutOfRange(){
+        IpResolver ipResolver = new IpResolver(Subnet.fromString("0.0.0.0/32"));
+        ipResolver.takeSubnet(Subnet.fromString("0.0.0.0/32"));
+        assertThrows(IllegalArgumentException.class, () ->  ipResolver.takeSubnet(Subnet.fromString("0.0.0.1/32")));
+    }
 
 
-        }
 
-        private long findFirstGreaterSpeedTest(long ip, IpResolver ipResolver) {
-            Instant start = Instant.now();
-            int firstAddress = ipResolver.findFirstGreater(ip);
-            Instant end = Instant.now();
-            Object o = null;
-            if (firstAddress!=-1){
-                o  =ipResolver.freeRanges.get(firstAddress);
-                if (firstAddress!=0)
-                    System.out.println("prev "+ipResolver.freeRanges.get(firstAddress-1));
-            }
-            System.out.println("Find first Greater "+ ip +", found"+firstAddress+"" +
-                    "" + o +
-                    " : " + (end.toEpochMilli() - start.toEpochMilli()));
-            return firstAddress;
-        }
+    @Test
+    void testTakeFreeSubnet(){
+        Subnet subnet = ipResolver.takeFreeSubnet(32);
+        assertEquals(1L, ipResolver.getTakenIpsCount(), ".getTakenIpCount()");
+        assertEquals(Subnet.fromString("0.0.0.0/32"), subnet);
+    }
+
+    @Test
+    void testTakeFreeWhenFirstAndThirdAlreadyTaken() {
+        ipResolver.takeSubnet(Subnet.fromString("0.0.0.0/32"));
+        ipResolver.takeSubnet(Subnet.fromString("0.0.0.2/32"));
+        Subnet subnet = ipResolver.takeFreeSubnet(32);
+        assertEquals(3L, ipResolver.getTakenIpsCount(), ".getTakenIpCount()");
+        assertEquals(Subnet.fromString("0.0.0.1/32"), subnet);
+    }
+
+    @Test
+    void testTakeFreeWhenMaskIs31AndFirstAndThirdAlreadyTaken() {
+        ipResolver.takeSubnet(Subnet.fromString("0.0.0.0/32"));
+        ipResolver.takeSubnet(Subnet.fromString("0.0.0.2/32"));
+        Subnet subnet = ipResolver.takeFreeSubnet(31);
+        assertEquals(4L, ipResolver.getTakenIpsCount(), ".getTakenIpCount()");
+        assertEquals(Subnet.fromString("0.0.0.4/31"), subnet);
+    }
+
+    @Test
+    void testTakeFreeWhenNoPlaceOnFirst(){
+        ipResolver.takeSubnet(Subnet.fromString("0.0.0.63/32"));
+        Subnet subnet = ipResolver.takeFreeSubnet(26);
+        assertEquals(Subnet.fromString("0.0.0.64/26"), subnet);
+    }
+
+    @Test
+    void testTakeFreeWhenNoPlaceOnFirstAndThird() {
+        ipResolver.takeSubnet(Subnet.fromString("0.0.0.63/32"));
+        ipResolver.takeSubnet(Subnet.fromString("0.0.0.64/32"));
+        Subnet subnet = ipResolver.takeFreeSubnet(26);
+        assertEquals(Subnet.fromString("0.0.0.128/26"), subnet);
+    }
+
+    @Test
+    void testTakeFreeWhenNoIpLeft(){
+        ipResolver = new IpResolver(Subnet.fromString("0.0.0.0/32"));
+        ipResolver.takeSubnet(Subnet.fromString("0.0.0.0/32"));
+        assertThrows(NoFreeIpException.class, () -> ipResolver.takeFreeSubnet(32));
+    }
+
+    @Test
+    void testTakeFreeWhenNoIpWithMaskLeft() {
+        ipResolver = new IpResolver(Subnet.fromString("0.0.0.0/29"));
+        ipResolver.takeSubnet(Subnet.fromString("0.0.0.4/32"));
+        assertThrows(NoFreeIpException.class, () -> ipResolver.takeFreeSubnet(29));
+    }
+
 }
