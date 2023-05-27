@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,7 +27,7 @@ public class WgManager {
     @Autowired
     public WgManager(WgTool wgTool,
                      @Value("${wg.interface.subnet}") String subnet,
-                     @Value("${wg.interface.ip") String interfaceIp) {
+                     @Value("${wg.interface.ip}") String interfaceIp) {
         WgManager.wgTool = wgTool;
         Subnet allowedSubnet = Subnet.fromString(subnet);
         wgIpResolver = new IpResolver(allowedSubnet);
@@ -65,11 +66,18 @@ public class WgManager {
     }
 
 
+
+
     public WgPeer createPeer(){
-        String privateKey = wgTool.generatePrivateKey();
-        String publicKey = wgTool.generatePublicKey(privateKey);
-        String presharedKey = wgTool.generatePresharedKey();
+        String privateKey = wgTool.generatePrivateKey().strip();
+        String publicKey = wgTool.generatePublicKey(privateKey.strip()).strip();
+        String presharedKey = wgTool.generatePresharedKey().strip();
         Subnet address = wgIpResolver.takeFreeSubnet(defaultMask);
+        System.out.println(address.toString());
+        System.out.println(publicKey);
+        System.out.println(presharedKey);
+        System.out.println(interfaceName);
+        wgTool.addPeer(interfaceName, publicKey, presharedKey, address.toString(), 0);
         return WgPeer.withPublicKey(publicKey)
                 .presharedKey(presharedKey)
                 .allowedIps(address.toString())

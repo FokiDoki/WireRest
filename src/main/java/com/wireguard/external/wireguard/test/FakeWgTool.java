@@ -27,11 +27,26 @@ public class FakeWgTool extends WgTool {
 
     @Override
     public String generatePrivateKey() {
-        return null;
+        return "FAKEprv/"+generateRandomString(35)+"=\\r\\n";
     }
+
+    private String generateRandomString(int length) {
+        return Stream.generate(() -> "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz")
+                .limit(length)
+                .mapToInt(n -> (int) (n.charAt((int) (Math.random() * n.length()))))
+                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                .toString();
+    }
+
 
     @Override
     public String generatePublicKey(String privateKey) {
-        return null;
+        return "FAKEpub/"+generateRandomString(35)+"=\\r\\n";
     }
+
+    @Override
+    public String generatePresharedKey() {
+        return "FAKEpsk/"+generateRandomString(35)+"=\\r\\n";
+    }
+
 }
