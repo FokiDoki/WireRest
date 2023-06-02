@@ -6,6 +6,7 @@ import com.wireguard.api.ResourceNotFoundException;
 import com.wireguard.external.wireguard.ParsingException;
 import com.wireguard.external.wireguard.WgManager;
 import com.wireguard.external.wireguard.WgPeer;
+import com.wireguard.external.wireguard.dto.CreatedPeer;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -46,7 +47,7 @@ public class PeerController {
     @GetMapping("/peers")
     public List<WgPeer> getPeers() throws ParsingException {
         return wgManager.getPeers();
-    }
+    }   
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK",
@@ -60,7 +61,7 @@ public class PeerController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error",
                     content = { @Content(mediaType = "application/json",
                             schema = @Schema(implementation = AppError.class)) }) })
-    @GetMapping("/peer/{public_key}")
+    @GetMapping("/peer/{public_key}") //FIX BUG WITH CRASH WHEN / IN PATH
     public WgPeer getPeerByPublicKey(
             @PathVariable(name = "public_key") String publicKey) throws ParsingException {
         Optional<WgPeer> peer =  wgManager.getPeerByPublicKey(publicKey);
@@ -76,7 +77,7 @@ public class PeerController {
                     content = {
                             @Content(
                                     mediaType = "application/json",
-                                    schema = @Schema(implementation = WgPeer.class)
+                                    schema = @Schema(implementation = CreatedPeer.class)
                             )
                     }
             ),
@@ -84,7 +85,7 @@ public class PeerController {
                     content = { @Content(mediaType = "application/json",
                             schema = @Schema(implementation = AppError.class)) }) })
     @PostMapping("/peer/create")
-    public WgPeer createPeer() {
+    public CreatedPeer createPeer() {
         return wgManager.createPeer();
     }
 

@@ -1,6 +1,7 @@
 package com.wireguard.external.wireguard;
 
 import com.wireguard.external.shell.ShellRunner;
+import com.wireguard.external.wireguard.dto.CreatedPeer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,15 +82,18 @@ public class WgManager {
     }
 
 
-    public WgPeer createPeer(){
+    public CreatedPeer createPeer(){
         String privateKey = wgTool.generatePrivateKey().strip();
         String publicKey = wgTool.generatePublicKey(privateKey.strip()).strip();
         String presharedKey = wgTool.generatePresharedKey().strip();
         Subnet address = wgIpResolver.takeFreeSubnet(defaultMask);
         wgTool.addPeer(interfaceName, publicKey, presharedKey, address.toString(), 0);
-        return WgPeer.withPublicKey(publicKey)
-                .presharedKey(presharedKey)
-                .allowedIPv4Ips(Set.of(address.toString()))
-                .build();
+        return new CreatedPeer(
+                publicKey,
+                presharedKey,
+                privateKey,
+                address.toString(),
+                0
+        );
     }
 }
