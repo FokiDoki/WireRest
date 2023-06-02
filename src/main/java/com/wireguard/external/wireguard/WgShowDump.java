@@ -10,6 +10,4 @@ import java.util.List;
 public class WgShowDump {
     private final WgInterface wgInterface;
     private final List<WgPeer> peers;
-
-
 }

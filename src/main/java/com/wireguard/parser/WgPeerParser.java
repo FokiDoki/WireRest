@@ -3,11 +3,8 @@ package com.wireguard.parser;
 import com.wireguard.external.wireguard.WgPeer;
 import org.springframework.util.Assert;
 
-import java.net.InetSocketAddress;
-import java.sql.Timestamp;
-import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class WgPeerParser {
    public static WgPeer parse(String wgShowPeerDump, String splitter){
@@ -25,45 +22,37 @@ public class WgPeerParser {
 
 
         return WgPeer.
-                withPublicKey(parseAndValidatePublicKey( WgShowPeerDump.get(0) ))
-                .presharedKey(parseAndValidatePresharedKey(WgShowPeerDump.get(1)))
+                withPublicKey( WgShowPeerDump.get(0))
+                .presharedKey(WgShowPeerDump.get(1))
                 .endpoint(parseEndpoint(WgShowPeerDump.get(2)))
-                .allowedIps(parseAndValidateAllowedIps(WgShowPeerDump.get(3)))
-                .latestHandshake(parseAndValidateLatestHandshake(WgShowPeerDump.get(4)))
-                .transferRx(parseAndValidateTransferRx(WgShowPeerDump.get(5)))
-                .transferTx(parseAndValidateTransferTx(WgShowPeerDump.get(6)))
+                .allowedIps(parseAllowedIps(WgShowPeerDump.get(3)))
+                .latestHandshake(Long.parseLong(WgShowPeerDump.get(4)))
+                .transferRx(Long.parseLong(WgShowPeerDump.get(5)))
+                .transferTx(Long.parseLong(WgShowPeerDump.get(6)))
                 .persistentKeepalive(parsePersistentKeepalive(WgShowPeerDump.get(7)))
                 .build();
     }
 
-
-    private static String parseAndValidatePublicKey(String publicKey){
-        return Validator.validateKey(publicKey);
-    }
-
-    private static String parseAndValidatePresharedKey(String presharedKey){
-        return Validator.validateKey(presharedKey);
-    }
 
     private static String  parseEndpoint(String endpoint){
         if (endpoint.equals("(none)")) return null;
         return endpoint;
     }
 
-    private static String parseAndValidateAllowedIps(String allowedIps){
-        return allowedIps; //TODO: do validation mechanism   !
-    }
+    private static WgPeer.AllowedIps parseAllowedIps(String allowedIps){
+        Set<String> allowedIpsList = Set.of(allowedIps.split(","));
+        WgPeer.AllowedIps allowedIpsObject = new WgPeer.AllowedIps();
+        for (String allowedIp : allowedIpsList){
 
-    private static Long parseAndValidateLatestHandshake(String latestHandshake){
-        return Long.parseLong(latestHandshake);
-    }
-
-    private static long parseAndValidateTransferRx(String transferRx){
-        return Long.parseLong(transferRx);
-    }
-
-    private static long parseAndValidateTransferTx(String transferTx){
-        return Long.parseLong(transferTx);
+            if (Utils.isIpV4Cidr(allowedIp)){
+                allowedIpsObject.addIpv4(allowedIp);
+            } else if (Utils.isIpV6Cidr(allowedIp)){
+                allowedIpsObject.addIpv6(allowedIp);
+            } else {
+                throw new IllegalArgumentException("WgPeerParser.parseAllowedIps: invalid IP address %s".formatted(allowedIp));
+            }
+        }
+        return allowedIpsObject;
     }
 
     private static int parsePersistentKeepalive(String persistentKeepalive){

@@ -42,7 +42,7 @@ class WgShowDumpParserTest {
         Assertions.assertEquals(11, wgPeers.size());
         WgPeer peer = dump.getPeers().get(0);
         Assertions.assertEquals(FIRST_PEER_ENDPOINT, peer.getEndpoint());
-        Assertions.assertEquals(FIRST_PEER_ALLOWED_IPS, peer.getAllowedIps());
+        Assertions.assertEquals(FIRST_PEER_ALLOWED_IPS, peer.getAllowedIps().toString());
         Assertions.assertEquals(FIRST_PEER_PERSISTENT_KEEPALIVE, peer.getPersistentKeepalive());
         Assertions.assertEquals(FIRST_PEER_LAST_HANDSHAKE_TIME, peer.getLatestHandshake());
 

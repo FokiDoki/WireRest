@@ -21,27 +21,15 @@ public class WgInterfaceParser {
         List<String> wgShowInterfaceData =
                 Utils.trimAll(wgShowArrayWithInterfaceData);
         return new WgInterface(
-                parseAndValidatePrivateKey(wgShowInterfaceData.get(0)),
-                parseAndValidatePublicKey(wgShowInterfaceData.get(1)),
-                parseAndValidateListenPort(wgShowInterfaceData.get(2)),
-                parseAndValidateFwmark(wgShowInterfaceData.get(3))
+                wgShowInterfaceData.get(0),
+                wgShowInterfaceData.get(1),
+                Integer.parseInt(wgShowInterfaceData.get(2)),
+                parseFwmark(wgShowInterfaceData.get(3))
                 );
     }
 
 
-    private static String parseAndValidatePrivateKey(String privateKey){
-        return Validator.validateKey(privateKey);
-    }
-
-    private static String parseAndValidatePublicKey(String publicKey){
-        return Validator.validateKey(publicKey);
-    }
-
-    private static int parseAndValidateListenPort(String listenPort){
-        return Validator.validatePort(listenPort);
-    }
-
-    private static int parseAndValidateFwmark(String fwmark){
+    private static int parseFwmark(String fwmark){
         if (fwmark.equals("off")) return 0;
         return Integer.parseInt(fwmark);
     }

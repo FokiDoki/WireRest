@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.net.InetSocketAddress;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.Set;
 
 public class WgPeerContainerTest {
     WgPeerContainer wgPeerContainer = new WgPeerContainer();
@@ -17,7 +18,7 @@ public class WgPeerContainerTest {
         WgPeer peer1 = WgPeer.withPublicKey("publicKey1")
                         .presharedKey("presharedKey1")
                         .endpoint("192.168.0.1:2222")
-                        .allowedIps("allowedIps1")
+                        .allowedIPv4Ips(Set.of("allowedIps1"))
                         .latestHandshake(12345678)
                         .transferRx(2222)
                         .transferTx(1111)
@@ -26,7 +27,7 @@ public class WgPeerContainerTest {
         WgPeer peer2 = WgPeer.withPublicKey("publi+c/Key=2")
                         .presharedKey("presharedKey2")
                         .endpoint("192.168.0.1:2222")
-                        .allowedIps("allowedIps1")
+                        .allowedIPv4Ips(Set.of("allowedIps1"))
                         .latestHandshake(12345678)
                         .transferRx(2222)
                         .transferTx(1111)

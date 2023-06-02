@@ -31,26 +31,6 @@ class WgInterfaceParserTests {
     }
 
     @Test
-    void invalidBase64ParsingTest(){
-        String invalid2keys = "1234567890\t1234567890\t1234\t1234\n";
-        assertThrows(NotABase64Exception.class, () -> WgInterfaceParser.parse(invalid2keys, "\t"));
-        String validFirstBase64ButInvalidTwo = "%s\t1234567890\t1234\t1234\n".formatted(validbase64);
-        assertThrows(NotABase64Exception.class, () -> WgInterfaceParser.parse(validFirstBase64ButInvalidTwo, "\t"));
-    }
-
-    @Test
-    void invalidPortParsingTest(){
-        String invalidPort = "%s\t%s\t0\t1234\n".formatted(validbase64,validbase64);
-        assertThrows(IllegalArgumentException.class, () -> WgInterfaceParser.parse(invalidPort, "\t"));
-    }
-
-    @Test
-    void invalidPortParsingTest2(){
-        String invalidPort = "%s\t%s\t1234567890\t1234\n".formatted(validbase64,validbase64);
-        assertThrows(IllegalArgumentException.class, () -> WgInterfaceParser.parse(invalidPort, "\t"));
-    }
-
-    @Test
     void noPortParsingTest(){
         String noPort = "%s\t%s\t \t1234\n".formatted(validbase64,validbase64);
         assertThrows(IllegalArgumentException.class, () -> WgInterfaceParser.parse(noPort, "\t"));

@@ -137,7 +137,7 @@ public class Subnet {
     private static byte[] parseIp(String ipStr){
         if (!ipStr.matches(IP_VALIDATE_REGEX)) {
             throw new IllegalArgumentException(
-                    "IpResolver.parseIp: ip value %s is not a valid ip".formatted(ipStr)
+                    "Subnet.parseIp: ip value %s is not a valid ip".formatted(ipStr)
             );
         }
         String[] ipParts = ipStr.split("\\.");
@@ -151,7 +151,7 @@ public class Subnet {
     private static byte[] parseMask(int mask){
         if(mask < 0 || mask > 32){
                 throw new IllegalArgumentException(
-                    "IpResolver.validateMask: mask value %d out of range".formatted(mask)
+                    "Subnet.parseMask: mask value %d out of range".formatted(mask)
             );
         }
         byte[] maskBytes = new byte[4];

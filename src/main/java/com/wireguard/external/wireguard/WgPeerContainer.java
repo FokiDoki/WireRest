@@ -4,7 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -54,5 +56,13 @@ public class WgPeerContainer {
             }
         }
         return null;
+    }
+
+    public Set<String> getIpv4Addresses(){
+        Set<String> ipv4Addresses = new HashSet<>();
+        for(WgPeer peer : peers){
+            ipv4Addresses.addAll(peer.getAllowedIps().getIPv4IPs());
+        }
+        return ipv4Addresses;
     }
 }

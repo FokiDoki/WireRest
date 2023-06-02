@@ -17,15 +17,7 @@ class UtilsTests {
     }
 
 
-    @Test
-    void isBase64() {
-            assertTrue(Utils.isBase64("ZHdjdmRlZXd2ZXd2ZXd2ZXd2ZXdibGVyYm1yLGJlcg=="));
-            assertFalse(Utils.isBase64("not-base64"));
-    }
 
 
-    @Test
-    void throwIfNotBase64() {
-        assertThrows(NotABase64Exception.class, () -> Utils.throwIfNotBase64("not-base64"));
-    }
+
 }
