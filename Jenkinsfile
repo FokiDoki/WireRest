@@ -1,6 +1,11 @@
 pipeline {
     agent any
     stages {
+        stage('CheckMavenVersion') {
+            steps {
+                sh 'mvn -version'
+            }
+        }
         stage('Build') {
             steps {
                 sh 'mvn clean validate compile'
@@ -11,6 +16,6 @@ pipeline {
                 sh 'mvn test'
             }
         }
-        
+
     }
 }
