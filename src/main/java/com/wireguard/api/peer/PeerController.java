@@ -6,6 +6,7 @@ import com.wireguard.api.ResourceNotFoundException;
 import com.wireguard.external.wireguard.ParsingException;
 import com.wireguard.external.wireguard.WgManager;
 import com.wireguard.external.wireguard.WgPeer;
+import com.wireguard.external.wireguard.dto.CreatedPeer;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -13,6 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -45,7 +47,7 @@ public class PeerController {
     @GetMapping("/peers")
     public List<WgPeer> getPeers() throws ParsingException {
         return wgManager.getPeers();
-    }
+    }   
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK",
@@ -59,9 +61,8 @@ public class PeerController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error",
                     content = { @Content(mediaType = "application/json",
                             schema = @Schema(implementation = AppError.class)) }) })
-    @GetMapping("/peer/{public_key}")
-    public WgPeer getPeerByPublicKey(
-            @PathVariable(name = "public_key") String publicKey) throws ParsingException {
+    @GetMapping("/peer")
+    public WgPeer getPeerByPublicKey(String publicKey) throws ParsingException {
         Optional<WgPeer> peer =  wgManager.getPeerByPublicKey(publicKey);
         if (peer.isPresent()){
             return peer.get();
@@ -70,8 +71,22 @@ public class PeerController {
         }
     }
 
-
-
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Created",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = CreatedPeer.class)
+                            )
+                    }
+            ),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = AppError.class)) }) })
+    @PostMapping("/peer/create")
+    public CreatedPeer createPeer() {
+        return wgManager.createPeer();
+    }
 
 
 

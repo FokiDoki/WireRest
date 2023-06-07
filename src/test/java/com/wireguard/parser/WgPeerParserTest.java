@@ -30,7 +30,7 @@ public class WgPeerParserTest {
         Assertions.assertThat(wgPeer.getPublicKey()).isEqualTo(pubkey);
         Assertions.assertThat(wgPeer.getPresharedKey()).isEqualTo(presharedkey);
         Assertions.assertThat(wgPeer.getEndpoint()).isEqualTo("90.90.90.90:2222");
-        Assertions.assertThat(wgPeer.getAllowedIps()).isEqualTo("10.66.66.10/24");
+        Assertions.assertThat(wgPeer.getAllowedIps().toString()).isEqualTo("10.66.66.10/24");
         Assertions.assertThat(wgPeer.getLatestHandshake()).isEqualTo(12345678L);
         Assertions.assertThat(wgPeer.getTransferRx()).isEqualTo(2222);
         Assertions.assertThat(wgPeer.getTransferTx()).isEqualTo(1111);

@@ -14,21 +14,21 @@ public class ShellRunnerWindowsTests {
     private ShellRunner shellRunner = new ShellRunner();
     @Test
     public void run() {
-        String result = shellRunner.execute("cmd.exe /c echo hello");
+        String result = shellRunner.execute(new String[]{"cmd.exe", "/c", "echo hello"});
         Assertions.assertEquals("hello\r\n", result);
     }
 
     @Test
     public void runWhenExeDoesNotExists(){
         assertThatExceptionOfType(ProcessStartException.class).isThrownBy(
-                () -> shellRunner.execute("imnotexists echo hello")
+                () -> shellRunner.execute(new String[]{"imnotexists", "echo", "hello"})
         );
     }
 
     @Test
     public void runWhenExitCodeIsNotZero(){
         assertThatExceptionOfType(CommandExecutionException.class).isThrownBy(
-                () -> shellRunner.execute("cmd.exe /c exit 1")
+                () -> shellRunner.execute(new String[]{"cmd.exe", "/c", "exit 1"})
         );
     }
 

@@ -1,21 +1,132 @@
 package com.wireguard.external.wireguard;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.*;
+import org.springframework.util.Assert;
 
-import java.net.InetSocketAddress;
+import java.util.*;
 
-@Data
-@AllArgsConstructor
+@Getter
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class WgPeer {
     private String publicKey;
-    public String presharedKey;
-    public String endpoint;
-    public String allowedIps;
-    public long latestHandshake;
-    public long transferRx;
-    public long transferTx;
-    public int persistentKeepalive;
+    private String presharedKey;
+    private String endpoint;
+    private AllowedIps allowedIps;
+    private long latestHandshake;
+    private long transferRx;
+    private long transferTx;
+    private int persistentKeepalive;
 
+    public static Builder withPublicKey(String publicKey){
+        return new Builder().publicKey(publicKey);
+    }
+
+    @Data
+    @NoArgsConstructor
+    public static class AllowedIps{
+        private Set<String> IPv4IPs = new HashSet<>();
+        private Set<String> IPv6IPs = new HashSet<>();
+
+        public void addIpv4(String allowedIPv4Ip){
+            IPv4IPs.add(allowedIPv4Ip);
+        }
+
+        public void addIpv6(String allowedIPv6Ip){
+            IPv6IPs.add(allowedIPv6Ip);
+        }
+
+        public List<String> getAllowedIps(){
+            List<String> allowedIps = new ArrayList<>();
+            allowedIps.addAll(IPv4IPs);
+            allowedIps.addAll(IPv6IPs);
+            return allowedIps;
+        }
+
+        public String toString(){
+            return String.join(",", getAllowedIps());
+        }
+        public boolean isEmpty(){
+            return IPv4IPs.isEmpty() && IPv6IPs.isEmpty();
+        }
+    }
+
+
+    public static class Builder{
+        private String publicKey;
+        private String presharedKey;
+        private String endpoint;
+        private AllowedIps allowedIps = new AllowedIps();
+        private long latestHandshake;
+        private long transferRx;
+        private long transferTx;
+        private int persistentKeepalive;
+
+        protected Builder(){}
+
+        public Builder publicKey(String publicKey) {
+            this.publicKey = publicKey;
+            return this;
+        }
+
+        public Builder presharedKey(String presharedKey) {
+            this.presharedKey = presharedKey;
+            return this;
+        }
+
+        public Builder endpoint(String endpoint) {
+            this.endpoint = endpoint;
+            return this;
+        }
+
+        public Builder allowedIPv4Ips(Set<String> allowedIPv4Ips) {
+            this.allowedIps.setIPv4IPs(allowedIPv4Ips);
+            return this;
+        }
+
+        public Builder allowedIPv6Ips(Set<String> allowedIPv6Ips) {
+            this.allowedIps.setIPv6IPs(allowedIPv6Ips);
+            return this;
+        }
+
+        public Builder allowedIps(AllowedIps allowedIps) {
+            this.allowedIps = allowedIps;
+            return this;
+        }
+
+        public Builder latestHandshake(long latestHandshake) {
+            this.latestHandshake = latestHandshake;
+            return this;
+        }
+
+        public Builder transferRx(long transferRx) {
+            this.transferRx = transferRx;
+            return this;
+        }
+
+        public Builder transferTx(long transferTx) {
+            this.transferTx = transferTx;
+            return this;
+        }
+
+        public Builder persistentKeepalive(int persistentKeepalive) {
+            this.persistentKeepalive = persistentKeepalive;
+            return this;
+        }
+
+        public WgPeer build(){
+            Assert.notNull(publicKey, "Public key must not be null");
+            Assert.notNull(presharedKey, "Preshared key must not be null");
+            Assert.isTrue(!allowedIps.isEmpty(), "allowed Ips must not be null");
+            return new WgPeer(publicKey,
+                    presharedKey,
+                    endpoint,
+                    allowedIps,
+                    latestHandshake,
+                    transferRx,
+                    transferTx,
+                    persistentKeepalive);
+        }
+
+    }
 
 }
