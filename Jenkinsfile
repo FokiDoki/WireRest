@@ -23,7 +23,7 @@ pipeline {
         }
         stage('Run'){
             steps {
-                sh 'JAVA_HOME=/usr/lib/jvm/jdk-20 java -jar target/WireguardController-0.2-SNAPSHOT.jar'
+                sh 'JAVA_HOME=/usr/lib/jvm/jdk-20/java -jar target/WireguardController-0.2-SNAPSHOT.jar'
             }
         }
 
