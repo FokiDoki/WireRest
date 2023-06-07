@@ -3,7 +3,7 @@ pipeline {
     stages {
         stage('CheckMavenVersion') {
             steps {
-                sh 'mvn -version'
+                sh 'JAVA_HOME=/usr/lib/jvm/jdk-20 mvn -version'
             }
         }
         stage('Build') {
