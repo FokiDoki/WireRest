@@ -23,7 +23,7 @@ pipeline {
         }
         stage('Run'){
             steps {
-                sh 'sudo /usr/lib/jvm/jdk-20/bin/java -jar target/WireguardController-0.2-SNAPSHOT.jar'
+                sh 'systemctl restart wg_controller_dev'
             }
         }
 
