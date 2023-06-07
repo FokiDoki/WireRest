@@ -8,12 +8,12 @@ pipeline {
         }
         stage('Build') {
             steps {
-                sh 'mvn clean validate compile'
+                sh 'JAVA_HOME=/usr/lib/jvm/jdk-20 mvn clean validate compile'
             }
         }
         stage('Test') {
             steps {
-                sh 'mvn test'
+                sh 'JAVA_HOME=/usr/lib/jvm/jdk-20 mvn test'
             }
         }
 
