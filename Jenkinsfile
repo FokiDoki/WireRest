@@ -16,6 +16,16 @@ pipeline {
                 sh 'JAVA_HOME=/usr/lib/jvm/jdk-20 mvn test'
             }
         }
+        stage('Package') {
+            steps {
+                sh 'JAVA_HOME=/usr/lib/jvm/jdk-20 mvn package'
+            }
+        }
+        stage('Run'){
+            steps {
+                sh 'JAVA_HOME=/usr/lib/jvm/jdk-20 java -jar target/WireguardController-0.2-SNAPSHOT.jar'
+            }
+        }
 
     }
 }
