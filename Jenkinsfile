@@ -23,7 +23,7 @@ pipeline {
         }
         stage('Run'){
             steps {
-                sh '/usr/lib/jvm/jdk-20/bin/java -jar target/WireguardController-0.2-SNAPSHOT.jar'
+                sh 'sudo /usr/lib/jvm/jdk-20/bin/java -jar target/WireguardController-0.2-SNAPSHOT.jar'
             }
         }
 
