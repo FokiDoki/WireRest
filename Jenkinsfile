@@ -21,14 +21,9 @@ pipeline {
                 sh 'JAVA_HOME=/usr/lib/jvm/jdk-20 mvn package'
             }
         }
-        stage('who'){
-            steps {
-                sh 'whoami'
-            }
-        }
         stage('Run'){
             steps {
-                sh 'systemctl restart wg_controller_dev'
+                sh 'sudo systemctl restart wg_controller_dev'
             }
         }
 
