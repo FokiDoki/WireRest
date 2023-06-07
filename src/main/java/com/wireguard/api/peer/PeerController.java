@@ -61,9 +61,8 @@ public class PeerController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error",
                     content = { @Content(mediaType = "application/json",
                             schema = @Schema(implementation = AppError.class)) }) })
-    @GetMapping("/peer/{public_key}") //FIX BUG WITH CRASH WHEN / IN PATH
-    public WgPeer getPeerByPublicKey(
-            @PathVariable(name = "public_key") String publicKey) throws ParsingException {
+    @GetMapping("/peer") 
+    public WgPeer getPeerByPublicKey(String publicKey) throws ParsingException {
         Optional<WgPeer> peer =  wgManager.getPeerByPublicKey(publicKey);
         if (peer.isPresent()){
             return peer.get();
