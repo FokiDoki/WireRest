@@ -1,5 +1,9 @@
 pipeline {
     agent any
+
+    environment {
+        spring.profiles.active="prod"
+    }
     stages {
         stage('Build') {
             steps {
@@ -18,6 +22,7 @@ pipeline {
         }
         stage('Run'){
             steps {
+                sh 'echo ${spring.profiles.active}'
                 sh 'sudo systemctl restart wg_controller_dev'
             }
         }
