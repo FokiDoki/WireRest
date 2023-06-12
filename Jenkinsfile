@@ -22,7 +22,8 @@
             }
             stage('Run'){
                 steps {
-                    sh 'echo ${SPRING_PROFILE}'
+                    sh 'echo spring.active.profiles=${SPRING_PROFILE} > env'
+                    sh 'cp env /etc/default/wg_controller_dev'
                     sh 'sudo systemctl restart wg_controller_dev'
                 }
             }
