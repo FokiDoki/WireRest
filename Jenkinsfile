@@ -4,7 +4,7 @@
         environment {
             RUN_PROFILES="prod"
             RUN_PORT=8081
-            RUN_ARGS="--spring.profiles.active=${RUN_PROFILES} --server.port=${RUN_PORT}"
+            RUN_ARGS="--spring.profiles.active=${RUN_PROFILES} --server.port=${zRUN_PORT}"
         }
         stages {
             stage('Build') {
@@ -31,7 +31,7 @@
             }
             stage('Check'){
                 steps {
-                    sleep 5
+                    sleep 10
                     sh 'curl -s http://127.0.0.1:${RUN_PORT}/interface'
                 }
             }
