@@ -1,31 +1,31 @@
-pipeline {
-    agent any
+    pipeline {
+        agent any
 
-    environment {
-        spring.profiles.active="prod"
-    }
-    stages {
-        stage('Build') {
-            steps {
-                sh 'JAVA_HOME=/usr/lib/jvm/jdk-20 mvn clean validate compile'
-            }
+        environment {
+            SPRING_PROFILE="prod"
         }
-        stage('Test') {
-            steps {
-                sh 'JAVA_HOME=/usr/lib/jvm/jdk-20 mvn test'
+        stages {
+            stage('Build') {
+                steps {
+                    sh 'JAVA_HOME=/usr/lib/jvm/jdk-20 mvn clean validate compile'
+                }
             }
-        }
-        stage('Package') {
-            steps {
-                sh 'JAVA_HOME=/usr/lib/jvm/jdk-20 mvn package'
+            stage('Test') {
+                steps {
+                    sh 'JAVA_HOME=/usr/lib/jvm/jdk-20 mvn test'
+                }
             }
-        }
-        stage('Run'){
-            steps {
-                sh 'echo ${spring.profiles.active}'
-                sh 'sudo systemctl restart wg_controller_dev'
+            stage('Package') {
+                steps {
+                    sh 'JAVA_HOME=/usr/lib/jvm/jdk-20 mvn package'
+                }
             }
-        }
+            stage('Run'){
+                steps {
+                    sh 'echo ${spring.profiles.active}'
+                    sh 'sudo systemctl restart wg_controller_dev'
+                }
+            }
 
+        }
     }
-}
