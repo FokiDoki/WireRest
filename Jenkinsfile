@@ -2,7 +2,9 @@
         agent any
 
         environment {
-            RUN_ARGS="--spring.profiles.active=prod"
+            RUN_PROFILES="prod"
+            RUN_PORT=8081
+            RUN_ARGS="--spring.profiles.active=${RUN_PROFILES} --server.port=${RUN_PORT}"
         }
         stages {
             stage('Build') {
@@ -27,6 +29,14 @@
                     sh 'sudo systemctl restart wg_controller_dev'
                 }
             }
+            stage('Check'){
+                steps {
+                    sleep 5
+                    sh 'curl -s http://127.0.0.1:${RUN_PORT}/interface'
+                }
+
+
+
 
         }
     }
