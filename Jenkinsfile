@@ -4,7 +4,7 @@
         environment {
             RUN_PROFILES="prod"
             RUN_PORT=8081
-            RUN_ARGS="--spring.profiles.active=${RUN_PROFILES} --server.port=${zRUN_PORT}"
+            RUN_ARGS="--spring.profiles.active=${RUN_PROFILES} --server.port=${RUN_PORT}"
         }
         stages {
             stage('Build') {
