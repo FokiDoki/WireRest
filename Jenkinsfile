@@ -2,7 +2,7 @@
         agent any
 
         environment {
-            SPRING_PROFILE="prod"
+            RUN_ARGS="--spring.profiles.active=prod"
         }
         stages {
             stage('Build') {
@@ -22,7 +22,7 @@
             }
             stage('Run'){
                 steps {
-                    sh 'echo spring.active.profiles=${SPRING_PROFILE} > env'
+                    sh 'echo ARGS=${RUN_ARGS} > env'
                     sh 'sudo cp env /etc/default/wg_controller_dev'
                     sh 'sudo systemctl restart wg_controller_dev'
                 }
