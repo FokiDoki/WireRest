@@ -22,7 +22,7 @@
             }
             stage('Run'){
                 steps {
-                    sh 'echo ${spring.profiles.active}'
+                    sh 'echo ${SPRING_PROFILE}'
                     sh 'sudo systemctl restart wg_controller_dev'
                 }
             }
