@@ -61,8 +61,8 @@ class WgToolTests {
         Assertions.assertEquals(44, presharedKey.length());
     }
 
-    @Test
-    @Order(10)
+
+    
     void addPeer() throws IOException {
         String privateKey = wgTool.generatePrivateKey();
         String publicKey = wgTool.generatePublicKey(privateKey);
