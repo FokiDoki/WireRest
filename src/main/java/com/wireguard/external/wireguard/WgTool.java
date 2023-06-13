@@ -30,7 +30,7 @@ public class WgTool {
         } else {
             command = new String[]{"/bin/sh", "-c", commandStr};
         }
-        return shell.execute(command);
+        return shell.execute(command).strip();
     }
 
     private String run(String commandStr) {
@@ -43,12 +43,12 @@ public class WgTool {
     }
 
     public String generatePrivateKey() {
-        return run(WG_GENKEY_COMMAND).strip();
+        return run(WG_GENKEY_COMMAND);
     }
 
 
     public String generatePublicKey(String privateKey) {
-        return run(WG_PUBKEY_COMMAND.formatted(privateKey)).strip();
+        return run(WG_PUBKEY_COMMAND.formatted(privateKey));
     }
 
     private void createFile(String path, String content) {
