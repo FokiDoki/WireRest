@@ -18,19 +18,20 @@ import java.util.Optional;
 class WgToolTests {
     private final static ShellRunner shellRunner = new ShellRunner();
     private final static String interfaceName = "wg_cont_test";
+    private final static File wgConfigFile = new File("src/test/resources/%s.conf".formatted(interfaceName));
+
     private final static String interfacePublicKey = "sBdtuH6Q84CmecM+A832NOyAb9Oz0W7rJdPCR/JS63I=";
     private final static WgTool wgTool = new WgTool();
     @BeforeEach
     void setUpEnvironment() {
-        File wgConfigFile = new File("src/test/resources/%s.conf".formatted(interfaceName));
-        String pathToWgConfig = wgConfigFile.getAbsolutePath();
-        String resultOfCommand = shellRunner.execute(new String[]{"sudo","wg-quick", "up", pathToWgConfig}, List.of(0,1));
+
+        String resultOfCommand = shellRunner.execute(new String[]{"sudo","wg-quick", "up", wgConfigFile.getAbsolutePath()}, List.of(0,1));
         Assertions.assertFalse(resultOfCommand.contains("wg-quick:"));
     }
 
     @AfterTestClass
     public void tearDownEnvironment() {
-        String resultOfCommand = shellRunner.execute(new String[]{"sudo","wg-quick", "down", interfaceName}, List.of(0,1));
+        String resultOfCommand = shellRunner.execute(new String[]{"sudo","wg-quick", "down", wgConfigFile.getAbsolutePath()}, List.of(0,1));
         Assertions.assertFalse(resultOfCommand.contains("wg-quick:"));
     }
     @Test
