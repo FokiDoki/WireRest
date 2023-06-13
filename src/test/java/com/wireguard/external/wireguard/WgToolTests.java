@@ -38,7 +38,7 @@ class WgToolTests {
     void showDump() throws IOException {
         WgShowDump dump = wgTool.showDump(interfaceName);
         Assertions.assertNotNull(dump);
-        Assertions.assertEquals(interfacePublicKey, dump.wgInterface().getPublicKey());
+        Assertions.assertEquals(interfacePublicKey, dump.wgInterface().getPrivateKey());
         Assertions.assertEquals(3, dump.peers().size());
     }
 
