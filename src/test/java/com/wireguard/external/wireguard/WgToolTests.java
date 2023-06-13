@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @EnabledOnOs(OS.LINUX)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class WgToolTests {
     private final static ShellRunner shellRunner = new ShellRunner();
     private final static String interfaceName = "wg_cont_test";
@@ -61,8 +62,8 @@ class WgToolTests {
         Assertions.assertEquals(44, presharedKey.length());
     }
 
-
-    
+    @Test
+    @Order(10)
     void addPeer() throws IOException {
         String privateKey = wgTool.generatePrivateKey();
         String publicKey = wgTool.generatePublicKey(privateKey);
