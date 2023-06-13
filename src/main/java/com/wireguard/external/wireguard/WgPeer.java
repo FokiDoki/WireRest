@@ -121,8 +121,6 @@ public class WgPeer {
 
         public WgPeer build(){
             Assert.notNull(publicKey, "Public key must not be null");
-            Assert.notNull(presharedKey, "Preshared key must not be null");
-            Assert.isTrue(!allowedIps.isEmpty(), "allowed Ips must not be null");
             return new WgPeer(publicKey,
                     presharedKey,
                     endpoint,
