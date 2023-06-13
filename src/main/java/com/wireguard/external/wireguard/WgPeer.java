@@ -27,6 +27,20 @@ public class WgPeer {
         return new Builder().publicKey(publicKey);
     }
 
+    @Override
+    public String toString() {
+        return "WgPeer{" +
+                "publicKey='" + publicKey + '\'' +
+                ", presharedKey='" + presharedKey + '\'' +
+                ", endpoint='" + endpoint + '\'' +
+                ", allowedIps=" + allowedIps.toString() +
+                ", latestHandshake=" + latestHandshake +
+                ", transferRx=" + transferRx +
+                ", transferTx=" + transferTx +
+                ", persistentKeepalive=" + persistentKeepalive +
+                '}';
+    }
+
     @Data
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class AllowedIps{
