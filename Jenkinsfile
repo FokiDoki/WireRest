@@ -9,16 +9,12 @@
 
         }
         stages {
-            stage('Build') {
+            stage('Build/Test') {
                 steps {
-                    sh 'JAVA_HOME=/usr/lib/jvm/jdk-20 mvn clean validate compile'
+                    sh 'JAVA_HOME=/usr/lib/jvm/jdk-20 mvn clean validate compile test'
                 }
             }
-            stage('Test') {
-                steps {
-                    sh 'JAVA_HOME=/usr/lib/jvm/jdk-20 mvn test'
-                }
-            }
+    
             stage('Package') {
                 steps {
                     sh 'JAVA_HOME=/usr/lib/jvm/jdk-20 mvn package'
