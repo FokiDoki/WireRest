@@ -4,7 +4,6 @@ import com.wireguard.external.shell.ShellRunner;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
-import org.springframework.test.context.event.annotation.AfterTestClass;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,8 +25,8 @@ class WgToolTests {
         Assertions.assertFalse(resultOfCommand.contains("wg-quick:"));
     }
 
-    @AfterTestClass
-    public void tearDownEnvironment() {
+    @AfterAll
+    static void tearDownEnvironment() {
         String resultOfCommand = shellRunner.execute(new String[]{"sudo","wg-quick", "down", wgConfigFile.getAbsolutePath()}, List.of(0,1));
         Assertions.assertFalse(resultOfCommand.contains("wg-quick:"));
     }
