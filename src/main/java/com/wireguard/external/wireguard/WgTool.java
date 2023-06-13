@@ -38,7 +38,7 @@ public class WgTool {
     }
 
     public WgShowDump showDump(String interfaceName) throws IOException {
-        String dumpString = run(WG_SHOW_DUMP_COMMAND.formatted(interfaceName));
+        String dumpString = run(WG_SHOW_DUMP_COMMAND.formatted(interfaceName), true);
         return WgShowDumpParser.fromDump(dumpString);
     }
 
