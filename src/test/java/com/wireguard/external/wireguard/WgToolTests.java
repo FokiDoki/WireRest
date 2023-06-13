@@ -36,6 +36,7 @@ class WgToolTests {
         WgShowDump dump = wgTool.showDump(interfaceName);
         Assertions.assertNotNull(dump);
         Assertions.assertEquals(interfacePublicKey, dump.wgInterface().getPrivateKey());
+        System.out.println(dump.peers().toString());
         Assertions.assertEquals(3, dump.peers().size());
     }
 
