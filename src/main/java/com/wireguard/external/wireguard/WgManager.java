@@ -2,6 +2,7 @@ package com.wireguard.external.wireguard;
 
 import com.wireguard.external.shell.ShellRunner;
 import com.wireguard.external.wireguard.dto.CreatedPeer;
+import com.wireguard.external.wireguard.dto.WgPeerDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,12 +52,10 @@ public class WgManager {
 
 
     public WgInterface getInterface()  {
-        return getDump().getWgInterface();
+        return getDump().wgInterface();
     }
 
-    public List<WgPeer> getPeers()  {
-        return getDump().getPeers();
-    }
+
 
     private WgShowDump getDump() {
         try{
@@ -67,14 +66,13 @@ public class WgManager {
         }
     }
 
-    public Optional<WgPeer> getPeerByPublicKey(String publicKey) throws ParsingException {
+    public Optional<WgPeerDTO> getPeerByPublicKey(String publicKey) throws ParsingException {
         WgPeerContainer peerContainer = getWgPeerContainer();
-        WgPeer wgPeer = peerContainer.getByPublicKey(publicKey);
-        return Optional.ofNullable(wgPeer);
+        return peerContainer.getDTOByPublicKey(publicKey);
     }
 
     private WgPeerContainer getWgPeerContainer()  {
-        List<WgPeer> peers = getPeers();
+        List<WgPeer> peers = getDump().peers();
         return new WgPeerContainer(peers);
     }
 
@@ -83,6 +81,10 @@ public class WgManager {
         return peerContainer.getIpv4Addresses();
     }
 
+    public Set<WgPeerDTO> getPeers(){
+        WgPeerContainer peerContainer = getWgPeerContainer();
+        return peerContainer.toDTOSet();
+    }
 
     public CreatedPeer createPeer(){
         String privateKey = wgTool.generatePrivateKey().strip();

@@ -1,9 +1,15 @@
 package com.wireguard.external.wireguard;
 
-import lombok.*;
+import java.util.HashSet;
+import java.util.Set;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.util.Assert;
 
-import java.util.*;
+
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
@@ -17,12 +23,12 @@ public class WgPeer {
     private long transferTx;
     private int persistentKeepalive;
 
-    public static Builder withPublicKey(String publicKey){
+    public static Builder withPublicKey(String publicKey) {
         return new Builder().publicKey(publicKey);
     }
 
     @Data
-    @NoArgsConstructor
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class AllowedIps{
         private Set<String> IPv4IPs = new HashSet<>();
         private Set<String> IPv6IPs = new HashSet<>();
@@ -35,15 +41,15 @@ public class WgPeer {
             IPv6IPs.add(allowedIPv6Ip);
         }
 
-        public List<String> getAllowedIps(){
-            List<String> allowedIps = new ArrayList<>();
+        public Set<String> getAll(){
+            Set<String> allowedIps = new HashSet<>();
             allowedIps.addAll(IPv4IPs);
             allowedIps.addAll(IPv6IPs);
             return allowedIps;
         }
-
+        @Override
         public String toString(){
-            return String.join(",", getAllowedIps());
+            return String.join(",", getAll());
         }
         public boolean isEmpty(){
             return IPv4IPs.isEmpty() && IPv6IPs.isEmpty();
