@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 @Profile("prod")
 @Component
@@ -22,9 +23,18 @@ public class WgTool {
     protected final ShellRunner shell = new ShellRunner();
 
 
-    private String run(String commandStr) {
-        String[] command = new String[]{"/bin/sh", "-c", commandStr};
+    private String run(String commandStr, Boolean privileged) {
+        String[] command;
+        if (privileged) {
+            command = new String[]{"sudo", "/bin/sh", "-c", commandStr};
+        } else {
+            command = new String[]{"/bin/sh", "-c", commandStr};
+        }
         return shell.execute(command);
+    }
+
+    private String run(String commandStr) {
+        return run(commandStr, false);
     }
 
     public WgShowDump showDump(String interfaceName) throws IOException {
@@ -59,7 +69,7 @@ public class WgTool {
         createFile(presharedKeyPath, presharedKey);
         try{
             run(WG_ADD_PEER_COMMAND.formatted(
-                interfaceName, publicKey, presharedKeyPath, allowedIps, persistentKeepalive));
+                interfaceName, publicKey, presharedKeyPath, allowedIps, persistentKeepalive), true);
         } finally {
             deleteFile(presharedKeyPath);
         }
