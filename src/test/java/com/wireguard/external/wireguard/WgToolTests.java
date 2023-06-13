@@ -31,7 +31,7 @@ class WgToolTests {
         Assertions.assertFalse(resultOfCommand.contains("wg-quick:"));
     }
     @Test
-    @Order(20)
+    @Order(5)
     void showDump() throws IOException {
         WgShowDump dump = wgTool.showDump(interfaceName);
         Assertions.assertNotNull(dump);
