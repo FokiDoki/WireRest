@@ -48,7 +48,7 @@ class WgToolTests {
     }
 
     @Test
-    void generatePublicKey() {w
+    void generatePublicKey() {
         String privateKey = wgTool.generatePrivateKey();
         String publicKey = wgTool.generatePublicKey(privateKey);
         Assertions.assertNotNull(publicKey);
