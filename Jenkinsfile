@@ -4,7 +4,9 @@
         environment {
             RUN_PROFILES="prod"
             RUN_PORT=8081
+            SERVICE_NAME="wg_controller_dev"
             RUN_ARGS="--spring.profiles.active=${RUN_PROFILES} --server.port=${RUN_PORT}"
+
         }
         stages {
             stage('Build') {
@@ -25,8 +27,8 @@
             stage('Run'){
                 steps {
                     sh 'echo ARGS=${RUN_ARGS} > env'
-                    sh 'sudo cp env /etc/default/wg_controller_dev'
-                    sh 'sudo systemctl restart wg_controller_dev'
+                    sh 'sudo cp env /etc/default/${SERVICE_NAME}'
+                    sh 'sudo systemctl restart ${SERVICE_NAME}'
                 }
             }
             stage('Check'){
