@@ -16,7 +16,7 @@ import java.util.Optional;
 @EnabledOnOs(OS.LINUX)
 class WgToolTests {
     private final static ShellRunner shellRunner = new ShellRunner();
-    private final static String interfaceName = "wg-cont-test";
+    private final static String interfaceName = "wg_cont_test";
     private final static String interfacePublicKey = "sBdtuH6Q84CmecM+A832NOyAb9Oz0W7rJdPCR/JS63I=";
     private final static WgTool wgTool = new WgTool();
     @BeforeEach
