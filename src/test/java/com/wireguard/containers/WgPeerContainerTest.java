@@ -38,19 +38,26 @@ public class WgPeerContainerTest {
     }
 
     @Test
+    public void testIsPresent(){
+        Assertions.assertTrue(wgPeerContainer.getByPublicKey("publicKey1").isPresent());
+    }
+
+    @Test
     public void testGetByPublicKey() {
-        WgPeer wgPeer = wgPeerContainer.getByPublicKey("publicKey1");
+        WgPeer wgPeer = wgPeerContainer.getByPublicKey("publicKey1").get();
         Assertions.assertEquals("publicKey1", wgPeer.getPublicKey());
     }
     @Test
     public void testGetByPublicKey2() {
-        WgPeer wgPeer = wgPeerContainer.getByPublicKey("publi+c/Key=2");
+        WgPeer wgPeer = wgPeerContainer.getByPublicKey("publi+c/Key=2").get();
         Assertions.assertEquals("publi+c/Key=2", wgPeer.getPublicKey());
     }
 
     @Test
     public void testGetByPreSharedKey() {
-        WgPeer wgPeer = wgPeerContainer.getByPresharedKey("presharedKey1");
+        WgPeer wgPeer = wgPeerContainer.getByPresharedKey("presharedKey1").get();
         Assertions.assertEquals("presharedKey1", wgPeer.getPresharedKey());
     }
+
+
 }

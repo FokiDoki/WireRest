@@ -33,12 +33,12 @@ public class WgTool {
     }
 
     public String generatePrivateKey() {
-        return run(WG_GENKEY_COMMAND);
+        return run(WG_GENKEY_COMMAND).strip();
     }
 
 
     public String generatePublicKey(String privateKey) {
-        return run(WG_PUBKEY_COMMAND.formatted(privateKey));
+        return run(WG_PUBKEY_COMMAND.formatted(privateKey)).strip();
     }
 
     private void createFile(String path, String content) {

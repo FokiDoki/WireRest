@@ -1,12 +1,12 @@
 package com.wireguard.external.wireguard;
 
+import com.wireguard.external.wireguard.dto.WgPeerDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Data
 @AllArgsConstructor
@@ -40,29 +40,48 @@ public class WgPeerContainer {
         return peers.size();
     }
 
-    public WgPeer getByPublicKey(String publicKey){
+    public Optional<WgPeer> getByPublicKey(String publicKey){
         for(WgPeer peer : peers){
             if(peer.getPublicKey().equals(publicKey)){
-                return peer;
+                return Optional.of(peer);
             }
         }
-        return null;
+        return Optional.empty();
     }
 
-    public WgPeer getByPresharedKey(String presharedKey){
+    public Optional<WgPeer> getByPresharedKey(String presharedKey){
         for(WgPeer peer : peers){
             if(peer.getPresharedKey().equals(presharedKey)){
-                return peer;
+                return Optional.of(peer);
             }
         }
-        return null;
+        return Optional.empty();
+    }
+
+    public Optional<WgPeerDTO> getDTOByPublicKey(String publicKey){
+        Optional<WgPeer> peer = getByPublicKey(publicKey);
+        return peer.map(WgPeerDTO::from);
+    }
+
+    public Optional<WgPeerDTO> getDTOByPresharedKey(String presharedKey){
+        Optional<WgPeer> peer = getByPresharedKey(presharedKey);
+        return peer.map(WgPeerDTO::from);
     }
 
     public Set<String> getIpv4Addresses(){
-        Set<String> ipv4Addresses = new HashSet<>();
-        for(WgPeer peer : peers){
-            ipv4Addresses.addAll(peer.getAllowedIps().getIPv4IPs());
-        }
-        return ipv4Addresses;
+        return peers.stream()
+                .map(peer -> peer.getAllowedIps().getIPv4IPs())
+                .flatMap(Collection::stream)
+                .collect(Collectors.toSet());
+    }
+
+    public Set<WgPeer> toSet(){
+        return new HashSet<>(peers);
+    }
+
+    public Set<WgPeerDTO> toDTOSet(){
+        return peers.stream()
+                .map(WgPeerDTO::from)
+                .collect(Collectors.toSet());
     }
 }

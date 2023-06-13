@@ -7,9 +7,12 @@ import com.wireguard.external.shell.ShellRunner;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
+
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-@EnabledIfSystemProperty(named = "os.name", matches = "Windows.*")
+@EnabledOnOs(OS.WINDOWS)
 public class ShellRunnerWindowsTests {
     private ShellRunner shellRunner = new ShellRunner();
     @Test

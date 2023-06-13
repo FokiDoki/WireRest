@@ -18,7 +18,7 @@ import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.function.Function;
 
-@Data
+
 public class WgShowDumpParser {
 
     private static final Logger logger = LoggerFactory.getLogger(WgShowDumpParser.class);
@@ -45,13 +45,6 @@ public class WgShowDumpParser {
         }
     }
 
-    private static String tryReadLine(Scanner scanner) {
-        if (scanner.hasNextLine()) {
-            return scanner.nextLine();
-        } else {
-            throw new NoSuchElementException("Scanner has no more lines");
-        }
-    }
 
     private static List<WgPeer> parsePeers(Scanner peersDump) {
         List<WgPeer> peers = new ArrayList<WgPeer>();

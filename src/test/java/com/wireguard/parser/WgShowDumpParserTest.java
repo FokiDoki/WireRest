@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import java.io.*;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.Set;
 
 class WgShowDumpParserTest {
     private String wgShowDump;
@@ -31,21 +32,43 @@ class WgShowDumpParserTest {
     void fromDumpTest() throws IOException {
         WgShowDump dump = WgShowDumpParser.fromDump(wgShowDump);
 
-        Assertions.assertEquals(16666, dump.getWgInterface().getListenPort());
-        Assertions.assertEquals("Ds123123312G859AO3s1I8vhTgrgrgrgrgrgt9LKF8B=", dump.getWgInterface().getPrivateKey());
-        Assertions.assertEquals("Z1xHdYc+enfengren+nvrenbvnbmegw3gjrejgvfnvn=", dump.getWgInterface().getPublicKey());
+        Assertions.assertEquals(16666, dump.wgInterface().getListenPort());
+        Assertions.assertEquals("Ds123123312G859AO3s1I8vhTgrgrgrgrgrgt9LKF8B=", dump.wgInterface().getPrivateKey());
+        Assertions.assertEquals("Z1xHdYc+enfengren+nvrenbvnbmegw3gjrejgvfnvn=", dump.wgInterface().getPublicKey());
     }
+
     @Test
     void fromDumpTestPeerParsing() throws IOException {
         WgShowDump dump = WgShowDumpParser.fromDump(wgShowDump);
-        WgPeerContainer wgPeers = new WgPeerContainer(dump.getPeers());
+        WgPeerContainer wgPeers = new WgPeerContainer(dump.peers());
         Assertions.assertEquals(11, wgPeers.size());
-        WgPeer peer = dump.getPeers().get(0);
+        WgPeer peer = dump.peers().get(0);
         Assertions.assertEquals(FIRST_PEER_ENDPOINT, peer.getEndpoint());
-        Assertions.assertEquals(FIRST_PEER_ALLOWED_IPS, peer.getAllowedIps().toString());
+        Assertions.assertEquals(Set.of("10.66.66.2/32", "fd42:42:42::2/128"), peer.getAllowedIps().getAll());
         Assertions.assertEquals(FIRST_PEER_PERSISTENT_KEEPALIVE, peer.getPersistentKeepalive());
         Assertions.assertEquals(FIRST_PEER_LAST_HANDSHAKE_TIME, peer.getLatestHandshake());
 
+    }
+
+    @Test
+    void isConstructorPrivate() {
+        Assertions.assertThrows(IllegalAccessException.class, () -> {
+            WgShowDumpParser.class.getDeclaredConstructor().newInstance();
+        });
+    }
+
+    @Test
+    void emptyDumpTest(){
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            WgShowDumpParser.fromDump("");
+        });
+    }
+
+    @Test
+    void invalidDumpTest(){
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            WgShowDumpParser.fromDump("invalid dump");
+        });
     }
 
 }
