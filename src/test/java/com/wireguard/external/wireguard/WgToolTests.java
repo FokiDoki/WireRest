@@ -31,12 +31,11 @@ class WgToolTests {
         Assertions.assertFalse(resultOfCommand.contains("wg-quick:"));
     }
     @Test
-    @Order(1)
+    @Order(20)
     void showDump() throws IOException {
         WgShowDump dump = wgTool.showDump(interfaceName);
         Assertions.assertNotNull(dump);
         Assertions.assertEquals(interfacePublicKey, dump.wgInterface().getPrivateKey());
-        dump.peers().stream().forEach(peer -> System.out.println(peer.toString()));
         Assertions.assertEquals(3, dump.peers().size());
     }
 
@@ -63,7 +62,7 @@ class WgToolTests {
     }
 
     @Test
-    @Order(2)
+    @Order(10)
     void addPeer() throws IOException {
         String privateKey = wgTool.generatePrivateKey();
         String publicKey = wgTool.generatePublicKey(privateKey);
