@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 
 public class ShellRunner {
@@ -22,19 +23,21 @@ public class ShellRunner {
         this.charset = StandardCharsets.UTF_8;
     }
 
-    /*
-    REF: https://github.com/spring-projects/spring-boot/blob/main/spring-boot-project/spring-boot-docker-compose/src/main/java/org/springframework/boot/docker/compose/core/ProcessRunner.java#L101
-     */
 
-    public String execute(String[] command) {
+
+    public String execute(String[] command, List<Integer> allowedExitCodes) {
         Process process = startProcess(command);
         int exitCode = waitForProcess(process);
         String stdout = readInputStream(process.getInputStream());
         String stderr = readInputStream(process.getErrorStream());
-        if (exitCode != 0) {
+        if (!allowedExitCodes.contains(exitCode)) {
             throw new CommandExecutionException(String.join(" ", command), exitCode, stdout, stderr);
         }
         return stdout;
+    }
+
+    public String execute(String[] command){
+        return execute(command, List.of(0));
     }
 
     private Process startProcess(String[] command) {

@@ -10,6 +10,7 @@ import org.junit.jupiter.api.condition.OS;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 @EnabledOnOs(OS.LINUX)
@@ -22,13 +23,13 @@ class WgToolTests {
     void setUpEnvironment() {
         File wgConfigFile = new File("src/test/resources/%s.conf".formatted(interfaceName));
         String pathToWgConfig = wgConfigFile.getAbsolutePath();
-        String resultOfCommand = shellRunner.execute(new String[]{"sudo","wg-quick", "up", pathToWgConfig});
+        String resultOfCommand = shellRunner.execute(new String[]{"sudo","wg-quick", "up", pathToWgConfig}, List.of(0,2));
         Assertions.assertFalse(resultOfCommand.contains("wg-quick:"));
     }
 
     @AfterAll
     static void tearDownEnvironment() {
-        String resultOfCommand = shellRunner.execute(new String[]{"sudo","wg-quick", "down", interfaceName});
+        String resultOfCommand = shellRunner.execute(new String[]{"sudo","wg-quick", "down", interfaceName}, List.of(0,2));
         Assertions.assertFalse(resultOfCommand.contains("wg-quick:"));
     }
     @Test
