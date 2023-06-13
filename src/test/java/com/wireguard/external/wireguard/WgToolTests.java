@@ -22,13 +22,13 @@ class WgToolTests {
     void setUpEnvironment() {
         File wgConfigFile = new File("src/test/resources/%s.conf".formatted(interfaceName));
         String pathToWgConfig = wgConfigFile.getAbsolutePath();
-        String resultOfCommand = shellRunner.execute(new String[]{"sudo","wg-quick", "up", pathToWgConfig});
+        String resultOfCommand = shellRunner.execute(new String[]{"wg-quick", "up", pathToWgConfig});
         Assertions.assertFalse(resultOfCommand.contains("wg-quick:"));
     }
 
     @AfterAll
     static void tearDownEnvironment() {
-        String resultOfCommand = shellRunner.execute(new String[]{"sudo","wg-quick", "down", interfaceName});
+        String resultOfCommand = shellRunner.execute(new String[]{"wg-quick", "down", interfaceName});
         Assertions.assertFalse(resultOfCommand.contains("wg-quick:"));
     }
     @Test
