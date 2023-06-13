@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
+import org.springframework.test.context.event.annotation.AfterTestClass;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,8 +28,8 @@ class WgToolTests {
         Assertions.assertFalse(resultOfCommand.contains("wg-quick:"));
     }
 
-    @AfterAll
-    static void tearDownEnvironment() {
+    @AfterTestClass
+    public void tearDownEnvironment() {
         String resultOfCommand = shellRunner.execute(new String[]{"sudo","wg-quick", "down", interfaceName}, List.of(0,1));
         Assertions.assertFalse(resultOfCommand.contains("wg-quick:"));
     }

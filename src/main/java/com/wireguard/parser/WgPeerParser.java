@@ -48,6 +48,7 @@ public class WgPeerParser {
     private static Map<IpType, Set<String>> filterAllowedIps(String allowedIps){
         Set<String> allowedIpsStringsList = Set.of(allowedIps.split(","));
         Map<IpType, Set<String>> allowedIpsMap = Map.of(IpType.IPV4, new HashSet<>(), IpType.IPV6, new HashSet<>());
+        if (allowedIps.equals("(none)")) return allowedIpsMap;
         allowedIpsStringsList.forEach(allowedIp -> {
             if (Utils.isIpV4Cidr(allowedIp)){
                 allowedIpsMap.get(IpType.IPV4).add(allowedIp);

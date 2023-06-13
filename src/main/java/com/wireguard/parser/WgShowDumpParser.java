@@ -40,7 +40,7 @@ public class WgShowDumpParser {
             List<WgPeer> peers = parsePeers(scanner);
             return new WgShowDump(wgInterface, peers);
         } catch (Exception e) {
-            logger.error("Error while parsing dump %s".formatted(dump));
+            logger.error("Error while parsing dump \n%s".formatted(dump));
             throw e;
         }
     }
