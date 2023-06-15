@@ -22,13 +22,22 @@ public class WgTool {
     protected final ShellRunner shell = new ShellRunner();
 
 
+    private String run(String commandStr, Boolean privileged) {
+        String[] command;
+        if (privileged) {
+            command = new String[]{"sudo", "/bin/sh", "-c", commandStr};
+        } else {
+            command = new String[]{"/bin/sh", "-c", commandStr};
+        }
+        return shell.execute(command).strip();
+    }
+
     private String run(String commandStr) {
-        String[] command = new String[]{"/bin/sh", "-c", commandStr};
-        return shell.execute(command);
+        return run(commandStr, false);
     }
 
     public WgShowDump showDump(String interfaceName) throws IOException {
-        String dumpString = run(WG_SHOW_DUMP_COMMAND.formatted(interfaceName));
+        String dumpString = run(WG_SHOW_DUMP_COMMAND.formatted(interfaceName), true);
         return WgShowDumpParser.fromDump(dumpString);
     }
 
@@ -59,7 +68,7 @@ public class WgTool {
         createFile(presharedKeyPath, presharedKey);
         try{
             run(WG_ADD_PEER_COMMAND.formatted(
-                interfaceName, publicKey, presharedKeyPath, allowedIps, persistentKeepalive));
+                interfaceName, publicKey, presharedKeyPath, allowedIps, persistentKeepalive), true);
         } finally {
             deleteFile(presharedKeyPath);
         }

@@ -2,6 +2,8 @@ package com.wireguard.external.wireguard;
 
 import com.wireguard.external.shell.ShellRunner;
 import com.wireguard.external.wireguard.dto.CreatedPeer;
+import com.wireguard.external.wireguard.dto.WgInterfaceDTO;
+import com.wireguard.external.wireguard.dto.WgPeerDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +12,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -20,81 +21,61 @@ import java.util.Set;
 public class WgManager {
 
     private static final Logger logger = LoggerFactory.getLogger(ShellRunner.class);
-    @Value("${wg.interface.name}")
-    private String interfaceName = "wg0";
-    @Value("${wg.interface.new_cient_subnet_mask}")
-    private int defaultMask;
+    private final WgInterface wgInterface;
+    @Value("${wg.interface.new_client_subnet_mask}")
+    private int defaultMaskForNewClients = 32;
     private final IpResolver wgIpResolver;
-
     private static WgTool wgTool;
 
     @Autowired
-    public WgManager(WgTool wgTool,
-                     @Value("${wg.interface.subnet}") String subnet,
-                     @Value("${wg.interface.ip}") String interfaceIp) {
+    public WgManager(WgTool wgTool, IpResolver wgIpResolver, WgInterface wgInterface) {
         WgManager.wgTool = wgTool;
-
-        Subnet allowedSubnet = Subnet.fromString(subnet);
-        wgIpResolver = new IpResolver(allowedSubnet);
-        Set<String> forbiddenIps = getBusyIpv4Set();
-        forbiddenIps.add(interfaceIp);
-        forbiddenIps.add(allowedSubnet.getIpString());
-        configureIpResolver(forbiddenIps);
-    }
-
-    private void configureIpResolver(Set<String> ipsToExclude){
-        for (String ip : ipsToExclude){
-            wgIpResolver.takeSubnet(Subnet.fromString(ip+"/32"));
-        }
+        this.wgIpResolver = wgIpResolver;
+        this.wgInterface = wgInterface;
     }
 
 
-
-    public WgInterface getInterface()  {
-        return getDump().getWgInterface();
+    public WgInterfaceDTO getInterface()  {
+        return getDump().wgInterfaceDTO();
     }
 
-    public List<WgPeer> getPeers()  {
-        return getDump().getPeers();
-    }
+
 
     private WgShowDump getDump() {
         try{
-            return wgTool.showDump(interfaceName);
+            return wgTool.showDump(wgInterface.name());
         } catch (IOException e) {
             logger.error("Error getting dump", e);
             throw new ParsingException("Error while getting dump", e);
         }
     }
 
-    public Optional<WgPeer> getPeerByPublicKey(String publicKey) throws ParsingException {
+    public Optional<WgPeerDTO> getPeerDTOByPublicKey(String publicKey) throws ParsingException {
         WgPeerContainer peerContainer = getWgPeerContainer();
-        WgPeer wgPeer = peerContainer.getByPublicKey(publicKey);
-        return Optional.ofNullable(wgPeer);
+        return peerContainer.getDTOByPublicKey(publicKey);
     }
 
     private WgPeerContainer getWgPeerContainer()  {
-        List<WgPeer> peers = getPeers();
+        List<WgPeer> peers = getDump().peers();
         return new WgPeerContainer(peers);
     }
 
-    public Set<String> getBusyIpv4Set()  {
+    public Set<WgPeerDTO> getPeers(){
         WgPeerContainer peerContainer = getWgPeerContainer();
-        return peerContainer.getIpv4Addresses();
+        return peerContainer.toDTOSet();
     }
-
 
     public CreatedPeer createPeer(){
         String privateKey = wgTool.generatePrivateKey().strip();
         String publicKey = wgTool.generatePublicKey(privateKey.strip()).strip();
         String presharedKey = wgTool.generatePresharedKey().strip();
-        Subnet address = wgIpResolver.takeFreeSubnet(defaultMask);
-        wgTool.addPeer(interfaceName, publicKey, presharedKey, address.toString(), 0);
+        Subnet address = wgIpResolver.takeFreeSubnet(defaultMaskForNewClients);
+        wgTool.addPeer(wgInterface.name(), publicKey, presharedKey, address.toString(), 0);
         return new CreatedPeer(
                 publicKey,
                 presharedKey,
                 privateKey,
-                address.toString(),
+                Set.of(address.toString()),
                 0
         );
     }

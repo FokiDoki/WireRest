@@ -1,32 +1,18 @@
 package com.wireguard.external.wireguard;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.springframework.util.Assert;
 
-import java.util.Arrays;
 import java.util.List;
 
-
+@EqualsAndHashCode
 public class Subnet {
     private final byte[] ip;
     private final byte[] mask;
     @Getter private final int numericMask;
     private static final String IP_VALIDATE_REGEX = "^((25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)(\\.(?!$)|$)){4}$";
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Subnet subnet = (Subnet) o;
-        return Arrays.equals(ip, subnet.ip) && Arrays.equals(mask, subnet.mask);
-    }
-
-    @Override
-    public int hashCode() {
-        int result = Arrays.hashCode(ip);
-        result = 31 * result + Arrays.hashCode(mask);
-        return result;
-    }
 
     public static Subnet fromString(String subnet){
         Assert.isTrue(subnet.contains("/"), subnet+ " is not a valid subnet");
@@ -107,10 +93,6 @@ public class Subnet {
 
     public String getLastIpString(){
         return bytesIpToString(getLastIpBytes());
-    }
-
-    public int getMask(){
-        return numericMask;
     }
 
     public List<Integer> getFirstIp(){

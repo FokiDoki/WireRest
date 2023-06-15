@@ -2,16 +2,18 @@ package com.wireguard.parser;
 
 
 import com.wireguard.converters.StreamToStringConverter;
-import com.wireguard.external.wireguard.WgPeerContainer;
 import com.wireguard.external.wireguard.WgPeer;
+import com.wireguard.external.wireguard.WgPeerContainer;
 import com.wireguard.external.wireguard.WgShowDump;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.*;
-import java.sql.Timestamp;
-import java.time.Instant;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Set;
 
 class WgShowDumpParserTest {
     private String wgShowDump;
@@ -31,21 +33,43 @@ class WgShowDumpParserTest {
     void fromDumpTest() throws IOException {
         WgShowDump dump = WgShowDumpParser.fromDump(wgShowDump);
 
-        Assertions.assertEquals(16666, dump.getWgInterface().getListenPort());
-        Assertions.assertEquals("Ds123123312G859AO3s1I8vhTgrgrgrgrgrgt9LKF8B=", dump.getWgInterface().getPrivateKey());
-        Assertions.assertEquals("Z1xHdYc+enfengren+nvrenbvnbmegw3gjrejgvfnvn=", dump.getWgInterface().getPublicKey());
+        Assertions.assertEquals(16666, dump.wgInterfaceDTO().getListenPort());
+        Assertions.assertEquals("Ds123123312G859AO3s1I8vhTgrgrgrgrgrgt9LKF8B=", dump.wgInterfaceDTO().getPrivateKey());
+        Assertions.assertEquals("Z1xHdYc+enfengren+nvrenbvnbmegw3gjrejgvfnvn=", dump.wgInterfaceDTO().getPublicKey());
     }
+
     @Test
     void fromDumpTestPeerParsing() throws IOException {
         WgShowDump dump = WgShowDumpParser.fromDump(wgShowDump);
-        WgPeerContainer wgPeers = new WgPeerContainer(dump.getPeers());
+        WgPeerContainer wgPeers = new WgPeerContainer(dump.peers());
         Assertions.assertEquals(11, wgPeers.size());
-        WgPeer peer = dump.getPeers().get(0);
+        WgPeer peer = dump.peers().get(0);
         Assertions.assertEquals(FIRST_PEER_ENDPOINT, peer.getEndpoint());
-        Assertions.assertEquals(FIRST_PEER_ALLOWED_IPS, peer.getAllowedIps().toString());
+        Assertions.assertEquals(Set.of("10.66.66.2/32", "fd42:42:42::2/128"), peer.getAllowedIps().getAll());
         Assertions.assertEquals(FIRST_PEER_PERSISTENT_KEEPALIVE, peer.getPersistentKeepalive());
         Assertions.assertEquals(FIRST_PEER_LAST_HANDSHAKE_TIME, peer.getLatestHandshake());
 
+    }
+
+    @Test
+    void isConstructorPrivate() {
+        Assertions.assertThrows(IllegalAccessException.class, () -> {
+            WgShowDumpParser.class.getDeclaredConstructor().newInstance();
+        });
+    }
+
+    @Test
+    void emptyDumpTest(){
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            WgShowDumpParser.fromDump("");
+        });
+    }
+
+    @Test
+    void invalidDumpTest(){
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            WgShowDumpParser.fromDump("invalid dump");
+        });
     }
 
 }

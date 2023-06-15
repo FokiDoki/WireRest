@@ -3,9 +3,8 @@ package com.wireguard.external.wireguard;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.time.Instant;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class IpResolverTest {
     private static final Subnet SUBNET = Subnet.fromString("0.0.0.0/16");

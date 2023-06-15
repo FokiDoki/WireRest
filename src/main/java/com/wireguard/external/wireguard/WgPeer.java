@@ -3,10 +3,14 @@ package com.wireguard.external.wireguard;
 import lombok.*;
 import org.springframework.util.Assert;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
+
 
 @Getter
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class WgPeer {
     private String publicKey;
     private String presharedKey;
@@ -17,12 +21,26 @@ public class WgPeer {
     private long transferTx;
     private int persistentKeepalive;
 
-    public static Builder withPublicKey(String publicKey){
+    public static Builder withPublicKey(String publicKey) {
         return new Builder().publicKey(publicKey);
     }
 
+    @Override
+    public String toString() {
+        return "WgPeer{" +
+                "publicKey='" + publicKey + '\'' +
+                ", presharedKey='" + presharedKey + '\'' +
+                ", endpoint='" + endpoint + '\'' +
+                ", allowedIps=" + allowedIps.toString() +
+                ", latestHandshake=" + latestHandshake +
+                ", transferRx=" + transferRx +
+                ", transferTx=" + transferTx +
+                ", persistentKeepalive=" + persistentKeepalive +
+                '}';
+    }
+
     @Data
-    @NoArgsConstructor
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class AllowedIps{
         private Set<String> IPv4IPs = new HashSet<>();
         private Set<String> IPv6IPs = new HashSet<>();
@@ -35,15 +53,15 @@ public class WgPeer {
             IPv6IPs.add(allowedIPv6Ip);
         }
 
-        public List<String> getAllowedIps(){
-            List<String> allowedIps = new ArrayList<>();
+        public Set<String> getAll(){
+            Set<String> allowedIps = new HashSet<>();
             allowedIps.addAll(IPv4IPs);
             allowedIps.addAll(IPv6IPs);
-            return allowedIps;
+            return Collections.unmodifiableSet(allowedIps);
         }
-
+        @Override
         public String toString(){
-            return String.join(",", getAllowedIps());
+            return String.join(",", getAll());
         }
         public boolean isEmpty(){
             return IPv4IPs.isEmpty() && IPv6IPs.isEmpty();
@@ -115,8 +133,6 @@ public class WgPeer {
 
         public WgPeer build(){
             Assert.notNull(publicKey, "Public key must not be null");
-            Assert.notNull(presharedKey, "Preshared key must not be null");
-            Assert.isTrue(!allowedIps.isEmpty(), "allowed Ips must not be null");
             return new WgPeer(publicKey,
                     presharedKey,
                     endpoint,

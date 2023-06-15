@@ -1,24 +1,24 @@
 package com.wireguard.api.peer;
 
 import com.wireguard.api.AppError;
-
 import com.wireguard.api.ResourceNotFoundException;
 import com.wireguard.external.wireguard.ParsingException;
 import com.wireguard.external.wireguard.WgManager;
-import com.wireguard.external.wireguard.WgPeer;
 import com.wireguard.external.wireguard.dto.CreatedPeer;
+import com.wireguard.external.wireguard.dto.WgPeerDTO;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @RestController
 public class PeerController {
@@ -37,7 +37,7 @@ public class PeerController {
                     content = {
                     @Content(
                             mediaType = "application/json",
-                            array = @ArraySchema(schema = @Schema(implementation = WgPeer.class))
+                            array = @ArraySchema(schema = @Schema(implementation = WgPeerDTO.class))
                     )
             }
             ),
@@ -45,7 +45,8 @@ public class PeerController {
                     content = { @Content(mediaType = "application/json",
                             schema = @Schema(implementation = AppError.class)) }) })
     @GetMapping("/peers")
-    public List<WgPeer> getPeers() throws ParsingException {
+    public Set<WgPeerDTO> getPeers() throws ParsingException {
+        System.out.println(wgManager.hashCode());
         return wgManager.getPeers();
     }   
 
@@ -54,7 +55,7 @@ public class PeerController {
                     content = {
                             @Content(
                                     mediaType = "application/json",
-                                    schema = @Schema(implementation = WgPeer.class)
+                                    schema = @Schema(implementation = WgPeerDTO.class)
                             )
                     }
             ),
@@ -62,8 +63,8 @@ public class PeerController {
                     content = { @Content(mediaType = "application/json",
                             schema = @Schema(implementation = AppError.class)) }) })
     @GetMapping("/peer")
-    public WgPeer getPeerByPublicKey(String publicKey) throws ParsingException {
-        Optional<WgPeer> peer =  wgManager.getPeerByPublicKey(publicKey);
+    public WgPeerDTO getPeerByPublicKey(String publicKey) throws ParsingException {
+        Optional<WgPeerDTO> peer =  wgManager.getPeerDTOByPublicKey(publicKey);
         if (peer.isPresent()){
             return peer.get();
         } else {
@@ -84,8 +85,8 @@ public class PeerController {
                     content = { @Content(mediaType = "application/json",
                             schema = @Schema(implementation = AppError.class)) }) })
     @PostMapping("/peer/create")
-    public CreatedPeer createPeer() {
-        return wgManager.createPeer();
+    public ResponseEntity<CreatedPeer> createPeer() {
+        return new ResponseEntity<>(wgManager.createPeer(), HttpStatus.CREATED);
     }
 
 

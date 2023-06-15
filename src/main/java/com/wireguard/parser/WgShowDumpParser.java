@@ -1,24 +1,18 @@
 package com.wireguard.parser;
 
 
-import com.wireguard.external.wireguard.WgInterface;
 import com.wireguard.external.wireguard.WgPeer;
 import com.wireguard.external.wireguard.WgShowDump;
-import lombok.Data;
+import com.wireguard.external.wireguard.dto.WgInterfaceDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Scanner;
-import java.util.function.Function;
 
-@Data
+
 public class WgShowDumpParser {
 
     private static final Logger logger = LoggerFactory.getLogger(WgShowDumpParser.class);
@@ -36,22 +30,15 @@ public class WgShowDumpParser {
         }
         String dumpHeader = scanner.nextLine();
         try {
-            WgInterface wgInterface = parseInterface(dumpHeader);
+            WgInterfaceDTO wgInterfaceDTO = parseInterface(dumpHeader);
             List<WgPeer> peers = parsePeers(scanner);
-            return new WgShowDump(wgInterface, peers);
+            return new WgShowDump(wgInterfaceDTO, peers);
         } catch (Exception e) {
-            logger.error("Error while parsing dump %s".formatted(dump));
+            logger.error("Error while parsing dump \n%s".formatted(dump));
             throw e;
         }
     }
 
-    private static String tryReadLine(Scanner scanner) {
-        if (scanner.hasNextLine()) {
-            return scanner.nextLine();
-        } else {
-            throw new NoSuchElementException("Scanner has no more lines");
-        }
-    }
 
     private static List<WgPeer> parsePeers(Scanner peersDump) {
         List<WgPeer> peers = new ArrayList<WgPeer>();
@@ -64,7 +51,7 @@ public class WgShowDumpParser {
         return peers;
     }
 
-    private static WgInterface parseInterface(String wgShowInterfaceLine) {
+    private static WgInterfaceDTO parseInterface(String wgShowInterfaceLine) {
         logger.trace("Parsing interface "+wgShowInterfaceLine);
         Assert.notNull(wgShowInterfaceLine, "Wg interface dump is null");
         return WgInterfaceParser.parse(wgShowInterfaceLine, SPLITTER);
