@@ -10,8 +10,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.Set;
 
 class WgShowDumpParserTest {
@@ -32,9 +30,9 @@ class WgShowDumpParserTest {
     void fromDumpTest() throws IOException {
         WgShowDump dump = WgShowDumpParser.fromDump(wgShowDump);
 
-        Assertions.assertEquals(16666, dump.wgInterface().getListenPort());
-        Assertions.assertEquals("Ds123123312G859AO3s1I8vhTgrgrgrgrgrgt9LKF8B=", dump.wgInterface().getPrivateKey());
-        Assertions.assertEquals("Z1xHdYc+enfengren+nvrenbvnbmegw3gjrejgvfnvn=", dump.wgInterface().getPublicKey());
+        Assertions.assertEquals(16666, dump.wgInterfaceDTO().getListenPort());
+        Assertions.assertEquals("Ds123123312G859AO3s1I8vhTgrgrgrgrgrgt9LKF8B=", dump.wgInterfaceDTO().getPrivateKey());
+        Assertions.assertEquals("Z1xHdYc+enfengren+nvrenbvnbmegw3gjrejgvfnvn=", dump.wgInterfaceDTO().getPublicKey());
     }
 
     @Test
