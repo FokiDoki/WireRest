@@ -9,9 +9,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.hamcrest.Matchers.containsString;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -26,9 +25,9 @@ class InterfaceControllerTest {
         mockMvc.perform(get("/interface"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString("privateKey")))
-                .andExpect(content().string(containsString("publicKey")))
-                .andExpect(content().string(containsString("listenPort")))
-                .andExpect(content().string(containsString("fwMark")));
+                .andExpect(jsonPath("$.privateKey").isString())
+                .andExpect(jsonPath("$.publicKey").isString())
+                .andExpect(jsonPath("$.listenPort").isNumber())
+                .andExpect(jsonPath("$.fwMark").isNumber());
     }
 }

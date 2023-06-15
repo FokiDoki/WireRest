@@ -75,7 +75,7 @@ public class WgManager {
                 publicKey,
                 presharedKey,
                 privateKey,
-                address.toString(),
+                Set.of(address.toString()),
                 0
         );
     }

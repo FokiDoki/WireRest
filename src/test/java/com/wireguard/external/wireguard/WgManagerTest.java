@@ -3,6 +3,7 @@ package com.wireguard.external.wireguard;
 import com.wireguard.external.wireguard.dto.CreatedPeer;
 import com.wireguard.external.wireguard.dto.WgInterfaceDTO;
 import com.wireguard.external.wireguard.dto.WgPeerDTO;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -15,9 +16,11 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class WgManagerTest {
-    WgManager wgManager;
+import static org.mockito.Mockito.reset;
 
+class WgManagerTest {
+    private WgManager wgManager;
+    private static WgTool wgTool;
     final static String wgInterfaceName = "wg0";
     final static WgInterfaceDTO wgInterfaceDTO = new WgInterfaceDTO(
             "privateKey",
@@ -40,7 +43,7 @@ class WgManagerTest {
     );
     @BeforeEach
     void setUp() throws IOException {
-        WgTool wgTool = Mockito.mock(WgTool.class);
+        wgTool = Mockito.mock(WgTool.class);
         Mockito.when(wgTool.showDump(wgInterfaceName)).thenReturn(
                 new WgShowDump(wgInterfaceDTO, peers)
         );
@@ -55,6 +58,11 @@ class WgManagerTest {
                 wgTool,
                 ipResolver,
                 new WgInterface(wgInterfaceName, "10.0.0.0"));
+    }
+
+    @AfterAll
+    static void tearDown() {
+        reset(wgTool);
     }
 
 
@@ -81,7 +89,7 @@ class WgManagerTest {
     @Test
     void createPeer() {
         CreatedPeer peer = wgManager.createPeer();
-        assertEquals("10.0.0.2/32", peer.getAddress());
+        assertEquals(Set.of("10.0.0.2/32"), peer.getAddress());
         assertEquals("generatedPsk", peer.getPresharedKey());
         assertEquals("GeneratedPubKeyFromPrivateKey", peer.getPublicKey());
         assertEquals("generatedPrivateKey", peer.getPrivateKey());

@@ -3,6 +3,7 @@ package com.wireguard.api.peer;
 import com.wireguard.api.AppError;
 
 import com.wireguard.api.ResourceNotFoundException;
+import com.wireguard.external.wireguard.NoFreeIpException;
 import com.wireguard.external.wireguard.ParsingException;
 import com.wireguard.external.wireguard.WgManager;
 import com.wireguard.external.wireguard.dto.CreatedPeer;
@@ -12,6 +13,8 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -45,6 +48,7 @@ public class PeerController {
                             schema = @Schema(implementation = AppError.class)) }) })
     @GetMapping("/peers")
     public Set<WgPeerDTO> getPeers() throws ParsingException {
+        System.out.println(wgManager.hashCode());
         return wgManager.getPeers();
     }   
 
@@ -83,8 +87,8 @@ public class PeerController {
                     content = { @Content(mediaType = "application/json",
                             schema = @Schema(implementation = AppError.class)) }) })
     @PostMapping("/peer/create")
-    public CreatedPeer createPeer() {
-        return wgManager.createPeer();
+    public ResponseEntity<CreatedPeer> createPeer() {
+        return new ResponseEntity<>(wgManager.createPeer(), HttpStatus.CREATED);
     }
 
 

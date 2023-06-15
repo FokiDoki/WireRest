@@ -1,5 +1,6 @@
 package com.wireguard.external.wireguard;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import lombok.AccessLevel;
@@ -59,7 +60,7 @@ public class WgPeer {
             Set<String> allowedIps = new HashSet<>();
             allowedIps.addAll(IPv4IPs);
             allowedIps.addAll(IPv6IPs);
-            return allowedIps;
+            return Collections.unmodifiableSet(allowedIps);
         }
         @Override
         public String toString(){
