@@ -12,7 +12,7 @@ import org.springframework.util.Assert;
 
 
 @Getter
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class WgPeer {
     private String publicKey;
     private String presharedKey;

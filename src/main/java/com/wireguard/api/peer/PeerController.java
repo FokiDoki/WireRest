@@ -5,7 +5,6 @@ import com.wireguard.api.AppError;
 import com.wireguard.api.ResourceNotFoundException;
 import com.wireguard.external.wireguard.ParsingException;
 import com.wireguard.external.wireguard.WgManager;
-import com.wireguard.external.wireguard.WgPeer;
 import com.wireguard.external.wireguard.dto.CreatedPeer;
 import com.wireguard.external.wireguard.dto.WgPeerDTO;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -14,11 +13,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -65,7 +62,7 @@ public class PeerController {
                             schema = @Schema(implementation = AppError.class)) }) })
     @GetMapping("/peer")
     public WgPeerDTO getPeerByPublicKey(String publicKey) throws ParsingException {
-        Optional<WgPeerDTO> peer =  wgManager.getPeerByPublicKey(publicKey);
+        Optional<WgPeerDTO> peer =  wgManager.getPeerDTOByPublicKey(publicKey);
         if (peer.isPresent()){
             return peer.get();
         } else {

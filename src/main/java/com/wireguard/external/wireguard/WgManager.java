@@ -22,7 +22,7 @@ public class WgManager {
 
     private static final Logger logger = LoggerFactory.getLogger(ShellRunner.class);
     private final WgInterface wgInterface;
-    @Value("${wg.interface.new_cient_subnet_mask}")
+    @Value("${wg.interface.new_client_subnet_mask}")
     private int defaultMaskForNewClients = 32;
     private final IpResolver wgIpResolver;
     private static WgTool wgTool;
@@ -50,7 +50,7 @@ public class WgManager {
         }
     }
 
-    public Optional<WgPeerDTO> getPeerByPublicKey(String publicKey) throws ParsingException {
+    public Optional<WgPeerDTO> getPeerDTOByPublicKey(String publicKey) throws ParsingException {
         WgPeerContainer peerContainer = getWgPeerContainer();
         return peerContainer.getDTOByPublicKey(publicKey);
     }
@@ -58,11 +58,6 @@ public class WgManager {
     private WgPeerContainer getWgPeerContainer()  {
         List<WgPeer> peers = getDump().peers();
         return new WgPeerContainer(peers);
-    }
-
-    public Set<String> getBusyIpv4Set()  {
-        WgPeerContainer peerContainer = getWgPeerContainer();
-        return peerContainer.getIpv4Addresses();
     }
 
     public Set<WgPeerDTO> getPeers(){

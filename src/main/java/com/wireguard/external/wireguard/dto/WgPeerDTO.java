@@ -7,6 +7,7 @@ import java.util.Set;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
+@EqualsAndHashCode
 public class WgPeerDTO {
     private String publicKey;
     private String presharedKey;

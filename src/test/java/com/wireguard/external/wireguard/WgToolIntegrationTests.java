@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @EnabledOnOs(OS.LINUX)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class WgToolTests {
+class WgToolIntegrationTests {
     private final static ShellRunner shellRunner = new ShellRunner();
     private final static String interfaceName = "wg_cont_test";
     private final static File wgConfigFile = new File("src/test/resources/%s.conf".formatted(interfaceName));
