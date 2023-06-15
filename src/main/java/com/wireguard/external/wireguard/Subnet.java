@@ -109,10 +109,6 @@ public class Subnet {
         return bytesIpToString(getLastIpBytes());
     }
 
-    public int getMask(){
-        return numericMask;
-    }
-
     public List<Integer> getFirstIp(){
         return byteIpToIntList(getFirstIpBytes());
     }

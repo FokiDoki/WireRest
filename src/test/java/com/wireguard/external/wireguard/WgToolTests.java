@@ -77,4 +77,5 @@ class WgToolTests {
         Assertions.assertEquals(presharedKey, addedPeer.get().getPresharedKey());
         Assertions.assertEquals(allowedIps, addedPeer.get().getAllowedIps().toString());
     }
+
 }
