@@ -1,6 +1,5 @@
 package com.wireguard.external.wireguard;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -48,6 +47,10 @@ public class IpResolver {
             return givenSubnet;
         }
         throw new NoFreeIpException("Cannot find free subnet with mask "+mask);
+    }
+
+    public void takeIp(String ip){
+        takeSubnet(Subnet.fromString(ip+"/32"));
     }
 
     public void takeSubnet(Subnet subnet){
