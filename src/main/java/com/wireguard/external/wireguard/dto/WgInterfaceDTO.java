@@ -13,7 +13,7 @@ public class WgInterfaceDTO {
     @Min(1)
     @Max(65535)
     private int listenPort;
-    private int fwmark;
+    private int fwMark;
 
 
 }

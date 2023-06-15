@@ -43,7 +43,7 @@ class WgInterfaceDTOParserTests {
         assertEquals(wgInterfaceDTO.getPrivateKey(), validbase64);
         assertEquals(wgInterfaceDTO.getPublicKey(), validbase64);
         assertEquals(wgInterfaceDTO.getListenPort(), 1234);
-        assertEquals(wgInterfaceDTO.getFwmark(), 321);
+        assertEquals(wgInterfaceDTO.getFwMark(), 321);
     }
 
     @Test
@@ -53,7 +53,7 @@ class WgInterfaceDTOParserTests {
         assertEquals(wgInterfaceDTO.getPrivateKey(), validbase64);
         assertEquals(wgInterfaceDTO.getPublicKey(), validbase64);
         assertEquals(wgInterfaceDTO.getListenPort(), 64444);
-        assertEquals(wgInterfaceDTO.getFwmark(), 0);
+        assertEquals(wgInterfaceDTO.getFwMark(), 0);
     }
 
 
