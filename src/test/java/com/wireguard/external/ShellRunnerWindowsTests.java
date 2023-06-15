@@ -6,7 +6,6 @@ import com.wireguard.external.shell.ProcessStartException;
 import com.wireguard.external.shell.ShellRunner;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 

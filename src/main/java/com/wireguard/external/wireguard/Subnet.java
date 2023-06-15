@@ -4,7 +4,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.springframework.util.Assert;
 
-import java.util.Arrays;
 import java.util.List;
 
 @EqualsAndHashCode

@@ -1,6 +1,5 @@
 package com.wireguard.external.wireguard;
 
-import com.wireguard.external.shell.ShellRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;

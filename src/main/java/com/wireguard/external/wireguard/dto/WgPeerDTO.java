@@ -1,7 +1,10 @@
 package com.wireguard.external.wireguard.dto;
 
 import com.wireguard.external.wireguard.WgPeer;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.Set;
 

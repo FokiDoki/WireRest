@@ -2,14 +2,17 @@ package com.wireguard.parser;
 
 
 import com.wireguard.converters.StreamToStringConverter;
-import com.wireguard.external.wireguard.WgPeerContainer;
 import com.wireguard.external.wireguard.WgPeer;
+import com.wireguard.external.wireguard.WgPeerContainer;
 import com.wireguard.external.wireguard.WgShowDump;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Set;
 
 class WgShowDumpParserTest {

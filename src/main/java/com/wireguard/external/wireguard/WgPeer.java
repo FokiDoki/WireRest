@@ -1,14 +1,11 @@
 package com.wireguard.external.wireguard;
 
+import lombok.*;
+import org.springframework.util.Assert;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.springframework.util.Assert;
 
 
 

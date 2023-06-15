@@ -1,14 +1,11 @@
 package com.wireguard.containers;
 
-import com.wireguard.external.wireguard.WgPeerContainer;
 import com.wireguard.external.wireguard.WgPeer;
+import com.wireguard.external.wireguard.WgPeerContainer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.net.InetSocketAddress;
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.Set;
 
 public class WgPeerContainerTest {

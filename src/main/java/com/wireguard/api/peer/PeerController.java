@@ -1,9 +1,7 @@
 package com.wireguard.api.peer;
 
 import com.wireguard.api.AppError;
-
 import com.wireguard.api.ResourceNotFoundException;
-import com.wireguard.external.wireguard.NoFreeIpException;
 import com.wireguard.external.wireguard.ParsingException;
 import com.wireguard.external.wireguard.WgManager;
 import com.wireguard.external.wireguard.dto.CreatedPeer;
