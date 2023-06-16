@@ -19,7 +19,7 @@
                     sh 'JAVA_HOME=/usr/lib/jvm/jdk-20 mvn package'
                     jacoco(
                                     execPattern: '**/build/jacoco/*.exec',
-                                    classPattern: '**/build/classes/java/main',
+                                    classPattern: 'target/test-classes/**/',
                                     sourcePattern: '**/src/main'
                                 )
                 }
@@ -35,7 +35,7 @@
             stage('Check'){
                 steps {
                     sleep 10
-                    sh 'curl -s http://127.0.0.1:${RUN_PORT}/interface'
+                    sh 'curl -s http://127.0.0.1:${RUN_PORT}/interface  > /dev/null'
                 }
             }
 
