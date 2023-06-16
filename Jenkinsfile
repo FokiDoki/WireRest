@@ -16,7 +16,7 @@
             }
             stage('Test/Package') {
                 steps {
-                    sh 'JAVA_HOME=/usr/lib/jvm/jdk-20 mvn packag'
+                    sh 'JAVA_HOME=/usr/lib/jvm/jdk-20 mvn package'
                     jacoco(execPattern: '**/target/*.exec')
                     recordCoverage(tools: [[parser: 'JACOCO']])
                 }
