@@ -18,10 +18,10 @@
                 steps {
                     sh 'JAVA_HOME=/usr/lib/jvm/jdk-20 mvn package'
                     jacoco(
-                                    execPattern: '**/build/jacoco/*.exec',
-                                    classPattern: 'target/test-classes/**/',
-                                    sourcePattern: '**/src/main'
-                                )
+                           execPattern: '/target/jacoco.exec',
+                           classPattern: '**/build/classes/java/main',
+                           sourcePattern: '**/src/main'
+                    )
                 }
             }
             stage('Run'){
