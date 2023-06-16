@@ -17,6 +17,15 @@
             stage('Test/Package') {
                 steps {
                     sh 'JAVA_HOME=/usr/lib/jvm/jdk-20 mvn package'
+                        post {
+                            success {
+                                jacoco(
+                                    execPattern: '**/build/jacoco/*.exec',
+                                    classPattern: '**/build/classes/java/main',
+                                    sourcePattern: '**/src/main'
+                                )
+                            }
+                        }
                 }
             }
             stage('Run'){
@@ -26,6 +35,7 @@
                     sh 'sudo systemctl restart ${SERVICE_NAME}'
                 }
             }
+
             stage('Check'){
                 steps {
                     sleep 10
