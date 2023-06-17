@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>wireguard</groupId>
-    <artifactId>WireguardController</artifactId>
-    <version>0.2-SNAPSHOT</version>
-    <name>Wireguard Controller</name>
-    <description>Wireguard Controller</description>
+    <artifactId>wirerest</artifactId>
+    <version>0.2</version>
+    <name>WireRest</name>
+    <description>WireRest - REST api for Wireguard</description>
     <properties>
         <java.version>20</java.version>
         <maven.compiler.source>20</maven.compiler.source>
