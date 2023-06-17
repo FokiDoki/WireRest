@@ -7,7 +7,6 @@
             POM_VERSION="0.2"
             SERVICE_NAME="wirerest"
             RUN_ARGS="--spring.profiles.active=${RUN_PROFILES} --server.port=${RUN_PORT}"
-
         }
         stages {
             stage('Build') {
@@ -25,7 +24,7 @@
             stage('Run'){
                 steps {
                     sh 'echo ARGS=${RUN_ARGS} > env'
-                    sh 'echo JAR_PATH=`pwd`/target/${SERVICE_NAME}- ${POM_VERSION}.jar >> env'
+                    sh 'echo JAR_PATH=`pwd`/target/${SERVICE_NAME}.${POM_VERSION}.jar >> env'
                     sh 'sudo cp env /etc/default/${SERVICE_NAME}'
                     sh 'sudo systemctl restart ${SERVICE_NAME}'
                 }
