@@ -8,6 +8,7 @@ public class WireguardControllerApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(WireguardControllerApplication.class, args);
+        System.out.println("some dangerous code");
     }
 
 }
