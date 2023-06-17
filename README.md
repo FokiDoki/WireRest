@@ -21,6 +21,7 @@ Swagger UI is available at http://127.0.0.1:8081/swagger-ui.html
 ### How to run:
 
 ---
+Java 20 required
 #### Default configuration:
 
 ```shell
