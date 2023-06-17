@@ -25,7 +25,7 @@ Java 20 required
 #### Default configuration:
 
 ```shell
-java -jar wire-rest.jar
+java -jar wirerest-0.2.jar
 ```
 Server run on port 8081
 
