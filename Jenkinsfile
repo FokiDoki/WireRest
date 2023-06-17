@@ -4,6 +4,7 @@
         environment {
             RUN_PROFILES="prod"
             RUN_PORT=8081
+            APP_NAME="wirerest"
             SERVICE_NAME="wg_controller_dev"
             RUN_ARGS="--spring.profiles.active=${RUN_PROFILES} --server.port=${RUN_PORT}"
 
@@ -24,6 +25,7 @@
             stage('Run'){
                 steps {
                     sh 'echo ARGS=${RUN_ARGS} > env'
+                    sh 'echo JAR_PATH=`pwd`/target/${APP_NAME}-${POM_VERSION}.jar >> env'
                     sh 'sudo cp env /etc/default/${SERVICE_NAME}'
                     sh 'sudo systemctl restart ${SERVICE_NAME}'
                 }
