@@ -17,6 +17,8 @@
             stage('Test/Package') {
                 steps {
                     sh 'JAVA_HOME=/usr/lib/jvm/jdk-20 mvn package'
+                    jacoco(execPattern: '**/target/*.exec')
+                    recordCoverage(tools: [[parser: 'JACOCO']])
                 }
             }
             stage('Run'){
@@ -26,10 +28,11 @@
                     sh 'sudo systemctl restart ${SERVICE_NAME}'
                 }
             }
+
             stage('Check'){
                 steps {
                     sleep 10
-                    sh 'curl -s http://127.0.0.1:${RUN_PORT}/interface'
+                    sh 'curl -s http://127.0.0.1:${RUN_PORT}/interface  > /dev/null'
                 }
             }
 
