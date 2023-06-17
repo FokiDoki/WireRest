@@ -17,7 +17,6 @@ public class Config {
 
     @Bean
     public IpResolver ipResolver(
-            @Value("${wg.interface.ip}") String interfaceIp,
             WgTool wgTool,
             WgInterface wgInterface
     ) throws IOException {
@@ -26,7 +25,7 @@ public class Config {
         IpResolver ipResolver = new IpResolver(interfaceSubnet);
         ipResolver.takeIp(interfaceSubnet.getFirstIpString());
         ipResolver.takeIp(interfaceSubnet.getLastIpString());
-        ipResolver.takeIp(interfaceIp);
+        ipResolver.takeIp(wgInterface.ip());
 
         wgTool.showDump(wgInterface.name()).peers().forEach(
                 peer ->
