@@ -3,7 +3,7 @@
 ![Jenkins JaCoCo Tests Coverage](https://img.shields.io/jenkins/coverage/apiv4?jobUrl=http%3A%2F%2Fs2.fokidoki.su%2Fjob%2Fwg_controller&style=flat-square)
 ---
 This is a REST API for Wireguard. It is written in Java using Spring Boot and Spring MVC. 
-Project is under start of development.
+Project is under early of development.
 
 Swagger UI is available at http://127.0.0.1:8081/swagger-ui.html
 
