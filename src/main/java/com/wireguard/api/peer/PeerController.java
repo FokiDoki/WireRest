@@ -46,7 +46,6 @@ public class PeerController {
                             schema = @Schema(implementation = AppError.class)) }) })
     @GetMapping("/peers")
     public Set<WgPeerDTO> getPeers() throws ParsingException {
-        System.out.println(wgManager.hashCode());
         return wgManager.getPeers();
     }   
 

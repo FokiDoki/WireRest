@@ -5,7 +5,7 @@
 This is a REST API for Wireguard. It is written in Java using Spring Boot and Spring MVC. 
 Project is under early of development.
 
-Swagger UI is available at http://127.0.0.1:8081/swagger-ui/index.html
+Swagger UI is available at http://127.0.0.1:8081/swagger-ui 
 
 
 
@@ -52,7 +52,7 @@ mvn clean package
 ### TODO:
 
 ___
-- Migration to Spring WebFlux
+- ~~Migration to Spring WebFlux~~
 - Metrics for Prometheus
 - Add peer (Custom configuration)
 - Delete peer
@@ -60,3 +60,4 @@ ___
 - Oauth2 authorization
 - Authorization key rate limits & scopes 
 - Sort peers by key, ip, received, sent, last handshake etc. 
+- Callback API 
