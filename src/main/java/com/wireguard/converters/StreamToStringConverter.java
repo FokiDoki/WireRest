@@ -29,7 +29,9 @@ public class StreamToStringConverter implements Converter<InputStream, String> {
     @Nullable
     public String convert(InputStream source) {
         try{
+            System.out.println("Converting stream");
             return new String(source.readAllBytes(), charset);
+
         } catch (IOException e) {
             logger.error("Error converting stream", e);
             return null;
