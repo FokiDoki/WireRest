@@ -61,3 +61,4 @@ ___
 - Authorization key rate limits & scopes 
 - Sort peers by key, ip, received, sent, last handshake etc. 
 - Callback API 
+- Caching 
