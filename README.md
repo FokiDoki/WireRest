@@ -52,10 +52,11 @@ mvn clean package
 ### TODO:
 
 ___
-- Migration to Spring WebFlux
+- ~~Migration to Spring WebFlux~~
 - Metrics for Prometheus
 - Add peer (Custom configuration)
 - Delete peer
 - Update peer
 - Oauth2 authorization
 - Sort peers by key, ip, received, sent, last handshake etc. 
+- Callback API 
