@@ -5,7 +5,7 @@
 This is a REST API for Wireguard. It is written in Java using Spring Boot and Spring MVC. 
 Project is under early of development.
 
-Swagger UI is available at http://127.0.0.1:8081/swagger-ui/index.html
+Swagger UI is available at http://127.0.0.1:8081/swagger-ui 
 
 
 
