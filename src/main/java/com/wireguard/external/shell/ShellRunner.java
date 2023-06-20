@@ -28,10 +28,7 @@ public class ShellRunner {
     public String execute(String[] command, List<Integer> allowedExitCodes) {
         Process process = startProcess(command);
         int exitCode = waitForProcess(process);
-        System.out.println("Redirecting output");
         String stdout = readInputStream(process.getInputStream());
-        System.out.println("Redirecting error");
-        
         String stderr = readInputStream(process.getErrorStream());
         if (!allowedExitCodes.contains(exitCode)) {
             throw new CommandExecutionException(String.join(" ", command), exitCode, stdout, stderr);
