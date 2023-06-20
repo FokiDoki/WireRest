@@ -35,8 +35,23 @@
                     sleep 10
                     sh 'curl -s http://127.0.0.1:${RUN_PORT}/interface  > /dev/null'
                 }
+
             }
-
-
+        }
+        post {
+            failure {
+                script {
+                    if (env.CHANGE_ID) {
+                        pullRequest.addLabel('Jenkins - Build OK')
+                    }
+                }
+            }
+            success {
+                script {
+                    if (env.CHANGE_ID) {
+                        pullRequest.addLabel('Jenkins - Build Failed')
+                    }
+                }
+            }
         }
     }
