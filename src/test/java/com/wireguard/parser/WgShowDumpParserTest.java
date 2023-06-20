@@ -13,10 +13,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Scanner;
 import java.util.Set;
 
 class WgShowDumpParserTest {
-    private String wgShowDump;
+    private Scanner wgShowDump;
 //public-key, preshared-key, endpoint, allowed-ips, latest-handshake, transfer-rx, transfer-tx, persistent-keepalive.
     private static final String FIRST_PEER_ALLOWED_IPS = "10.66.66.2/32,fd42:42:42::2/128";
     private static final String FIRST_PEER_ENDPOINT = "90.255.84.234:62517";
@@ -26,7 +27,7 @@ class WgShowDumpParserTest {
     void setUp() throws FileNotFoundException {
         File wgshowdumpFile = new File("src/test/resources/wg_show_dump.txt");
         StreamToStringConverter streamToStringConverter = new StreamToStringConverter();
-        wgShowDump = streamToStringConverter.convert(new FileInputStream(wgshowdumpFile));
+        wgShowDump = new Scanner(new FileInputStream(wgshowdumpFile));
     }
 
     @Test
@@ -61,14 +62,14 @@ class WgShowDumpParserTest {
     @Test
     void emptyDumpTest(){
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            WgShowDumpParser.fromDump("");
+            WgShowDumpParser.fromDump(new Scanner(""));
         });
     }
 
     @Test
     void invalidDumpTest(){
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            WgShowDumpParser.fromDump("invalid dump");
+            WgShowDumpParser.fromDump(new Scanner("invalid dump"));
         });
     }
 

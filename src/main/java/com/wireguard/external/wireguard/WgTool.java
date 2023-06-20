@@ -5,7 +5,8 @@ import com.wireguard.parser.WgShowDumpParser;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
+import java.io.*;
+import java.util.Scanner;
 
 @Profile("prod")
 @Component
@@ -21,24 +22,35 @@ public class WgTool {
     private static final String presharedKeyPath = "/tmp/presharedKey";
     protected final ShellRunner shell = new ShellRunner();
 
-
     private String run(String commandStr, Boolean privileged) {
+        String[] command = getCommand(commandStr, privileged);
+        return shell.execute(command).strip();
+    }
+    private String[] getCommand(String commandStr, Boolean privileged) {
         String[] command;
         if (privileged) {
             command = new String[]{"sudo", "/bin/sh", "-c", commandStr};
         } else {
             command = new String[]{"/bin/sh", "-c", commandStr};
         }
-        return shell.execute(command).strip();
+        return command;
     }
 
     private String run(String commandStr) {
         return run(commandStr, false);
     }
 
+    private Scanner runToScanner(String commandStr, Boolean privileged) {
+        String[] command = getCommand(commandStr, privileged);
+        Process process = shell.startProcess(command);
+        return new Scanner(process.getInputStream());
+    }
+
+
+
     public WgShowDump showDump(String interfaceName) throws IOException {
-        String dumpString = run(WG_SHOW_DUMP_COMMAND.formatted(interfaceName), true);
-        return WgShowDumpParser.fromDump(dumpString);
+        Scanner scanner = runToScanner(WG_SHOW_DUMP_COMMAND.formatted(interfaceName), true);
+        return WgShowDumpParser.fromDump(scanner);
     }
 
     public String generatePrivateKey() {

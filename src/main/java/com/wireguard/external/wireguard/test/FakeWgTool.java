@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.Scanner;
 import java.util.stream.Stream;
 
 @Profile("test")
@@ -21,7 +22,7 @@ public class FakeWgTool extends WgTool {
     @Override
     public WgShowDump showDump(String interfaceName) {
         File wgShowDumpFile = new File("src/main/resources/test-data/wg_show_dump.txt");
-        String dump = streamToStringConverter.convert(new FileInputStream(wgShowDumpFile));
+        Scanner dump = new Scanner(new FileInputStream(wgShowDumpFile));
         return WgShowDumpParser.fromDump(dump);
     }
 
