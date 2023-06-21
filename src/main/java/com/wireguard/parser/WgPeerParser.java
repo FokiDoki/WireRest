@@ -24,7 +24,7 @@ public class WgPeerParser {
 
         Map<IpType, Set<String>> allowedIps = filterAllowedIps(WgShowPeerDump.get(3));
         return WgPeer.
-                withPublicKey( WgShowPeerDump.get(0))
+                publicKey( WgShowPeerDump.get(0))
                 .presharedKey(WgShowPeerDump.get(1))
                 .endpoint(parseEndpoint(WgShowPeerDump.get(2)))
                 .allowedIPv4Ips(allowedIps.get(IpType.IPV4))

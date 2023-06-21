@@ -55,6 +55,11 @@ public class WgManager {
         return peerContainer.getDTOByPublicKey(publicKey);
     }
 
+    public Optional<WgPeer> getPeerByPublicKey(String publicKey) throws ParsingException {
+        WgPeerContainer peerContainer = getWgPeerContainer();
+        return peerContainer.getByPublicKey(publicKey);
+    }
+
     private WgPeerContainer getWgPeerContainer()  {
         List<WgPeer> peers = getDump().peers();
         return new WgPeerContainer(peers);
@@ -70,13 +75,17 @@ public class WgManager {
         String publicKey = wgTool.generatePublicKey(privateKey.strip()).strip();
         String presharedKey = wgTool.generatePresharedKey().strip();
         Subnet address = wgIpResolver.takeFreeSubnet(defaultMaskForNewClients);
-        wgTool.addPeer(wgInterface.name(), publicKey, presharedKey, address.toString(), 0);
-        return new CreatedPeer(
+        CreatedPeer createdPeer = new CreatedPeer(
                 publicKey,
                 presharedKey,
                 privateKey,
                 Set.of(address.toString()),
-                0
-        );
+                0);
+        wgTool.addPeer(wgInterface.name(), createdPeer);
+        return createdPeer;
+    }
+
+    public void deletePeer(String publicKey)  {
+        wgTool.deletePeer(wgInterface.name(), publicKey);
     }
 }

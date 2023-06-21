@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -58,6 +59,9 @@ public class PeerController {
                             )
                     }
             ),
+            @ApiResponse(responseCode = "404", description = "Not Found",
+                 content = { @Content(mediaType = "application/json",
+                         schema = @Schema(implementation = AppError.class)) }),
             @ApiResponse(responseCode = "500", description = "Internal Server Error",
                     content = { @Content(mediaType = "application/json",
                             schema = @Schema(implementation = AppError.class)) }) })
@@ -88,6 +92,32 @@ public class PeerController {
         return new ResponseEntity<>(wgManager.createPeer(), HttpStatus.CREATED);
     }
 
+
+
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = WgPeerDTO.class)
+                            )
+                    }
+            ),
+            @ApiResponse(responseCode = "404", description = "Not Found",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = AppError.class)) }),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = AppError.class)) }) })
+    @DeleteMapping("/peer/delete")
+    public WgPeerDTO deletePeer(String publicKey) throws ParsingException {
+        Optional<WgPeerDTO> peer = wgManager.getPeerDTOByPublicKey(publicKey);
+        if (peer.isEmpty()){
+            throw new ResourceNotFoundException("Peer not found");
+        }
+        wgManager.deletePeer(publicKey);
+        return peer.get();
+    }
 
 
 }
