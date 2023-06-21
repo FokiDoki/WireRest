@@ -18,10 +18,9 @@ class WgToolIntegrationTests {
     private static File wgConfigFile;
     private final static String interfacePublicKey = "sBdtuH6Q84CmecM+A832NOyAb9Oz0W7rJdPCR/JS63I=";
     private final static WgTool wgTool = new WgTool();
-    @BeforeEach
-    void setUpEnvironment() throws IOException {
-        shellRunner.execute(new String[]{"touch", "/etc/wireguard/%s.conf".formatted(interfaceName)}, List.of(0));
+    public WgToolIntegrationTests() throws IOException {
         wgConfigFile = new File("/etc/wireguard/%s.conf".formatted(interfaceName));
+        wgConfigFile.createNewFile();
         FileInputStream wgConfigFileSourceStream = new FileInputStream(wgConfigFileSource);
         FileOutputStream wgConfigFileOutputStream = new FileOutputStream(wgConfigFile);
         wgConfigFileOutputStream.write(wgConfigFileSourceStream.readAllBytes());
