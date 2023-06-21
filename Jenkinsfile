@@ -40,4 +40,14 @@ pipeline {
 
 
     }
+        publishers {
+            commitStatusOnGH {
+                unstableAsError()
+                message('Build finished')
+            }
+
+            commentPullRequestOnGH() {
+                message("comment")
+            }
+        }
 }
