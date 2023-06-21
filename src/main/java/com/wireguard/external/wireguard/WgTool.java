@@ -19,6 +19,8 @@ public class WgTool {
     private static final String WG_ADD_PEER_COMMAND = "wg set %s peer %s preshared-key %s allowed-ips %s persistent-keepalive %d";
     private static final String CREATE_FILE_COMMAND = "echo %s > %s";
     private static final String DELETE_FILE_COMMAND = "rm %s";
+    private static final String WG_SAVE_COMMAND = "wg-quick save %s";
+    private static final String WG_SHOW_CONF_COMMAND = "wg showconf %s";
     private static final String presharedKeyPath = "/tmp/presharedKey";
     protected final ShellRunner shell = new ShellRunner();
 
@@ -53,6 +55,15 @@ public class WgTool {
         return WgShowDumpParser.fromDump(scanner);
     }
 
+    public String showConf(String interfaceName) {
+        Scanner scanner = runToScanner(WG_SHOW_CONF_COMMAND.formatted(interfaceName), true);
+        StringBuilder conf = new StringBuilder();
+        while (scanner.hasNextLine()) {
+            conf.append(scanner.nextLine()).append("\n");
+        }
+        return conf.toString();
+    }
+
     public String generatePrivateKey() {
         return run(WG_GENKEY_COMMAND);
     }
@@ -84,6 +95,11 @@ public class WgTool {
         } finally {
             deleteFile(presharedKeyPath);
         }
+        saveConfig(interfaceName);
+    }
+
+    private void saveConfig(String interfaceName) {
+        run(WG_SAVE_COMMAND.formatted(interfaceName), true);
     }
 
 
