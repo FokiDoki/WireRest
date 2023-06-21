@@ -20,10 +20,8 @@ class WgToolIntegrationTests {
     private final static WgTool wgTool = new WgTool();
     @BeforeEach
     void setUpEnvironment() throws IOException {
+        shellRunner.execute(new String[]{"touch", "/etc/wireguard/%s.conf".formatted(interfaceName)}, List.of(0));
         wgConfigFile = new File("/etc/wireguard/%s.conf".formatted(interfaceName));
-        Boolean isConfigCreated = wgConfigFile.createNewFile();
-        System.out.println("User "+shellRunner.execute(new String[]{"whoami"}, List.of(0)));
-        Assertions.assertTrue(isConfigCreated);
         FileInputStream wgConfigFileSourceStream = new FileInputStream(wgConfigFileSource);
         FileOutputStream wgConfigFileOutputStream = new FileOutputStream(wgConfigFile);
         wgConfigFileOutputStream.write(wgConfigFileSourceStream.readAllBytes());
