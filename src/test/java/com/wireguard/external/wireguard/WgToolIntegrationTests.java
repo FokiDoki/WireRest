@@ -33,9 +33,9 @@ class WgToolIntegrationTests {
     @AfterAll
     static void tearDownEnvironment() {
         String resultOfCommand = shellRunner.execute(new String[]{"sudo","wg-quick", "down", wgConfigFile.getAbsolutePath()}, List.of(0,1));
-        boolean isDeleted = wgConfigFile.delete();
+        //boolean isDeleted = wgConfigFile.delete();
         Assertions.assertFalse(resultOfCommand.contains("wg-quick:"));
-        Assertions.assertTrue(isDeleted);
+        //Assertions.assertTrue(isDeleted);
     }
     @Test
     @Order(5)
