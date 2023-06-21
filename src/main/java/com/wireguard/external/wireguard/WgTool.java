@@ -19,6 +19,9 @@ public class WgTool {
     private static final String WG_ADD_PEER_COMMAND = "wg set %s peer %s preshared-key %s allowed-ips %s persistent-keepalive %d";
     private static final String CREATE_FILE_COMMAND = "echo %s > %s";
     private static final String DELETE_FILE_COMMAND = "rm %s";
+    private static final String WG_DEL_PEER_COMMAND = "wg set %s peer %s remove";
+    private static final String WG_SAVE_COMMAND = "wg-quick save %s";
+    private static final String WG_SHOW_CONF_COMMAND = "wg showconf %s";
     private static final String presharedKeyPath = "/tmp/presharedKey";
     protected final ShellRunner shell = new ShellRunner();
 
@@ -87,5 +90,9 @@ public class WgTool {
     }
 
 
+    public void deletePeer(String interfaceName, String publicKey) {
+        run(WG_DEL_PEER_COMMAND.formatted(interfaceName, publicKey), true);
+        saveConfig(interfaceName);
+    }
 
 }
