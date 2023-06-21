@@ -56,6 +56,15 @@ public class WgTool {
         return WgShowDumpParser.fromDump(scanner);
     }
 
+    public String showConf(String interfaceName) {
+        Scanner scanner = runToScanner(WG_SHOW_CONF_COMMAND.formatted(interfaceName), true);
+        StringBuilder conf = new StringBuilder();
+        while (scanner.hasNextLine()) {
+            conf.append(scanner.nextLine()).append("\n");
+        }
+        return conf.toString();
+    }
+
     public String generatePrivateKey() {
         return run(WG_GENKEY_COMMAND);
     }
@@ -87,12 +96,17 @@ public class WgTool {
         } finally {
             deleteFile(presharedKeyPath);
         }
+        saveConfig(interfaceName);
     }
 
+    private void saveConfig(String interfaceName) {
+        run(WG_SAVE_COMMAND.formatted(interfaceName), true);
+    }
 
     public void deletePeer(String interfaceName, String publicKey) {
         run(WG_DEL_PEER_COMMAND.formatted(interfaceName, publicKey), true);
         saveConfig(interfaceName);
     }
+
 
 }

@@ -78,4 +78,12 @@ class WgToolIntegrationTests {
         Assertions.assertEquals(allowedIps, addedPeer.get().getAllowedIps().toString());
     }
 
+    @Test
+    @Order(15)
+    void saveConfig()  {
+        String config = wgTool.showConf(interfaceName);
+        Assertions.assertNotNull(config);
+        Assertions.assertTrue(config.contains("10.112.112.10/32"));
+    }
+
 }
