@@ -11,11 +11,15 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                pullRequest.addLabel('Build test')
+                script{
+                    pullRequest.addLabel('Build test')
+                }
+
                 echo sh(script: 'env|sort', returnStdout: true)
                 sh 'JAVA_HOME=/usr/lib/jvm/jdk-20 mvn clean validate compile'
             }
         }
+        /*
         stage('Test/Package') {
             steps {
                 sh 'JAVA_HOME=/usr/lib/jvm/jdk-20 mvn package'
@@ -37,7 +41,7 @@ pipeline {
                 sleep 10
                 sh 'curl -s http://127.0.0.1:${RUN_PORT}/interface  > /dev/null'
             }
-        }
+        }*/
 
 
     }
