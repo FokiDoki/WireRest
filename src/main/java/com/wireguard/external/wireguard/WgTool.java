@@ -96,7 +96,7 @@ public class WgTool {
                 interfaceName,
                 peer.getPublicKey(),
                 presharedKeyPath,
-                peer.getAddress(),
+                String.join(",", peer.getAddress()),
                 peer.getPersistentKeepalive()), true);
         } finally {
             deleteFile(presharedKeyPath);
