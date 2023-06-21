@@ -19,13 +19,13 @@ class WgToolIntegrationTests {
     private final static String interfacePublicKey = "sBdtuH6Q84CmecM+A832NOyAb9Oz0W7rJdPCR/JS63I=";
     private final static WgTool wgTool = new WgTool();
     public WgToolIntegrationTests() throws IOException {
-        wgConfigFile = new File("/etc/wireguard/%s.conf".formatted(interfaceName));
-        wgConfigFile.createNewFile();
         FileInputStream wgConfigFileSourceStream = new FileInputStream(wgConfigFileSource);
-        FileOutputStream wgConfigFileOutputStream = new FileOutputStream(wgConfigFile);
+        FileOutputStream wgConfigFileOutputStream = new FileOutputStream("/etc/wireguard/%s.conf".formatted(interfaceName));
         wgConfigFileOutputStream.write(wgConfigFileSourceStream.readAllBytes());
         wgConfigFileOutputStream.close();
         wgConfigFileSourceStream.close();
+        wgConfigFile = new File("/etc/wireguard/%s.conf".formatted(interfaceName));
+
         String resultOfCommand = shellRunner.execute(new String[]{"sudo","wg-quick", "up", wgConfigFile.getAbsolutePath()}, List.of(0,1));
         Assertions.assertFalse(resultOfCommand.contains("wg-quick:"));
     }
