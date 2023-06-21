@@ -39,6 +39,7 @@ public class PeerController {
                             mediaType = "application/json",
                             array = @ArraySchema(schema = @Schema(implementation = WgPeerDTO.class))
                     )
+                            //test tet
             }
             ),
             @ApiResponse(responseCode = "500", description = "Internal Server Error",
