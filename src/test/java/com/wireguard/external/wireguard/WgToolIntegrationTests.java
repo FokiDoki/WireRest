@@ -18,13 +18,16 @@ class WgToolIntegrationTests {
     private static File wgConfigFile;
     private final static String interfacePublicKey = "sBdtuH6Q84CmecM+A832NOyAb9Oz0W7rJdPCR/JS63I=";
     private final static WgTool wgTool = new WgTool();
-    public WgToolIntegrationTests() throws IOException {
+
+    @BeforeAll
+    static void setUpEnvironment() throws IOException {
+        wgConfigFile = new File("/etc/wireguard/%s.conf".formatted(interfaceName));
         FileInputStream wgConfigFileSourceStream = new FileInputStream(wgConfigFileSource);
-        FileOutputStream wgConfigFileOutputStream = new FileOutputStream("/etc/wireguard/%s.conf".formatted(interfaceName));
+        FileOutputStream wgConfigFileOutputStream = new FileOutputStream(wgConfigFile);
         wgConfigFileOutputStream.write(wgConfigFileSourceStream.readAllBytes());
         wgConfigFileOutputStream.close();
         wgConfigFileSourceStream.close();
-        wgConfigFile = new File("/etc/wireguard/%s.conf".formatted(interfaceName));
+
 
         String resultOfCommand = shellRunner.execute(new String[]{"sudo","wg-quick", "up", wgConfigFile.getAbsolutePath()}, List.of(0,1));
         Assertions.assertFalse(resultOfCommand.contains("wg-quick:"));
@@ -33,9 +36,9 @@ class WgToolIntegrationTests {
     @AfterAll
     static void tearDownEnvironment() {
         String resultOfCommand = shellRunner.execute(new String[]{"sudo","wg-quick", "down", wgConfigFile.getAbsolutePath()}, List.of(0,1));
-        //boolean isDeleted = wgConfigFile.delete();
+        boolean isDeleted = wgConfigFile.delete();
         Assertions.assertFalse(resultOfCommand.contains("wg-quick:"));
-        //Assertions.assertTrue(isDeleted);
+        Assertions.assertTrue(isDeleted);
     }
     @Test
     @Order(5)
