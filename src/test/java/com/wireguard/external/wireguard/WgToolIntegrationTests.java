@@ -1,6 +1,7 @@
 package com.wireguard.external.wireguard;
 
 import com.wireguard.external.shell.ShellRunner;
+import com.wireguard.external.wireguard.dto.CreatedPeer;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
@@ -8,6 +9,7 @@ import org.junit.jupiter.api.condition.OS;
 import java.io.*;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @EnabledOnOs(OS.LINUX)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -78,7 +80,9 @@ class WgToolIntegrationTests {
         String publicKey = wgTool.generatePublicKey(privateKey);
         String presharedKey = wgTool.generatePresharedKey();
         String allowedIps = "10.112.112.10/32";
-        wgTool.addPeer(interfaceName, publicKey, presharedKey, allowedIps, 0);
+        CreatedPeer createdPeer = new CreatedPeer(publicKey, presharedKey, privateKey,
+                Set.of(allowedIps), 0);
+        wgTool.addPeer(interfaceName, createdPeer);
         WgShowDump dump = wgTool.showDump(interfaceName);
         Optional<WgPeer> addedPeer = dump.peers().stream().filter(peer -> peer.getPublicKey().equals(publicKey)).findFirst();
         Assertions.assertTrue(addedPeer.isPresent());

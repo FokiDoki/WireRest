@@ -28,8 +28,8 @@ class PeerControllerTest {
     WgManager wgManager;
 
     Set<WgPeerDTO> peerDTOSet = Set.of(
-            WgPeerDTO.from(WgPeer.withPublicKey("PubKey1").build()),
-            WgPeerDTO.from(WgPeer.withPublicKey("PubKey2")
+            WgPeerDTO.from(WgPeer.publicKey("PubKey1").build()),
+            WgPeerDTO.from(WgPeer.publicKey("PubKey2")
                     .presharedKey("PresharedKey2")
                     .allowedIPv4Ips(Set.of("10.0.0.1/32","10.1.1.1/30"))
                     .allowedIPv6Ips(Set.of("2001:db8::/32"))

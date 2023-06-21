@@ -29,15 +29,15 @@ class WgManagerTest {
             321
     );
     final static List<WgPeer> peers = List.of(
-            WgPeer.withPublicKey("pubKey1")
+            WgPeer.publicKey("pubKey1")
                     .presharedKey("presharedKey1")
                     .allowedIPv4Ips(Set.of("10.0.0.1/32"))
                     .latestHandshake(0)
                     .transferRx(0)
                     .transferTx(0)
                     .build(),
-            WgPeer.withPublicKey("pubKey2").build(),
-            WgPeer.withPublicKey("pubKey3")
+            WgPeer.publicKey("pubKey2").build(),
+            WgPeer.publicKey("pubKey3")
                     .allowedIPv4Ips(Set.of("10.0.0.0/32"))
                     .build()
     );

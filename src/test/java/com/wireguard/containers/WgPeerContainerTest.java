@@ -12,7 +12,7 @@ public class WgPeerContainerTest {
     WgPeerContainer wgPeerContainer = new WgPeerContainer();
     @BeforeEach
     public void setUp() {
-        WgPeer peer1 = WgPeer.withPublicKey("publicKey1")
+        WgPeer peer1 = WgPeer.publicKey("publicKey1")
                         .presharedKey("presharedKey1")
                         .endpoint("192.168.0.1:2222")
                         .allowedIPv4Ips(Set.of("allowedIps1"))
@@ -21,7 +21,7 @@ public class WgPeerContainerTest {
                         .transferTx(1111)
                         .persistentKeepalive(0)
                         .build();
-        WgPeer peer2 = WgPeer.withPublicKey("publi+c/Key=2")
+        WgPeer peer2 = WgPeer.publicKey("publi+c/Key=2")
                         .presharedKey("presharedKey2")
                         .endpoint("192.168.0.1:2222")
                         .allowedIPv4Ips(Set.of("allowedIps1"))

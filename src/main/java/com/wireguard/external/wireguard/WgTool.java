@@ -1,6 +1,7 @@
 package com.wireguard.external.wireguard;
 
 import com.wireguard.external.shell.ShellRunner;
+import com.wireguard.external.wireguard.dto.CreatedPeer;
 import com.wireguard.parser.WgShowDumpParser;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -22,14 +23,15 @@ public class WgTool {
     private static final String WG_DEL_PEER_COMMAND = "wg set %s peer %s remove";
     private static final String WG_SAVE_COMMAND = "wg-quick save %s";
     private static final String WG_SHOW_CONF_COMMAND = "wg showconf %s";
-    private static final String presharedKeyPath = "/tmp/presharedKey";
+
+    static String presharedKeyPath = "/tmp/presharedKey";
     protected final ShellRunner shell = new ShellRunner();
 
     private String run(String commandStr, Boolean privileged) {
         String[] command = getCommand(commandStr, privileged);
         return shell.execute(command).strip();
     }
-    private String[] getCommand(String commandStr, Boolean privileged) {
+    protected String[] getCommand(String commandStr, Boolean privileged) {
         String[] command;
         if (privileged) {
             command = new String[]{"sudo", "/bin/sh", "-c", commandStr};
@@ -87,12 +89,15 @@ public class WgTool {
     }
 
     //I don't know how to do this without creating a file (wg set doesn't accept preshared key as a parameter)
-    public void addPeer(String interfaceName, String publicKey, String presharedKey,
-                        String allowedIps, int persistentKeepalive) {
-        createFile(presharedKeyPath, presharedKey);
+    public void addPeer(String interfaceName, CreatedPeer peer) {
+        createFile(presharedKeyPath, peer.getPresharedKey());
         try{
             run(WG_ADD_PEER_COMMAND.formatted(
-                interfaceName, publicKey, presharedKeyPath, allowedIps, persistentKeepalive), true);
+                interfaceName,
+                peer.getPublicKey(),
+                presharedKeyPath,
+                peer.getAddress(),
+                peer.getPersistentKeepalive()), true);
         } finally {
             deleteFile(presharedKeyPath);
         }

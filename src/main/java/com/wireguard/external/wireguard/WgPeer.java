@@ -21,7 +21,7 @@ public class WgPeer {
     private long transferTx;
     private int persistentKeepalive;
 
-    public static Builder withPublicKey(String publicKey) {
+    public static Builder publicKey(String publicKey) {
         return new Builder().publicKey(publicKey);
     }
 

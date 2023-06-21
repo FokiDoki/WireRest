@@ -3,11 +3,12 @@ package com.wireguard.external.wireguard;
 import com.wireguard.external.wireguard.dto.WgPeerDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Data
+@Getter
 @AllArgsConstructor
 public class WgPeerContainer {
     private List<WgPeer> peers;
@@ -19,12 +20,21 @@ public class WgPeerContainer {
         peers.add(peer);
     }
 
+    public void addPeers(Collection<WgPeer> peersForAdd){
+        peers.addAll(peersForAdd);
+    }
+
     public void removePeer(WgPeer peer){
         peers.remove(peer);
     }
 
     public void removePeer(int index){
         peers.remove(index);
+    }
+
+    public void removePeerByPublicKey(String publicKey){
+        Optional<WgPeer> peer = getByPublicKey(publicKey);
+        peer.ifPresent(this::removePeer);
     }
 
     public void clearPeers(){
