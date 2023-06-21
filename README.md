@@ -55,7 +55,7 @@ ___
 - ~~Migration to Spring WebFlux~~
 - Metrics for Prometheus
 - Add peer (Custom configuration)
-- Delete peer
+- ~~Delete peer~~
 - Update peer
 - Oauth2 authorization
 - Authorization key rate limits & scopes 
