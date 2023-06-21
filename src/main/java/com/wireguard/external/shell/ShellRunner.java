@@ -40,7 +40,7 @@ public class ShellRunner {
         return execute(command, List.of(0));
     }
 
-    private Process startProcess(String[] command) {
+    public Process startProcess(String[] command) {
         String stringCommand = String.join(" ", command);
         logger.trace("Executing command: %s".formatted(stringCommand));
         Runtime runtime = Runtime.getRuntime();
