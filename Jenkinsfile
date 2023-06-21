@@ -11,6 +11,7 @@ pipeline {
     stages {
         stage('Build') {
             steps {
+                pullRequest.addLabel('Build test')
                 echo sh(script: 'env|sort', returnStdout: true)
                 sh 'JAVA_HOME=/usr/lib/jvm/jdk-20 mvn clean validate compile'
             }
