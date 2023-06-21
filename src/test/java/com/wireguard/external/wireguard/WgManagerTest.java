@@ -57,7 +57,7 @@ class WgManagerTest {
         wgManager = new WgManager(
                 wgTool,
                 ipResolver,
-                new WgInterface(wgInterfaceName, "10.0.0.0"));
+                new WgInterface(wgInterfaceName, "10.0.0.0", null));
     }
 
     @AfterAll

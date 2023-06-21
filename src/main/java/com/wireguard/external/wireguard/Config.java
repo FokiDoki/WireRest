@@ -7,6 +7,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.io.IOException;
+import java.net.*;
+import java.util.Enumeration;
+import java.util.List;
 
 @Configuration
 public class Config {
@@ -40,11 +43,33 @@ public class Config {
 
     @Bean
     public WgInterface wgInterface(
-            @Value("${wg.interface.name}") String interfaceName,
-            @Value("${wg.interface.ip}") String interfaceIp
-    ){
+            @Value("${wg.interface.name}") String interfaceName
+    ) throws SocketException {
+        Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+        while(interfaces.hasMoreElements()) {
+            NetworkInterface networkInterface = interfaces.nextElement();
+            System.out.println(networkInterface.getName());
+            System.out.println(networkInterface.getDisplayName());
+            System.out.println(networkInterface.getIndex());
+            System.out.println(networkInterface.getMTU());
+            System.out.println(networkInterface.isLoopback());
+            System.out.println(networkInterface.isPointToPoint());
+            System.out.println(networkInterface.isUp());
+            System.out.println(networkInterface.isVirtual());
+            System.out.println(networkInterface.supportsMulticast());
+            System.out.println(networkInterface.getHardwareAddress());
+            System.out.println(networkInterface.getInterfaceAddresses());
+            System.out.println(networkInterface.getSubInterfaces());
+            System.out.println(networkInterface.getParent());
+            System.out.println(networkInterface.getNetworkInterfaces());
+            System.out.println(networkInterface.getSubInterfaces());
+            System.out.println(networkInterface.getInterfaceAddresses());
+            System.out.println("\n\n");
+            Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses();
+            // ...
+        }
         logger.info("Configuring WgInterface...");
-        return new WgInterface(interfaceName, interfaceIp);
+        return new WgInterface(interfaceName, "10.11.1.1", getInterfaceSubnet());
     }
 
 
