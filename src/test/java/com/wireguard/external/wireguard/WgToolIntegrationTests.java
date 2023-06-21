@@ -21,6 +21,7 @@ class WgToolIntegrationTests {
     @BeforeEach
     void setUpEnvironment() throws IOException {
         wgConfigFile = new File("/etc/wireguard/%s.conf".formatted(interfaceName));
+        wgConfigFile.createNewFile();
         FileInputStream wgConfigFileSourceStream = new FileInputStream(wgConfigFileSource);
         FileOutputStream wgConfigFileOutputStream = new FileOutputStream(wgConfigFile);
         wgConfigFileOutputStream.write(wgConfigFileSourceStream.readAllBytes());
