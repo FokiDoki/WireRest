@@ -88,6 +88,13 @@ public class PeerController {
         return new ResponseEntity<>(wgManager.createPeer(), HttpStatus.CREATED);
     }
 
+    @PostMapping("/peer/delete")
+    public void deletePeer(String publicKey) throws ParsingException {
+        if (wgManager.getPeerDTOByPublicKey(publicKey).isEmpty()){
+            throw new ResourceNotFoundException("Peer not found");
+        }
+        wgManager.deletePeer(publicKey);
+    }
 
 
 }

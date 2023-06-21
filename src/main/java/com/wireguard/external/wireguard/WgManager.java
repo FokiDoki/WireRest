@@ -79,4 +79,8 @@ public class WgManager {
                 0
         );
     }
+
+    public void deletePeer(String publicKey) {
+        wgTool.deletePeer(wgInterface.name(), publicKey);
+    }
 }
