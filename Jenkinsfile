@@ -11,6 +11,7 @@ pipeline {
     stages {
         stage('Build') {
             steps {
+                echo '${GITHUB_PR_HEAD_SHA}'
                 sh 'JAVA_HOME=/usr/lib/jvm/jdk-20 mvn clean validate compile'
             }
         }
