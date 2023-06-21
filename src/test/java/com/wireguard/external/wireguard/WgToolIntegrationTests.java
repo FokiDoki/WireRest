@@ -5,8 +5,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,13 +14,18 @@ import java.util.Optional;
 class WgToolIntegrationTests {
     private final static ShellRunner shellRunner = new ShellRunner();
     private final static String interfaceName = "wg_cont_test";
-    private final static File wgConfigFile = new File("src/test/resources/%s.conf".formatted(interfaceName));
-
+    private final static File wgConfigFileSource = new File("src/test/resources/%s.conf".formatted(interfaceName));
+    private static File wgConfigFile;
     private final static String interfacePublicKey = "sBdtuH6Q84CmecM+A832NOyAb9Oz0W7rJdPCR/JS63I=";
     private final static WgTool wgTool = new WgTool();
     @BeforeEach
-    void setUpEnvironment() {
-
+    void setUpEnvironment() throws IOException {
+        wgConfigFile = new File("/etc/wireguard/%s.conf".formatted(interfaceName));
+        FileInputStream wgConfigFileSourceStream = new FileInputStream(wgConfigFileSource);
+        FileOutputStream wgConfigFileOutputStream = new FileOutputStream(wgConfigFile);
+        wgConfigFileOutputStream.write(wgConfigFileSourceStream.readAllBytes());
+        wgConfigFileOutputStream.close();
+        wgConfigFileSourceStream.close();
         String resultOfCommand = shellRunner.execute(new String[]{"sudo","wg-quick", "up", wgConfigFile.getAbsolutePath()}, List.of(0,1));
         Assertions.assertFalse(resultOfCommand.contains("wg-quick:"));
     }
@@ -29,7 +33,9 @@ class WgToolIntegrationTests {
     @AfterAll
     static void tearDownEnvironment() {
         String resultOfCommand = shellRunner.execute(new String[]{"sudo","wg-quick", "down", wgConfigFile.getAbsolutePath()}, List.of(0,1));
+        boolean isDeleted = wgConfigFile.delete();
         Assertions.assertFalse(resultOfCommand.contains("wg-quick:"));
+        Assertions.assertTrue(isDeleted);
     }
     @Test
     @Order(5)
