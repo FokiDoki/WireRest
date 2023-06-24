@@ -63,7 +63,13 @@ public class Config {
             throw new RuntimeException("Network interface not found");
         }
         NetworkInterfaceDTO networkInterfaceDTO = new NetworkInterfaceDTO(interfaceName);
-        networkInterface.getInterfaceAddresses().forEach(networkInterfaceDTO::addInterfaceAddress);
+        networkInterface.getInterfaceAddresses().stream()
+                        .filter(interfaceAddress -> interfaceAddress.getAddress() instanceof Inet4Address)
+                        .findFirst().ifPresentOrElse( networkInterfaceDTO::addInterfaceAddress,
+                            () -> {
+                                logger.error("Network interface {} has no IPv4 address", interfaceName);
+                                throw new RuntimeException("Network interface %s has no IPv4 address".formatted(interfaceName));
+                            });
         networkInterface.getInetAddresses().asIterator().forEachRemaining(
                 inetAddress -> {
                     if (inetAddress instanceof Inet4Address) networkInterfaceDTO.addAddress((Inet4Address) inetAddress);
