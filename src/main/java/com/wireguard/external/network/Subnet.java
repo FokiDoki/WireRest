@@ -1,9 +1,10 @@
-package com.wireguard.external.wireguard;
+package com.wireguard.external.network;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.springframework.util.Assert;
 
+import java.net.Inet4Address;
 import java.util.List;
 
 @EqualsAndHashCode
@@ -14,11 +15,15 @@ public class Subnet {
     private static final String IP_VALIDATE_REGEX = "^((25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)(\\.(?!$)|$)){4}$";
 
 
-    public static Subnet fromString(String subnet){
+    public static Subnet valueOf(String subnet){
         Assert.isTrue(subnet.contains("/"), subnet+ " is not a valid subnet");
         String ip = subnet.split("/")[0];
         int mask = Integer.parseInt(subnet.split("/")[1]);
         return new Subnet(parseIp(ip), mask);
+    }
+
+    public static Subnet valueOf(Inet4Address inet4Address, int mask){
+        return new Subnet(inet4Address.getAddress(), mask);
     }
 
     public Subnet(byte[] ip, int mask){

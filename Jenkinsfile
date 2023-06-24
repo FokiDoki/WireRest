@@ -39,4 +39,9 @@ pipeline {
 
 
     }
+    post {
+        failure {
+            sh 'sudo journalctl -u wirerest.service --no-pager -n 250'
+        }
+    }
 }

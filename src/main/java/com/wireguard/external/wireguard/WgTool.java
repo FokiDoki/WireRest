@@ -53,7 +53,7 @@ public class WgTool {
 
 
 
-    public WgShowDump showDump(String interfaceName) throws IOException {
+    public WgShowDump showDump(String interfaceName) {
         Scanner scanner = runToScanner(WG_SHOW_DUMP_COMMAND.formatted(interfaceName), true);
         return WgShowDumpParser.fromDump(scanner);
     }
