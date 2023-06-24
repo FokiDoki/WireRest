@@ -41,7 +41,7 @@ pipeline {
     }
     post {
         failure {
-            sh 'systemctl status ${SERVICE_NAME}'
+            sh 'journalctl -u wirerest.service --no-pager -n 250'
         }
     }
 }
