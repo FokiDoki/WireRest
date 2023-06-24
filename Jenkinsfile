@@ -41,7 +41,7 @@ pipeline {
     }
     post {
         failure {
-            sh 'journalctl -u wirerest.service --no-pager -n 250'
+            sh 'sudo journalctl -u wirerest.service --no-pager -n 250'
         }
     }
 }
