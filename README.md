@@ -34,9 +34,6 @@ Server run on port 8081
 java -jar wire-rest.jar 
     --server.port=8081 # WireRest port
     --wg.interface.name=wg0 # Wireguard interface name
-    --wg.interface.subnet=10.66.66.0/24 # Subnet with which wireguard works
-    --wg.interface.ip=10.66.66.1 # Ip of wireguard
-    --wg.interface.port=51820 # Port of wireguard
     --wg.interface.new_client_subnet_mask=32 # Mask for ip of new peers
 ```
 

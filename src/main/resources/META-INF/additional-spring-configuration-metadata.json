@@ -6,21 +6,6 @@
       "description": "Wireguard interface name (interface should be already created)."
     },
     {
-      "name": "wg.interface.subnet",
-      "type": "java.lang.String",
-      "description": "Wireguard attached subnet (should be already created)."
-    },
-    {
-      "name": "wg.interface.ip",
-      "type": "java.net.InetAddress",
-      "description": "Wireguard interface IP address."
-    },
-    {
-      "name": "wg.interface.port",
-      "type": "java.lang.String",
-      "description": "Wireguard interface port."
-    },
-    {
       "name": "wg.interface.new_client_subnet_mask",
       "type": "java.lang.Integer",
       "description": "Mask for clients created with default params."
