@@ -1,6 +1,6 @@
 package com.wireguard.api.peer;
 
-import com.wireguard.external.wireguard.NoFreeIpException;
+import com.wireguard.external.network.NoFreeIpException;
 import com.wireguard.external.wireguard.WgManager;
 import com.wireguard.external.wireguard.WgPeer;
 import com.wireguard.external.wireguard.dto.CreatedPeer;

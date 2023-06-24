@@ -1,82 +1,87 @@
 package com.wireguard.external.wireguard;
 
+import com.wireguard.external.network.IpResolver;
+import com.wireguard.external.network.NetworkInterfaceDTO;
+import com.wireguard.external.network.Subnet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
-import java.io.IOException;
 import java.net.*;
-import java.util.Enumeration;
-import java.util.List;
+import java.util.function.Consumer;
 
 @Configuration
 public class Config {
 
     private static final Logger logger = LoggerFactory.getLogger(Config.class);
-    @Value("${wg.interface.subnet}")
-    private String interfaceSubnetString;
+    WgTool wgTool;
+
+    @Autowired
+    public Config(WgTool wgTool) {
+        this.wgTool = wgTool;
+    }
+
 
     @Bean
-    public IpResolver ipResolver(
-            WgTool wgTool,
-            WgInterface wgInterface
-    ) throws IOException {
+    public IpResolver ipResolver(NetworkInterfaceDTO wgInterface) {
         logger.info("Configuring IpResolver...");
-        Subnet interfaceSubnet = getInterfaceSubnet();
-        IpResolver ipResolver = new IpResolver(interfaceSubnet);
-        ipResolver.takeIp(interfaceSubnet.getFirstIpString());
-        ipResolver.takeIp(interfaceSubnet.getLastIpString());
-        ipResolver.takeIp(wgInterface.ip());
-
-        wgTool.showDump(wgInterface.name()).peers().forEach(
-                peer ->
-                        peer.getAllowedIps().getIPv4IPs().forEach(
-                                allowedIp ->
-                                    ipResolver.takeSubnet(Subnet.fromString(allowedIp))
-                        )
+        Subnet interfaceSubnet = wgInterface.getCidrV4Address().stream().findFirst().orElseThrow(
+                () -> new RuntimeException("Interface " + wgInterface.getName() + " has no IPv4 address")
         );
+        IpResolver ipResolver = new IpResolver(interfaceSubnet);
 
+        if (interfaceSubnet.getNumericMask()<=30) {
+            ipResolver.takeIp(interfaceSubnet.getFirstIpString());
+            ipResolver.takeIp(interfaceSubnet.getLastIpString());
+            wgInterface.getIpv4Addresses().forEach(iNet4Address -> ipResolver.takeIp(iNet4Address.getHostAddress()));
+        }
+        consumeBusyIps(ipResolver::takeIp, wgInterface.getName());
         return ipResolver;
     }
 
-    @Bean
-    public WgInterface wgInterface(
-            @Value("${wg.interface.name}") String interfaceName
-    ) throws SocketException {
-        Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-        while(interfaces.hasMoreElements()) {
-            NetworkInterface networkInterface = interfaces.nextElement();
-            System.out.println(networkInterface.getName());
-            System.out.println(networkInterface.getDisplayName());
-            System.out.println(networkInterface.getIndex());
-            System.out.println(networkInterface.getMTU());
-            System.out.println(networkInterface.isLoopback());
-            System.out.println(networkInterface.isPointToPoint());
-            System.out.println(networkInterface.isUp());
-            System.out.println(networkInterface.isVirtual());
-            System.out.println(networkInterface.supportsMulticast());
-            System.out.println(networkInterface.getHardwareAddress());
-            System.out.println(networkInterface.getInterfaceAddresses());
-            System.out.println(networkInterface.getSubInterfaces());
-            System.out.println(networkInterface.getParent());
-            System.out.println(networkInterface.getNetworkInterfaces());
-            System.out.println(networkInterface.getSubInterfaces());
-            System.out.println(networkInterface.getInterfaceAddresses());
-            System.out.println("\n\n");
-            Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses();
-            // ...
-        }
-        logger.info("Configuring WgInterface...");
-        return new WgInterface(interfaceName, "10.11.1.1", getInterfaceSubnet());
+
+
+    private void consumeBusyIps(Consumer<String> consumer, String interfaceName) {
+        wgTool.showDump(interfaceName).peers().forEach(
+                peer -> peer.getAllowedIps().getIPv4IPs().forEach(consumer)
+        );
     }
 
 
+    @Profile("prod")
+    @Bean
+    public NetworkInterfaceDTO wgInterface(
+            @Value("${wg.interface.name}") String interfaceName
+    ) throws SocketException {
+        NetworkInterface networkInterface = NetworkInterface.getByName(interfaceName);
+        if (networkInterface == null) {
+            logger.error("Network interface {} not found", interfaceName);
+            throw new RuntimeException("Network interface not found");
+        }
+        NetworkInterfaceDTO networkInterfaceDTO = new NetworkInterfaceDTO(interfaceName);
+        networkInterface.getInterfaceAddresses().forEach(networkInterfaceDTO::addInterfaceAddress);
+        networkInterface.getInetAddresses().asIterator().forEachRemaining(
+                inetAddress -> {
+                    if (inetAddress instanceof Inet4Address) networkInterfaceDTO.addAddress((Inet4Address) inetAddress);
+                });
+        return networkInterfaceDTO;
+    }
 
-
-
-    private Subnet getInterfaceSubnet(){
-        return Subnet.fromString(interfaceSubnetString);
+    @Profile("test")
+    @Bean
+    public NetworkInterfaceDTO wgInterfaceTest(
+            @Value("${wg.interface.name}") String interfaceName,
+            @Value("${wg.test.interface.cidr}") String cidr,
+            @Value("${wg.test.interface.interfaceIp}") String interfaceIp
+    ) throws UnknownHostException {
+        NetworkInterfaceDTO networkInterfaceDTO = new NetworkInterfaceDTO(interfaceName);
+        Subnet subnet = Subnet.valueOf(cidr);
+        networkInterfaceDTO.addInterfaceAddress(subnet);
+        networkInterfaceDTO.addAddress((Inet4Address) Inet4Address.getByName(interfaceIp));
+        return networkInterfaceDTO;
     }
 }

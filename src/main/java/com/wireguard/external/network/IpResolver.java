@@ -1,4 +1,4 @@
-package com.wireguard.external.wireguard;
+package com.wireguard.external.network;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -17,7 +17,7 @@ public class IpResolver {
 
 
 
-    private List<IpRange> availableRanges = new ArrayList<>();
+    private final List<IpRange> availableRanges = new ArrayList<>();
     private final IpRange totalAvailableRange;
     @Getter
     private final long totalIpsCount;
@@ -53,7 +53,7 @@ public class IpResolver {
     }
 
     public void takeIp(String ip){
-        takeSubnet(Subnet.fromString(ip+"/32"));
+        takeSubnet(Subnet.valueOf(ip+"/32"));
     }
 
     public void takeSubnet(Subnet subnet){

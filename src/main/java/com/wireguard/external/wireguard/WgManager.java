@@ -1,5 +1,8 @@
 package com.wireguard.external.wireguard;
 
+import com.wireguard.external.network.IpResolver;
+import com.wireguard.external.network.NetworkInterfaceDTO;
+import com.wireguard.external.network.Subnet;
 import com.wireguard.external.shell.ShellRunner;
 import com.wireguard.external.wireguard.dto.CreatedPeer;
 import com.wireguard.external.wireguard.dto.WgInterfaceDTO;
@@ -11,7 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
+import java.net.NetworkInterface;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -21,14 +24,14 @@ import java.util.Set;
 public class WgManager {
 
     private static final Logger logger = LoggerFactory.getLogger(ShellRunner.class);
-    private final WgInterface wgInterface;
+    private final NetworkInterfaceDTO wgInterface;
     @Value("${wg.interface.new_client_subnet_mask}")
     private int defaultMaskForNewClients = 32;
     private final IpResolver wgIpResolver;
     private static WgTool wgTool;
 
     @Autowired
-    public WgManager(WgTool wgTool, IpResolver wgIpResolver, WgInterface wgInterface) {
+    public WgManager(WgTool wgTool, IpResolver wgIpResolver, NetworkInterfaceDTO wgInterface) {
         WgManager.wgTool = wgTool;
         this.wgIpResolver = wgIpResolver;
         this.wgInterface = wgInterface;
@@ -42,12 +45,7 @@ public class WgManager {
 
 
     private WgShowDump getDump() {
-        try{
-            return wgTool.showDump(wgInterface.name());
-        } catch (IOException e) {
-            logger.error("Error getting dump", e);
-            throw new ParsingException("Error while getting dump", e);
-        }
+        return wgTool.showDump(wgInterface.getName());
     }
 
     public Optional<WgPeerDTO> getPeerDTOByPublicKey(String publicKey) throws ParsingException {
@@ -81,11 +79,11 @@ public class WgManager {
                 privateKey,
                 Set.of(address.toString()),
                 0);
-        wgTool.addPeer(wgInterface.name(), createdPeer);
+        wgTool.addPeer(wgInterface.getName(), createdPeer);
         return createdPeer;
     }
 
     public void deletePeer(String publicKey)  {
-        wgTool.deletePeer(wgInterface.name(), publicKey);
+        wgTool.deletePeer(wgInterface.getName(), publicKey);
     }
 }

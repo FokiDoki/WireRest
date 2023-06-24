@@ -1,5 +1,8 @@
 package com.wireguard.external.wireguard;
 
+import com.wireguard.external.network.IpResolver;
+import com.wireguard.external.network.NetworkInterfaceDTO;
+import com.wireguard.external.network.Subnet;
 import com.wireguard.external.wireguard.dto.CreatedPeer;
 import com.wireguard.external.wireguard.dto.WgInterfaceDTO;
 import com.wireguard.external.wireguard.dto.WgPeerDTO;
@@ -51,13 +54,14 @@ class WgManagerTest {
         Mockito.when(wgTool.generatePresharedKey()).thenReturn("generatedPsk");
         Mockito.when(wgTool.generatePublicKey("generatedPrivateKey")).thenReturn("GeneratedPubKeyFromPrivateKey");
 
-        IpResolver ipResolver = new IpResolver(Subnet.fromString("10.0.0.0/16"));
-        ipResolver.takeSubnet(Subnet.fromString("10.0.0.0/31"));
+        NetworkInterfaceDTO wgInterface = new NetworkInterfaceDTO(wgInterfaceName);
+        IpResolver ipResolver = new IpResolver(Subnet.valueOf("10.0.0.0/16"));
+        ipResolver.takeSubnet(Subnet.valueOf("10.0.0.0/31"));
 
         wgManager = new WgManager(
                 wgTool,
                 ipResolver,
-                new WgInterface(wgInterfaceName, "10.0.0.0", null));
+                wgInterface);
     }
 
     @AfterAll

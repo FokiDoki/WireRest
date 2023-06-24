@@ -1,4 +1,4 @@
-package com.wireguard.external.wireguard;
+package com.wireguard.external.network;
 
 public class NoFreeIpException extends RuntimeException{
     public NoFreeIpException(String message){
