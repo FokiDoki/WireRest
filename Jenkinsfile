@@ -40,7 +40,8 @@ pipeline {
 
     }
     post {
-    failure {
-        sh 'systemctl status ${SERVICE_NAME}'
+        failure {
+            sh 'systemctl status ${SERVICE_NAME}'
+        }
     }
 }
