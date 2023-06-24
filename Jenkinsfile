@@ -39,4 +39,8 @@ pipeline {
 
 
     }
+    post {
+    failure {
+        sh 'systemctl status ${SERVICE_NAME}'
+    }
 }
