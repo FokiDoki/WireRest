@@ -45,6 +45,7 @@ public class WgManager {
 
 
     private WgShowDump getDump() {
+        logger.debug("Dump requested for interface %s".formatted(wgInterface.getName()));
         return wgTool.showDump(wgInterface.getName());
     }
 
@@ -69,9 +70,9 @@ public class WgManager {
     }
 
     public CreatedPeer createPeer(){
-        String privateKey = wgTool.generatePrivateKey().strip();
-        String publicKey = wgTool.generatePublicKey(privateKey.strip()).strip();
-        String presharedKey = wgTool.generatePresharedKey().strip();
+        String privateKey = wgTool.generatePrivateKey();
+        String publicKey = wgTool.generatePublicKey(privateKey);
+        String presharedKey = wgTool.generatePresharedKey();
         Subnet address = wgIpResolver.takeFreeSubnet(defaultMaskForNewClients);
         CreatedPeer createdPeer = new CreatedPeer(
                 publicKey,
@@ -79,11 +80,19 @@ public class WgManager {
                 privateKey,
                 Set.of(address.toString()),
                 0);
-        wgTool.addPeer(wgInterface.getName(), createdPeer);
+        try {
+            wgTool.addPeer(wgInterface.getName(), createdPeer);
+            logger.info("Created peer, public key: %s".formatted(publicKey.substring(0, 6)));
+        } catch (Exception e){
+            wgIpResolver.freeSubnet(address);
+            throw e;
+        }
         return createdPeer;
     }
 
     public void deletePeer(String publicKey)  {
+
         wgTool.deletePeer(wgInterface.getName(), publicKey);
+        logger.info("Deleted peer, public key: %s".formatted(publicKey));
     }
 }

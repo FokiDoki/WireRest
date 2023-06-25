@@ -28,10 +28,16 @@ public class Config {
 
     @Bean
     public IpResolver ipResolver(NetworkInterfaceDTO wgInterface) {
+
         logger.info("Configuring IpResolver...");
         Subnet interfaceSubnet = wgInterface.getCidrV4Address().stream().findFirst().orElseThrow(
                 () -> new RuntimeException("Interface " + wgInterface.getName() + " has no IPv4 address")
         );
+        logger.info("Using interface: %s, address: %s, mask: %d".formatted(
+                wgInterface.getName(),
+                interfaceSubnet.toString(),
+                interfaceSubnet.getNumericMask()
+                ));
         IpResolver ipResolver = new IpResolver(interfaceSubnet);
 
         if (interfaceSubnet.getNumericMask()<=30) {
@@ -39,13 +45,19 @@ public class Config {
             ipResolver.takeIp(interfaceSubnet.getLastIpString());
             wgInterface.getIpv4Addresses().forEach(iNet4Address -> ipResolver.takeIp(iNet4Address.getHostAddress()));
         }
-        consumeBusyIps(ipResolver::takeIp, wgInterface.getName());
+        consumeUsedIps(ipResolver::takeIp, wgInterface.getName());
+
+        logger.info("IpResolver configured, available IPs: %d, used IPs: %d, Total: %d".formatted(
+                ipResolver.getAvailableIpsCount(),
+                ipResolver.getUsedIpsCount(),
+                ipResolver.getTotalIpsCount()-2
+        ));
         return ipResolver;
     }
 
 
 
-    private void consumeBusyIps(Consumer<String> consumer, String interfaceName) {
+    private void consumeUsedIps(Consumer<String> consumer, String interfaceName) {
         wgTool.showDump(interfaceName).peers().forEach(
                 peer -> peer.getAllowedIps().getIPv4IPs().forEach(consumer)
         );
