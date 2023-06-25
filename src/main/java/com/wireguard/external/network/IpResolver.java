@@ -74,7 +74,7 @@ public class IpResolver {
             availableRanges.addAll(currRangeIndex, insertSubnetIntoIpRange(subnet, availableRange));
             availableIpsCount -= subnet.getIpCount();
         } else {
-            throw new NoFreeIpException("Subnet " + subnet + " is is already taken");
+            throw new NoFreeIpException("Subnet " + subnet + " is is already used");
         }
     }
 
@@ -126,7 +126,7 @@ public class IpResolver {
             }
             availableIpsCount += subnet.getIpCount();
         } else {
-            throw new UncheckedIOException(new IOException("This subnet is not taken"));
+            throw new UncheckedIOException(new IOException("This subnet is not used"));
         }
     }
 
@@ -164,7 +164,7 @@ public class IpResolver {
         }
     }
 
-    public long getTakenIpsCount(){
+    public long getUsedIpsCount(){
         return totalIpsCount - availableIpsCount;
     }
 
