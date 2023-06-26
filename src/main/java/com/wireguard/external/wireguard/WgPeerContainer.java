@@ -60,6 +60,13 @@ public class WgPeerContainer extends TreeSet<WgPeer> implements IWgPeerContainer
 
         Comparator<Object> comparator = (o1, o2) -> {
             try {
+                if (field.get(o1) == null && field.get(o2) == null) {
+                    return 0;
+                } else if (field.get(o1) == null) {
+                    return -1;
+                } else if (field.get(o2) == null) {
+                    return 1;
+                }
                 if (field.get(o1) instanceof Comparable){
                     return ((Comparable<Object>) field.get(o1)).compareTo(field.get(o2));
                 }
