@@ -56,6 +56,6 @@ ___
 - Update peer
 - Oauth2 authorization
 - Authorization key rate limits & scopes 
-- Sort peers by key, ip, received, sent, last handshake etc. 
+- ~~Sort peers by key, ip, received, sent, last handshake etc.~~
 - Callback API 
 - Caching 
