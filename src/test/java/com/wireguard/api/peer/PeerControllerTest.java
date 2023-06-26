@@ -10,9 +10,11 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -27,7 +29,7 @@ class PeerControllerTest {
     @MockBean
     WgManager wgManager;
 
-    Set<WgPeerDTO> peerDTOSet = Set.of(
+    List<WgPeerDTO> peerDTOList = List.of(
             WgPeerDTO.from(WgPeer.publicKey("PubKey1").build()),
             WgPeerDTO.from(WgPeer.publicKey("PubKey2")
                     .presharedKey("PresharedKey2")
@@ -43,8 +45,8 @@ class PeerControllerTest {
 
     @Test
     void getPeers() {
-        Mockito.when(wgManager.getPeers()).thenReturn(peerDTOSet);
-        Iterator<WgPeerDTO> peersIter = peerDTOSet.iterator();
+        Mockito.when(wgManager.getPeers(Sort.by("publicKey"))).thenReturn(peerDTOList);
+        Iterator<WgPeerDTO> peersIter = peerDTOList.iterator();
         webClient.get().uri("/peers").exchange()
                 .expectStatus().isOk()
                 .expectBodyList(WgPeerDTO.class).hasSize(2)
@@ -55,7 +57,7 @@ class PeerControllerTest {
     @Test
     void getPeerByPublicKey() {
         Optional<WgPeerDTO> peer = Optional.of(
-                peerDTOSet.stream().filter(p -> p.getPublicKey().equals("PubKey2"))
+                peerDTOList.stream().filter(p -> p.getPublicKey().equals("PubKey2"))
                 .findFirst().get()
         );
         Mockito.when(wgManager.getPeerDTOByPublicKey("PubKey2"))

@@ -44,7 +44,7 @@ class WgShowDumpParserTest {
         WgShowDump dump = WgShowDumpParser.fromDump(wgShowDump);
         WgPeerContainer wgPeers = new WgPeerContainer(dump.peers());
         Assertions.assertEquals(11, wgPeers.size());
-        WgPeer peer = dump.peers().stream().filter(p -> p.getEndpoint().equals(FIRST_PEER_ENDPOINT)).findFirst().get();
+        WgPeer peer = dump.peers().stream().filter(p -> p.getPublicKey().equals("8avysqyA1N+IIX8d1gergergergergbHf2TfuEfw4ff=")).findFirst().get();
         Assertions.assertEquals(FIRST_PEER_ENDPOINT, peer.getEndpoint());
         Assertions.assertEquals(Set.of("10.66.66.2/32", "fd42:42:42::2/128"), peer.getAllowedIps().getAll());
         Assertions.assertEquals(FIRST_PEER_PERSISTENT_KEEPALIVE, peer.getPersistentKeepalive());
