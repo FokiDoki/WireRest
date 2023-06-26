@@ -1,5 +1,6 @@
 package com.wireguard.external.wireguard;
 
+import com.wireguard.external.network.Subnet;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.beans.support.PagedListHolder;
@@ -42,6 +43,7 @@ public class WgPeerContainer extends TreeSet<WgPeer> implements IWgPeerContainer
         return super.stream()
                 .map(peer -> peer.getAllowedIps().getIPv4IPs())
                 .flatMap(Collection::stream)
+                .map(Subnet::toString)
                 .collect(Collectors.toSet());
     }
 

@@ -62,7 +62,9 @@ public class Config {
 
     private void consumeUsedIps(Consumer<String> consumer, String interfaceName) {
         wgTool.showDump(interfaceName).peers().forEach(
-                peer -> peer.getAllowedIps().getIPv4IPs().forEach(consumer)
+                peer -> peer.getAllowedIps().getIPv4IPs().stream()
+                        .map(Subnet::toString)
+                        .forEach(consumer)
         );
     }
 

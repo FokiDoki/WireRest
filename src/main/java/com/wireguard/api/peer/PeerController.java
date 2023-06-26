@@ -7,6 +7,7 @@ import com.wireguard.external.wireguard.ParsingException;
 import com.wireguard.external.wireguard.WgManager;
 import com.wireguard.external.wireguard.dto.CreatedPeer;
 import com.wireguard.external.wireguard.dto.WgPeerDTO;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -50,12 +51,19 @@ public class PeerController {
                     content = { @Content(mediaType = "application/json",
                             schema = @Schema(implementation = AppError.class)) }) })
     @GetMapping("/peers")
+    @Parameter(name = "page", description = "Page number")
+    @Parameter(name = "limit", description = "Page size (In case of 0, all peers will be returned)")
+    @Parameter(name = "sort", description = "Sort key and direction separated by a dot. The keys are the same as in the answer. " +
+            "Direction is optional and may have value DESC (High to low) and ASC (Low to high). Default is DESC. ", example = "transferTx.desc")
     public List<WgPeerDTO> getPeers(
             @RequestParam(value = "page", required = false, defaultValue = "0") int page,
             @RequestParam(value = "limit", required = false, defaultValue = "1000") int limit,
-            @RequestParam(value = "sort", required = false, defaultValue = "publicKey.asc") String sortKey
+            @RequestParam(value = "sort", required = false, defaultValue = "allowedIps.asc") String sortKey
     ) throws ParsingException {
         List<WgPeerDTO> peers;
+        if (limit == 0){
+            limit = Integer.MAX_VALUE;
+        }
         try {
             Pageable pageable = PageRequest.of(page, limit, getSort(sortKey));
             peers = wgManager.getPeers(pageable);
@@ -66,10 +74,10 @@ public class PeerController {
     }
 
 
-    public Sort getSort(String sortKey){
+    private Sort getSort(String sortKey){
         String[] keys = sortKey.split("\\.");
         if (keys.length == 1){
-            return Sort.by(sortKey);
+            return Sort.by(sortKey).descending();
         } else {
             Sort.Direction direction = Sort.Direction.fromString(keys[1]);
             return Sort.by(direction, keys[0]);
