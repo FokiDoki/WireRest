@@ -2,6 +2,7 @@ package com.wireguard.api.peer;
 
 import com.wireguard.api.AppError;
 import com.wireguard.external.network.NoFreeIpException;
+import com.wireguard.external.wireguard.ParsingException;
 import com.wireguard.external.wireguard.WgManager;
 import com.wireguard.external.wireguard.WgPeer;
 import com.wireguard.external.wireguard.dto.CreatedPeer;
@@ -13,6 +14,8 @@ import org.mockito.internal.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
@@ -48,7 +51,8 @@ class PeerControllerTest {
 
     @Test
     void getPeers() {
-        Mockito.when(wgManager.getPeers(Sort.by("publicKey"))).thenReturn(peerDTOList);
+        Mockito.when(wgManager.getPeers((Pageable) Mockito.any())).thenReturn(peerDTOList);
+
         Iterator<WgPeerDTO> peersIter = peerDTOList.iterator();
         webClient.get().uri("/peers").exchange()
                 .expectStatus().isOk()
@@ -56,6 +60,74 @@ class PeerControllerTest {
                 .contains(peersIter.next())
                 .contains(peersIter.next());
     }
+
+    @Test
+    void getPeersWithPageable() {
+        List<WgPeerDTO> peers = peerDTOList.stream().toList().subList(0,2);
+        Mockito.when(wgManager.getPeers(PageRequest.of(1, 2, Sort.by(Sort.Direction.ASC, "PresharedKey"))))
+                .thenReturn(peers);
+        webClient.get().uri(uriBuilder -> uriBuilder
+                        .path("/peers")
+                        .queryParam("page", 1)
+                        .queryParam("limit", 2)
+                        .queryParam("sort", "PresharedKey.asc")
+                        .build())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(WgPeerDTO.class).hasSize(2)
+                .contains(peers.get(0), peers.get(1));
+    }
+
+    @Test
+    void getPeersWithWrongPage(){
+        Mockito.when(wgManager.getPeers(PageRequest.of(1, 2, Sort.by(Sort.Direction.ASC, "WrongField"))))
+                .thenThrow(new ParsingException("WrongField", new RuntimeException()));
+        webClient.get().uri(uriBuilder -> uriBuilder
+                        .path("/peers")
+                        .queryParam("page", -1)
+                        .queryParam("limit", 2)
+                        .queryParam("sort", "PresharedKey.asc")
+                        .build())
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody()
+                .jsonPath("$.code").isEqualTo(400)
+                .jsonPath("$.message").value(containsString("Page"));
+    }
+
+    @Test
+    void getPeersWithWrongLimit(){
+        webClient.get().uri(uriBuilder -> uriBuilder
+                        .path("/peers")
+                        .queryParam("page", 0)
+                        .queryParam("limit", -1)
+                        .queryParam("sort", "PresharedKey.asc")
+                        .build())
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody()
+                .jsonPath("$.code").isEqualTo(400)
+                .jsonPath("$.message").value(containsString("size"));
+    }
+
+    @Test
+    void getPeersWithWrongSortKey(){
+        Mockito.when(wgManager.getPeers(PageRequest.of(0, 1, Sort.by(Sort.Direction.ASC, "WrongKey"))))
+                .thenThrow(new ParsingException("WrongField", new RuntimeException()));
+        webClient.get().uri(uriBuilder -> uriBuilder
+                        .path("/peers")
+                        .queryParam("page", 0)
+                        .queryParam("limit", 1)
+                        .queryParam("sort", "WrongKey.asc")
+                        .build())
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody()
+                .jsonPath("$.code").isEqualTo(400)
+                .jsonPath("$.message").value(containsString("Field"));
+    }
+
+
 
     @Test
     void getPeerByPublicKey() {
@@ -140,5 +212,6 @@ class PeerControllerTest {
                 .expectBody(AppError.class)
                 .isEqualTo(new AppError(404, "Peer with public key PubKey2 not found"));
     }
+
 
 }

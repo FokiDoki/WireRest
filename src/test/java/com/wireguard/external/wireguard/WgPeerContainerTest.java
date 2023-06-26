@@ -4,6 +4,9 @@ import org.assertj.core.util.IterableUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import java.util.Iterator;
@@ -61,6 +64,16 @@ class WgPeerContainerTest {
         assertFalse(ipv4Addresses.isEmpty());
         assertEquals(3, ipv4Addresses.size());
         assertTrue(ipv4Addresses.contains("10.0.0.1/32"));
+    }
+
+    @Test
+    void findAllPageable() {
+        Page<WgPeer> page = container.findAll(PageRequest.of(1, 2, Sort.by("latestHandshake").descending()));
+        assertNotNull(page);
+        List<WgPeer> peers = page.getContent();
+        assertEquals(2, peers.size());
+        assertEquals(1, peers.get(0).getLatestHandshake());
+        assertEquals(0, peers.get(1).getLatestHandshake());
     }
 
     @Test
