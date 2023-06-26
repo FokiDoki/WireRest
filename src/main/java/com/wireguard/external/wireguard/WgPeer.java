@@ -1,5 +1,7 @@
 package com.wireguard.external.wireguard;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import lombok.*;
 import org.springframework.util.Assert;
 
@@ -12,6 +14,7 @@ import java.util.Set;
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class WgPeer {
+    @Id
     private String publicKey;
     private String presharedKey;
     private String endpoint;

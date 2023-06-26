@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import java.net.NetworkInterface;
@@ -68,6 +69,12 @@ public class WgManager {
         WgPeerContainer peerContainer = getWgPeerContainer();
         return peerContainer.toDTOSet();
     }
+    public Set<WgPeerDTO> getPeers(Sort sort){
+        WgPeerContainer peerContainer = getWgPeerContainer();
+        peerContainer.findAll(sort);
+        return peerContainer.toDTOSet();
+    }
+
 
     public CreatedPeer createPeer(){
         String privateKey = wgTool.generatePrivateKey();

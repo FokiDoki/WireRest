@@ -4,13 +4,18 @@ import com.wireguard.external.wireguard.dto.WgPeerDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Getter
 @AllArgsConstructor
-public class WgPeerContainer {
+public class WgPeerContainer implements PagingAndSortingRepository<WgPeer, String> {
     private List<WgPeer> peers;
 
     public WgPeerContainer(){
@@ -92,5 +97,30 @@ public class WgPeerContainer {
         return peers.stream()
                 .map(WgPeerDTO::from)
                 .collect(Collectors.toSet());
+    }
+
+    @Override
+    public Iterable<WgPeer> findAll(Sort sort) {
+        sort.get().forEach(System.out::println);
+        return null;
+    }
+
+    private List<Object> sortList(Iterator<Sort.Order> orders, List<Object> list){
+        if (!orders.hasNext()) {
+            return list;
+        }
+        Sort.Order order = orders.next();
+        Comparator<Object> comparator = Comparator.comparing(o -> o.);
+        if (order.isAscending()) {
+            comparator = comparator.reversed();
+        }
+        list.sort(comparator);
+
+
+    }
+
+    @Override
+    public Page<WgPeer> findAll(Pageable pageable) {
+        return null;
     }
 }
