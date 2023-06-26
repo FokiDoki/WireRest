@@ -8,7 +8,7 @@ import java.net.Inet4Address;
 import java.util.List;
 
 @EqualsAndHashCode
-public class Subnet {
+public class Subnet implements Comparable<Subnet> {
     private final byte[] ip;
     private final byte[] mask;
     @Getter private final int numericMask;
@@ -154,5 +154,10 @@ public class Subnet {
             }
         }
         return maskBytes;
+    }
+
+    @Override
+    public int compareTo(Subnet o) {
+        return Long.compare(getFirstIpNumeric(), o.getFirstIpNumeric());
     }
 }

@@ -31,7 +31,7 @@ class WgManagerTest {
             1234,
             321
     );
-    final static List<WgPeer> peers = List.of(
+    final static Set<WgPeer> peers = Set.of(
             WgPeer.publicKey("pubKey1")
                     .presharedKey("presharedKey1")
                     .allowedIPv4Ips(Set.of("10.0.0.1/32"))
@@ -80,7 +80,7 @@ class WgManagerTest {
     void getPeerByPublicKey() {
         Optional<WgPeerDTO> peer = wgManager.getPeerDTOByPublicKey("pubKey1");
         assertTrue(peer.isPresent());
-        assertEquals(WgPeerDTO.from(peers.get(0)), peer.get());
+        assertEquals(WgPeerDTO.from(peers.stream().filter(p -> p.getPublicKey().equals("pubKey1")).findFirst().get()), peer.get());
     }
 
     @Test

@@ -2,11 +2,11 @@ package com.wireguard.external.network;
 
 import lombok.Getter;
 
-import java.net.*;
+import java.net.Inet4Address;
+import java.net.InterfaceAddress;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.function.Consumer;
 
 public class NetworkInterfaceDTO {
     @Getter  private final String name;

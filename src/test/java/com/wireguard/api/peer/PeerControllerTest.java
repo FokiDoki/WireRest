@@ -1,18 +1,26 @@
 package com.wireguard.api.peer;
 
+import com.wireguard.api.AppError;
 import com.wireguard.external.network.NoFreeIpException;
+import com.wireguard.external.wireguard.ParsingException;
 import com.wireguard.external.wireguard.WgManager;
 import com.wireguard.external.wireguard.WgPeer;
 import com.wireguard.external.wireguard.dto.CreatedPeer;
 import com.wireguard.external.wireguard.dto.WgPeerDTO;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.internal.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -27,7 +35,7 @@ class PeerControllerTest {
     @MockBean
     WgManager wgManager;
 
-    Set<WgPeerDTO> peerDTOSet = Set.of(
+    List<WgPeerDTO> peerDTOList = List.of(
             WgPeerDTO.from(WgPeer.publicKey("PubKey1").build()),
             WgPeerDTO.from(WgPeer.publicKey("PubKey2")
                     .presharedKey("PresharedKey2")
@@ -43,8 +51,9 @@ class PeerControllerTest {
 
     @Test
     void getPeers() {
-        Mockito.when(wgManager.getPeers()).thenReturn(peerDTOSet);
-        Iterator<WgPeerDTO> peersIter = peerDTOSet.iterator();
+        Mockito.when(wgManager.getPeers((Pageable) Mockito.any())).thenReturn(peerDTOList);
+
+        Iterator<WgPeerDTO> peersIter = peerDTOList.iterator();
         webClient.get().uri("/peers").exchange()
                 .expectStatus().isOk()
                 .expectBodyList(WgPeerDTO.class).hasSize(2)
@@ -53,9 +62,77 @@ class PeerControllerTest {
     }
 
     @Test
+    void getPeersWithPageable() {
+        List<WgPeerDTO> peers = peerDTOList.stream().toList().subList(0,2);
+        Mockito.when(wgManager.getPeers(PageRequest.of(1, 2, Sort.by(Sort.Direction.ASC, "PresharedKey"))))
+                .thenReturn(peers);
+        webClient.get().uri(uriBuilder -> uriBuilder
+                        .path("/peers")
+                        .queryParam("page", 1)
+                        .queryParam("limit", 2)
+                        .queryParam("sort", "PresharedKey.asc")
+                        .build())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(WgPeerDTO.class).hasSize(2)
+                .contains(peers.get(0), peers.get(1));
+    }
+
+    @Test
+    void getPeersWithWrongPage(){
+        Mockito.when(wgManager.getPeers(PageRequest.of(1, 2, Sort.by(Sort.Direction.ASC, "WrongField"))))
+                .thenThrow(new ParsingException("WrongField", new RuntimeException()));
+        webClient.get().uri(uriBuilder -> uriBuilder
+                        .path("/peers")
+                        .queryParam("page", -1)
+                        .queryParam("limit", 2)
+                        .queryParam("sort", "PresharedKey.asc")
+                        .build())
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody()
+                .jsonPath("$.code").isEqualTo(400)
+                .jsonPath("$.message").value(containsString("Page"));
+    }
+
+    @Test
+    void getPeersWithWrongLimit(){
+        webClient.get().uri(uriBuilder -> uriBuilder
+                        .path("/peers")
+                        .queryParam("page", 0)
+                        .queryParam("limit", -1)
+                        .queryParam("sort", "PresharedKey.asc")
+                        .build())
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody()
+                .jsonPath("$.code").isEqualTo(400)
+                .jsonPath("$.message").value(containsString("size"));
+    }
+
+    @Test
+    void getPeersWithWrongSortKey(){
+        Mockito.when(wgManager.getPeers(PageRequest.of(0, 1, Sort.by(Sort.Direction.ASC, "WrongKey"))))
+                .thenThrow(new ParsingException("WrongField", new RuntimeException()));
+        webClient.get().uri(uriBuilder -> uriBuilder
+                        .path("/peers")
+                        .queryParam("page", 0)
+                        .queryParam("limit", 1)
+                        .queryParam("sort", "WrongKey.asc")
+                        .build())
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody()
+                .jsonPath("$.code").isEqualTo(400)
+                .jsonPath("$.message").value(containsString("Field"));
+    }
+
+
+
+    @Test
     void getPeerByPublicKey() {
         Optional<WgPeerDTO> peer = Optional.of(
-                peerDTOSet.stream().filter(p -> p.getPublicKey().equals("PubKey2"))
+                peerDTOList.stream().filter(p -> p.getPublicKey().equals("PubKey2"))
                 .findFirst().get()
         );
         Mockito.when(wgManager.getPeerDTOByPublicKey("PubKey2"))
@@ -108,5 +185,33 @@ class PeerControllerTest {
                 .jsonPath("$.code").isEqualTo(500)
                 .jsonPath("$.message").value(containsString("ip"));
     }
+
+    @Test
+    void deletePeer() {
+        WgPeerDTO peerToDelete = peerDTOList.get(1);
+        Mockito.when(wgManager.getPeerDTOByPublicKey("PubKey2")).thenReturn(Optional.of(peerToDelete));
+        webClient.delete().uri(uriBuilder -> uriBuilder
+                        .path("/peer/delete")
+                        .queryParam("publicKey", "PubKey2")
+                        .build())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(WgPeerDTO.class)
+                .isEqualTo(peerToDelete);
+    }
+
+    @Test
+    void deletePeerNotExists(){
+        Mockito.when(wgManager.getPeerDTOByPublicKey(Mockito.anyString())).thenReturn(Optional.empty());
+        webClient.delete().uri(uriBuilder -> uriBuilder
+                        .path("/peer/delete")
+                        .queryParam("publicKey", "PubKey2")
+                        .build())
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody(AppError.class)
+                .isEqualTo(new AppError(404, "Peer with public key PubKey2 not found"));
+    }
+
 
 }

@@ -11,7 +11,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
-import java.net.*;
+import java.net.Inet4Address;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.function.Consumer;
 
 @Configuration
@@ -59,7 +62,9 @@ public class Config {
 
     private void consumeUsedIps(Consumer<String> consumer, String interfaceName) {
         wgTool.showDump(interfaceName).peers().forEach(
-                peer -> peer.getAllowedIps().getIPv4IPs().forEach(consumer)
+                peer -> peer.getAllowedIps().getIPv4IPs().stream()
+                        .map(Subnet::toString)
+                        .forEach(consumer)
         );
     }
 

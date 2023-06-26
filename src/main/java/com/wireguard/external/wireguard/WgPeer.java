@@ -1,17 +1,18 @@
 package com.wireguard.external.wireguard;
 
+import com.wireguard.external.network.Subnet;
 import lombok.*;
 import org.springframework.util.Assert;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-
+import java.util.stream.Collectors;
 
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class WgPeer {
+public class WgPeer implements Comparable<WgPeer> {
     private String publicKey;
     private String presharedKey;
     private String endpoint;
@@ -20,7 +21,6 @@ public class WgPeer {
     private long transferRx;
     private long transferTx;
     private int persistentKeepalive;
-
     public static Builder publicKey(String publicKey) {
         return new Builder().publicKey(publicKey);
     }
@@ -39,14 +39,19 @@ public class WgPeer {
                 '}';
     }
 
+    @Override
+    public int compareTo(WgPeer o) {
+        return this.publicKey.compareTo(o.publicKey);
+    }
+
     @Data
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class AllowedIps{
-        private Set<String> IPv4IPs = new HashSet<>();
+    public static class AllowedIps implements Comparable<AllowedIps>{
+        private Set<Subnet> IPv4IPs = new HashSet<>();
         private Set<String> IPv6IPs = new HashSet<>();
 
         public void addIpv4(String allowedIPv4Ip){
-            IPv4IPs.add(allowedIPv4Ip);
+            IPv4IPs.add(Subnet.valueOf(allowedIPv4Ip));
         }
 
         public void addIpv6(String allowedIPv6Ip){
@@ -55,7 +60,7 @@ public class WgPeer {
 
         public Set<String> getAll(){
             Set<String> allowedIps = new HashSet<>();
-            allowedIps.addAll(IPv4IPs);
+            IPv4IPs.forEach(subnet -> allowedIps.add(subnet.toString()));
             allowedIps.addAll(IPv6IPs);
             return Collections.unmodifiableSet(allowedIps);
         }
@@ -65,6 +70,12 @@ public class WgPeer {
         }
         public boolean isEmpty(){
             return IPv4IPs.isEmpty() && IPv6IPs.isEmpty();
+        }
+
+        @Override
+        public int compareTo(AllowedIps o) {
+            return IPv4IPs.stream().findFirst().orElse(Subnet.valueOf("0.0.0.0/32"))
+                    .compareTo(o.IPv4IPs.stream().findFirst().orElse(Subnet.valueOf("0.0.0.0/32")));
         }
     }
 
@@ -97,7 +108,10 @@ public class WgPeer {
         }
 
         public Builder allowedIPv4Ips(Set<String> allowedIPv4Ips) {
-            this.allowedIps.setIPv4IPs(allowedIPv4Ips);
+            this.allowedIps.setIPv4IPs(allowedIPv4Ips.stream()
+                    .map(Subnet::valueOf)
+                    .collect(Collectors.toSet()
+                    ));
             return this;
         }
 

@@ -1,25 +1,27 @@
 package com.wireguard.api.peer;
 
 import com.wireguard.api.AppError;
+import com.wireguard.api.BadRequestException;
 import com.wireguard.api.ResourceNotFoundException;
 import com.wireguard.external.wireguard.ParsingException;
 import com.wireguard.external.wireguard.WgManager;
 import com.wireguard.external.wireguard.dto.CreatedPeer;
 import com.wireguard.external.wireguard.dto.WgPeerDTO;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @RestController
 public class PeerController {
@@ -42,13 +44,45 @@ public class PeerController {
                     )
             }
             ),
+            @ApiResponse(responseCode = "400", description = "Bad Request",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = AppError.class)) }),
             @ApiResponse(responseCode = "500", description = "Internal Server Error",
                     content = { @Content(mediaType = "application/json",
                             schema = @Schema(implementation = AppError.class)) }) })
     @GetMapping("/peers")
-    public Set<WgPeerDTO> getPeers() throws ParsingException {
-        return wgManager.getPeers();
-    }   
+    @Parameter(name = "page", description = "Page number")
+    @Parameter(name = "limit", description = "Page size (In case of 0, all peers will be returned)")
+    @Parameter(name = "sort", description = "Sort key and direction separated by a dot. The keys are the same as in the answer. " +
+            "Direction is optional and may have value DESC (High to low) and ASC (Low to high). Default is DESC. ", example = "transferTx.desc")
+    public List<WgPeerDTO> getPeers(
+            @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+            @RequestParam(value = "limit", required = false, defaultValue = "1000") int limit,
+            @RequestParam(value = "sort", required = false, defaultValue = "allowedIps.asc") String sortKey
+    ) throws ParsingException {
+        List<WgPeerDTO> peers;
+        if (limit == 0){
+            limit = Integer.MAX_VALUE;
+        }
+        try {
+            Pageable pageable = PageRequest.of(page, limit, getSort(sortKey));
+            peers = wgManager.getPeers(pageable);
+        } catch (IllegalArgumentException | ParsingException e){
+            throw new BadRequestException(e.getMessage());
+        }
+        return peers;
+    }
+
+
+    private Sort getSort(String sortKey){
+        String[] keys = sortKey.split("\\.");
+        if (keys.length == 1){
+            return Sort.by(sortKey).descending();
+        } else {
+            Sort.Direction direction = Sort.Direction.fromString(keys[1]);
+            return Sort.by(direction, keys[0]);
+        }
+    }
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK",
@@ -113,7 +147,7 @@ public class PeerController {
     public WgPeerDTO deletePeer(String publicKey) throws ParsingException {
         Optional<WgPeerDTO> peer = wgManager.getPeerDTOByPublicKey(publicKey);
         if (peer.isEmpty()){
-            throw new ResourceNotFoundException("Peer not found");
+            throw new ResourceNotFoundException("Peer with public key %s not found".formatted(publicKey));
         }
         wgManager.deletePeer(publicKey);
         return peer.get();

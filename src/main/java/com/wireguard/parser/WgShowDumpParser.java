@@ -8,10 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
-import java.io.BufferedReader;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Scanner;
+import java.util.Set;
 
 
 public class WgShowDumpParser {
@@ -31,7 +30,7 @@ public class WgShowDumpParser {
         String dumpHeader = dump.nextLine();
         try {
             WgInterfaceDTO wgInterfaceDTO = parseInterface(dumpHeader);
-            List<WgPeer> peers = parsePeers(dump);
+            Set<WgPeer> peers = parsePeers(dump);
             return new WgShowDump(wgInterfaceDTO, peers);
         } catch (Exception e) {
             logger.error("Error while parsing dump \n%s".formatted(dump.toString()));
@@ -40,8 +39,8 @@ public class WgShowDumpParser {
     }
 
 
-    private static List<WgPeer> parsePeers(Scanner peersDump) {
-        List<WgPeer> peers = new ArrayList<WgPeer>();
+    private static Set<WgPeer> parsePeers(Scanner peersDump) {
+        Set<WgPeer> peers = new HashSet<>();
         while (peersDump.hasNextLine()) {
             String line = peersDump.nextLine();
             logger.trace("Parsing peer "+line);

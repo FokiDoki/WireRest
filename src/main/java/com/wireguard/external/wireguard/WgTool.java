@@ -6,7 +6,6 @@ import com.wireguard.parser.WgShowDumpParser;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-import java.io.*;
 import java.util.Scanner;
 
 @Profile("prod")

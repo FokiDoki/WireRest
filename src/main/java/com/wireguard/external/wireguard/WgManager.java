@@ -4,6 +4,8 @@ import com.wireguard.external.network.IpResolver;
 import com.wireguard.external.network.NetworkInterfaceDTO;
 import com.wireguard.external.network.Subnet;
 import com.wireguard.external.shell.ShellRunner;
+import com.wireguard.external.wireguard.converters.WgPeerContainerToWgPeerDTOSet;
+import com.wireguard.external.wireguard.converters.WgPeerIterableToWgPeerDTOList;
 import com.wireguard.external.wireguard.dto.CreatedPeer;
 import com.wireguard.external.wireguard.dto.WgInterfaceDTO;
 import com.wireguard.external.wireguard.dto.WgPeerDTO;
@@ -12,9 +14,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
-import java.net.NetworkInterface;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -29,6 +33,8 @@ public class WgManager {
     private int defaultMaskForNewClients = 32;
     private final IpResolver wgIpResolver;
     private static WgTool wgTool;
+    WgPeerContainerToWgPeerDTOSet containerToPeer = new WgPeerContainerToWgPeerDTOSet();
+    WgPeerIterableToWgPeerDTOList iterableToPeer = new WgPeerIterableToWgPeerDTOList();
 
     @Autowired
     public WgManager(WgTool wgTool, IpResolver wgIpResolver, NetworkInterfaceDTO wgInterface) {
@@ -49,9 +55,17 @@ public class WgManager {
         return wgTool.showDump(wgInterface.getName());
     }
 
+    private Optional<WgPeerDTO> getPeerDTOOptional(Optional<WgPeer> wgPeer){
+        if (wgPeer.isEmpty()){
+            return Optional.empty();
+        } else {
+            return Optional.of(WgPeerDTO.from(wgPeer.get()));
+        }
+    }
+
     public Optional<WgPeerDTO> getPeerDTOByPublicKey(String publicKey) throws ParsingException {
         WgPeerContainer peerContainer = getWgPeerContainer();
-        return peerContainer.getDTOByPublicKey(publicKey);
+        return getPeerDTOOptional(peerContainer.getByPublicKey(publicKey));
     }
 
     public Optional<WgPeer> getPeerByPublicKey(String publicKey) throws ParsingException {
@@ -60,14 +74,26 @@ public class WgManager {
     }
 
     private WgPeerContainer getWgPeerContainer()  {
-        List<WgPeer> peers = getDump().peers();
+        Set<WgPeer> peers = getDump().peers();
         return new WgPeerContainer(peers);
     }
 
     public Set<WgPeerDTO> getPeers(){
         WgPeerContainer peerContainer = getWgPeerContainer();
-        return peerContainer.toDTOSet();
+        return containerToPeer.convert(peerContainer);
     }
+
+    public List<WgPeerDTO> getPeers(Sort sort){
+        WgPeerContainer peerContainer = getWgPeerContainer();
+        return iterableToPeer.convert(peerContainer.findAll(sort));
+    }
+
+    public List<WgPeerDTO> getPeers(Pageable pageable){
+        WgPeerContainer peerContainer = getWgPeerContainer();
+        Page<WgPeer> page = peerContainer.findAll(pageable);
+        return iterableToPeer.convert(page);
+    }
+
 
     public CreatedPeer createPeer(){
         String privateKey = wgTool.generatePrivateKey();

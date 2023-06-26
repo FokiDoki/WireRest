@@ -7,17 +7,12 @@ import com.wireguard.external.wireguard.WgShowDump;
 import com.wireguard.external.wireguard.WgTool;
 import com.wireguard.external.wireguard.dto.CreatedPeer;
 import com.wireguard.external.wireguard.dto.WgInterfaceDTO;
-import com.wireguard.parser.WgShowDumpParser;
 import lombok.SneakyThrows;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.util.List;
-import java.util.Scanner;
 import java.util.Set;
-import java.util.stream.Stream;
 
 @Profile("test")
 @Component
@@ -28,7 +23,7 @@ public class FakeWgTool extends WgTool {
 
     public FakeWgTool() {
         wgInterfaceDTO = new WgInterfaceDTO("privkey", "pubkey", 16666, 0);
-        wgPeerContainer.addPeers(List.of(
+        wgPeerContainer.addAll(List.of(
                 WgPeer.publicKey("pubkey1").build(),
                 WgPeer.publicKey("pubkey2").presharedKey("presharedKey2").build(),
                 WgPeer.publicKey("PubKey3").presharedKey("presharedKey3").endpoint("10.0.0.1").build(),
@@ -47,7 +42,7 @@ public class FakeWgTool extends WgTool {
     @SneakyThrows
     @Override
     public WgShowDump showDump(String interfaceName) {
-        return new WgShowDump(wgInterfaceDTO, wgPeerContainer.getPeers());
+        return new WgShowDump(wgInterfaceDTO, wgPeerContainer);
     }
 
     @Override
@@ -57,7 +52,7 @@ public class FakeWgTool extends WgTool {
 
     @Override
     public void addPeer(String interfaceName, CreatedPeer peer) {
-        wgPeerContainer.addPeer(WgPeer.publicKey(peer.getPublicKey())
+        wgPeerContainer.add(WgPeer.publicKey(peer.getPublicKey())
                 .presharedKey(peer.getPresharedKey())
                 .allowedIPv4Ips(peer.getAddress())
                 .persistentKeepalive(peer.getPersistentKeepalive()).build()

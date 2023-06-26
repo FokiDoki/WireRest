@@ -1,96 +1,102 @@
 package com.wireguard.external.wireguard;
 
-import com.wireguard.external.wireguard.dto.WgPeerDTO;
+import com.wireguard.external.network.Subnet;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
+import org.springframework.beans.support.PagedListHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Getter
 @AllArgsConstructor
-public class WgPeerContainer {
-    private List<WgPeer> peers;
+public class WgPeerContainer extends TreeSet<WgPeer> implements IWgPeerContainer<WgPeer> {
 
-    public WgPeerContainer(){
-        peers = new ArrayList<>();
-    }
-    public void addPeer(WgPeer peer){
-        peers.add(peer);
-    }
-
-    public void addPeers(Collection<WgPeer> peersForAdd){
-        peers.addAll(peersForAdd);
-    }
-
-    public void removePeer(WgPeer peer){
-        peers.remove(peer);
-    }
-
-    public void removePeer(int index){
-        peers.remove(index);
+    public WgPeerContainer(Set<WgPeer> peers){
+        super(peers);
     }
 
     public void removePeerByPublicKey(String publicKey){
         Optional<WgPeer> peer = getByPublicKey(publicKey);
-        peer.ifPresent(this::removePeer);
-    }
-
-    public void clearPeers(){
-        peers.clear();
-    }
-
-    public WgPeer getPeer(int index){
-        return peers.get(index);
-    }
-
-    public int size(){
-        return peers.size();
+        peer.ifPresent(super::remove);
     }
 
     public Optional<WgPeer> getByPublicKey(String publicKey){
-        for(WgPeer peer : peers){
-            if(peer.getPublicKey().equals(publicKey)){
-                return Optional.of(peer);
-            }
-        }
-        return Optional.empty();
+        return super.stream().filter(
+                p -> p.getPublicKey().equals(publicKey)
+            ).findFirst();
     }
 
     public Optional<WgPeer> getByPresharedKey(String presharedKey){
-        for(WgPeer peer : peers){
-            if(peer.getPresharedKey().equals(presharedKey)){
-                return Optional.of(peer);
-            }
-        }
-        return Optional.empty();
-    }
-
-    public Optional<WgPeerDTO> getDTOByPublicKey(String publicKey){
-        Optional<WgPeer> peer = getByPublicKey(publicKey);
-        return peer.map(WgPeerDTO::from);
-    }
-
-    public Optional<WgPeerDTO> getDTOByPresharedKey(String presharedKey){
-        Optional<WgPeer> peer = getByPresharedKey(presharedKey);
-        return peer.map(WgPeerDTO::from);
+        return super.stream()
+                .filter(p -> p.getPresharedKey() != null)
+                .filter(p -> p.getPresharedKey().equals(presharedKey))
+                .findFirst();
     }
 
     public Set<String> getIpv4Addresses(){
-        return peers.stream()
+        return super.stream()
                 .map(peer -> peer.getAllowedIps().getIPv4IPs())
                 .flatMap(Collection::stream)
+                .map(Subnet::toString)
                 .collect(Collectors.toSet());
     }
 
-    public Set<WgPeer> toSet(){
-        return new HashSet<>(peers);
+
+    @Override
+    public Iterable<WgPeer> findAll(Sort sort)  {
+        try{
+            return sortList(sort.iterator(), new ArrayList<>(this));
+        } catch (NoSuchFieldException e){
+            throw new ParsingException("Filed %s not exist".formatted(e.getMessage()), e);
+        }
     }
 
-    public Set<WgPeerDTO> toDTOSet(){
-        return peers.stream()
-                .map(WgPeerDTO::from)
-                .collect(Collectors.toSet());
+
+    @SuppressWarnings("unchecked")
+    private List<WgPeer> sortList(Iterator<Sort.Order> orders, List<WgPeer> list) throws NoSuchFieldException {
+        if (!orders.hasNext()) {
+            return list;
+        }
+        Sort.Order order = orders.next();
+        Field field = WgPeer.class.getDeclaredField(order.getProperty());
+        field.setAccessible(true);
+
+        Comparator<Object> comparator = (o1, o2) -> {
+            try {
+                if (field.get(o1) == null && field.get(o2) == null) {
+                    return 0;
+                } else if (field.get(o1) == null) {
+                    return -1;
+                } else if (field.get(o2) == null) {
+                    return 1;
+                }
+                if (field.get(o1) instanceof Comparable){
+                    return ((Comparable<Object>) field.get(o1)).compareTo(field.get(o2));
+                }
+                return field.get(o1).toString().compareTo(field.get(o2).toString());
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException("Can't compare. ", e);
+            }
+        };
+        if (order.isDescending()) {
+            comparator = comparator.reversed();
+        }
+        list.sort(comparator);
+        return sortList(orders, list);
+    }
+
+    @Override
+    public Page<WgPeer> findAll(Pageable pageable) {
+        ArrayList<WgPeer> sorted = (ArrayList<WgPeer>) findAll(pageable.getSort());
+        PagedListHolder<WgPeer> page = new PagedListHolder<>(sorted);
+        page.setPageSize(pageable.getPageSize());
+        page.setPage(pageable.getPageNumber());
+        return new PageImpl<>(new ArrayList<>(page.getPageList()), pageable, this.size());
     }
 }
