@@ -1,7 +1,5 @@
 package com.wireguard.external.wireguard;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
 import lombok.*;
 import org.springframework.util.Assert;
 
@@ -13,8 +11,7 @@ import java.util.Set;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class WgPeer {
-    @Id
+public class WgPeer implements Comparable<WgPeer> {
     private String publicKey;
     private String presharedKey;
     private String endpoint;
@@ -23,7 +20,6 @@ public class WgPeer {
     private long transferRx;
     private long transferTx;
     private int persistentKeepalive;
-
     public static Builder publicKey(String publicKey) {
         return new Builder().publicKey(publicKey);
     }
@@ -40,6 +36,11 @@ public class WgPeer {
                 ", transferTx=" + transferTx +
                 ", persistentKeepalive=" + persistentKeepalive +
                 '}';
+    }
+
+    @Override
+    public int compareTo(WgPeer o) {
+        return this.publicKey.compareTo(o.publicKey);
     }
 
     @Data

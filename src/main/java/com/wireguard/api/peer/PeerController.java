@@ -16,8 +16,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @RestController
 public class PeerController {
@@ -44,10 +44,10 @@ public class PeerController {
                     content = { @Content(mediaType = "application/json",
                             schema = @Schema(implementation = AppError.class)) }) })
     @GetMapping("/peers")
-    public Set<WgPeerDTO> getPeers(
+    public List<WgPeerDTO> getPeers(
             @RequestParam(value = "page", required = false, defaultValue = "0") int page,
             @RequestParam(value = "limit", required = false, defaultValue = "1000") int limit,
-            @RequestParam(value = "sort", required = false) String sortKey
+            @RequestParam(value = "sort", required = false, defaultValue = "publicKey") String sortKey
     ) throws ParsingException {
         return wgManager.getPeers(Sort.by(sortKey).ascending());
     }   

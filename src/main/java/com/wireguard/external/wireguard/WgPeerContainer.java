@@ -1,123 +1,68 @@
 package com.wireguard.external.wireguard;
 
-import com.wireguard.external.wireguard.dto.WgPeerDTO;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Getter
 @AllArgsConstructor
-public class WgPeerContainer implements PagingAndSortingRepository<WgPeer, String> {
-    private List<WgPeer> peers;
+public class WgPeerContainer extends TreeSet<WgPeer> implements IWgPeerContainer<WgPeer> {
 
-    public WgPeerContainer(){
-        peers = new ArrayList<>();
-    }
-    public void addPeer(WgPeer peer){
-        peers.add(peer);
-    }
-
-    public void addPeers(Collection<WgPeer> peersForAdd){
-        peers.addAll(peersForAdd);
-    }
-
-    public void removePeer(WgPeer peer){
-        peers.remove(peer);
-    }
-
-    public void removePeer(int index){
-        peers.remove(index);
+    public WgPeerContainer(Set<WgPeer> peers){
+        super(peers);
     }
 
     public void removePeerByPublicKey(String publicKey){
         Optional<WgPeer> peer = getByPublicKey(publicKey);
-        peer.ifPresent(this::removePeer);
-    }
-
-    public void clearPeers(){
-        peers.clear();
-    }
-
-    public WgPeer getPeer(int index){
-        return peers.get(index);
-    }
-
-    public int size(){
-        return peers.size();
+        peer.ifPresent(super::remove);
     }
 
     public Optional<WgPeer> getByPublicKey(String publicKey){
-        for(WgPeer peer : peers){
-            if(peer.getPublicKey().equals(publicKey)){
-                return Optional.of(peer);
-            }
-        }
-        return Optional.empty();
+        return super.stream().filter(
+                p -> p.getPublicKey().equals(publicKey)
+            ).findFirst();
     }
 
     public Optional<WgPeer> getByPresharedKey(String presharedKey){
-        for(WgPeer peer : peers){
-            if(peer.getPresharedKey().equals(presharedKey)){
-                return Optional.of(peer);
-            }
-        }
-        return Optional.empty();
-    }
-
-    public Optional<WgPeerDTO> getDTOByPublicKey(String publicKey){
-        Optional<WgPeer> peer = getByPublicKey(publicKey);
-        return peer.map(WgPeerDTO::from);
-    }
-
-    public Optional<WgPeerDTO> getDTOByPresharedKey(String presharedKey){
-        Optional<WgPeer> peer = getByPresharedKey(presharedKey);
-        return peer.map(WgPeerDTO::from);
+        return super.stream().filter(
+                p -> p.getPresharedKey().equals(presharedKey)
+        ).findFirst();
     }
 
     public Set<String> getIpv4Addresses(){
-        return peers.stream()
+        return super.stream()
                 .map(peer -> peer.getAllowedIps().getIPv4IPs())
                 .flatMap(Collection::stream)
                 .collect(Collectors.toSet());
     }
 
-    public Set<WgPeer> toSet(){
-        return new HashSet<>(peers);
-    }
-
-    public Set<WgPeerDTO> toDTOSet(){
-        return peers.stream()
-                .map(WgPeerDTO::from)
-                .collect(Collectors.toSet());
-    }
-
     @SneakyThrows
     @Override
-    public Iterable<WgPeer> findAll(Sort sort) {
-        List<WgPeer> sortedPeers = (List<WgPeer>) sortList(sort.iterator(), peers);
-        return sortedPeers;
+    public Iterable<WgPeer> findAll(Sort sort)  {
+        return sortList(sort.iterator(), new ArrayList<>(this));
     }
 
-    private List<?> sortList(Iterator<Sort.Order> orders, List<?> list) throws NoSuchFieldException {
+    @SuppressWarnings("unchecked")
+    private List<WgPeer> sortList(Iterator<Sort.Order> orders, List<WgPeer> list) throws NoSuchFieldException {
         if (!orders.hasNext()) {
             return list;
         }
         Sort.Order order = orders.next();
-        Field field = list.get(0).getClass().getDeclaredField(order.getProperty());
+        Field field = WgPeer.class.getDeclaredField(order.getProperty());
         field.setAccessible(true);
 
         Comparator<Object> comparator = (o1, o2) -> {
             try {
+                if (field.get(o1) instanceof Comparable){
+                    return ((Comparable<Object>) field.get(o1)).compareTo(field.get(o2));
+                }
                 return field.get(o1).toString().compareTo(field.get(o2).toString());
             } catch (IllegalAccessException e) {
                 throw new RuntimeException("Can't compare. ", e);

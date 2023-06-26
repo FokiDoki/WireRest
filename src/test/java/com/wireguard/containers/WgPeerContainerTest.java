@@ -30,8 +30,8 @@ public class WgPeerContainerTest {
                         .transferTx(1111)
                         .persistentKeepalive(0)
                         .build();
-        wgPeerContainer.addPeer(peer1);
-        wgPeerContainer.addPeer(peer2);
+        wgPeerContainer.add(peer1);
+        wgPeerContainer.add(peer2);
     }
 
     @Test
