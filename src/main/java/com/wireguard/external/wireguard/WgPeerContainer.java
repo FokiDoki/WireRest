@@ -31,9 +31,10 @@ public class WgPeerContainer extends TreeSet<WgPeer> implements IWgPeerContainer
     }
 
     public Optional<WgPeer> getByPresharedKey(String presharedKey){
-        return super.stream().filter(
-                p -> p.getPresharedKey().equals(presharedKey)
-        ).findFirst();
+        return super.stream()
+                .filter(p -> p.getPresharedKey() != null)
+                .filter(p -> p.getPresharedKey().equals(presharedKey))
+                .findFirst();
     }
 
     public Set<String> getIpv4Addresses(){
@@ -75,7 +76,7 @@ public class WgPeerContainer extends TreeSet<WgPeer> implements IWgPeerContainer
                 throw new RuntimeException("Can't compare. ", e);
             }
         };
-        if (order.isAscending()) {
+        if (order.isDescending()) {
             comparator = comparator.reversed();
         }
         list.sort(comparator);
