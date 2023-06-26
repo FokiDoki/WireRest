@@ -12,6 +12,8 @@ import java.util.stream.Collectors;
 public class WgPeerContainerToWgPeerDTOSet implements Converter<WgPeerContainer, Set<WgPeerDTO>> {
     @Override
     public Set<WgPeerDTO> convert(WgPeerContainer source) {
-        return source.stream().map(WgPeerDTO::from).collect(Collectors.toSet());
+        return source.stream()
+                .map(WgPeerDTO::from)
+                .collect(Collectors.toSet());
     }
 }

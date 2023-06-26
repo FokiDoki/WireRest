@@ -115,7 +115,7 @@ public class PeerController {
     public WgPeerDTO deletePeer(String publicKey) throws ParsingException {
         Optional<WgPeerDTO> peer = wgManager.getPeerDTOByPublicKey(publicKey);
         if (peer.isEmpty()){
-            throw new ResourceNotFoundException("Peer not found");
+            throw new ResourceNotFoundException("Peer with public key %s not found".formatted(publicKey));
         }
         wgManager.deletePeer(publicKey);
         return peer.get();

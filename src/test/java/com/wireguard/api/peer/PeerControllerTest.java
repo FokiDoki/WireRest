@@ -1,12 +1,15 @@
 package com.wireguard.api.peer;
 
+import com.wireguard.api.AppError;
 import com.wireguard.external.network.NoFreeIpException;
 import com.wireguard.external.wireguard.WgManager;
 import com.wireguard.external.wireguard.WgPeer;
 import com.wireguard.external.wireguard.dto.CreatedPeer;
 import com.wireguard.external.wireguard.dto.WgPeerDTO;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.internal.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -109,6 +112,33 @@ class PeerControllerTest {
                 .expectBody()
                 .jsonPath("$.code").isEqualTo(500)
                 .jsonPath("$.message").value(containsString("ip"));
+    }
+
+    @Test
+    void deletePeer() {
+        WgPeerDTO peerToDelete = peerDTOList.get(1);
+        Mockito.when(wgManager.getPeerDTOByPublicKey("PubKey2")).thenReturn(Optional.of(peerToDelete));
+        webClient.delete().uri(uriBuilder -> uriBuilder
+                        .path("/peer/delete")
+                        .queryParam("publicKey", "PubKey2")
+                        .build())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(WgPeerDTO.class)
+                .isEqualTo(peerToDelete);
+    }
+
+    @Test
+    void deletePeerNotExists(){
+        Mockito.when(wgManager.getPeerDTOByPublicKey(Mockito.anyString())).thenReturn(Optional.empty());
+        webClient.delete().uri(uriBuilder -> uriBuilder
+                        .path("/peer/delete")
+                        .queryParam("publicKey", "PubKey2")
+                        .build())
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody(AppError.class)
+                .isEqualTo(new AppError(404, "Peer with public key PubKey2 not found"));
     }
 
 }
