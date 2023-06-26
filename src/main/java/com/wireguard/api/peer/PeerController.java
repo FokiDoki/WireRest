@@ -46,9 +46,10 @@ public class PeerController {
     @GetMapping("/peers")
     public Set<WgPeerDTO> getPeers(
             @RequestParam(value = "page", required = false, defaultValue = "0") int page,
-            @RequestParam(value = "limit", required = false, defaultValue = "1000") int limit
+            @RequestParam(value = "limit", required = false, defaultValue = "1000") int limit,
+            @RequestParam(value = "sort", required = false) String sortKey
     ) throws ParsingException {
-        return wgManager.getPeers(Sort.by("publicKey").descending());
+        return wgManager.getPeers(Sort.by(sortKey).ascending());
     }   
 
     @ApiResponses(value = {

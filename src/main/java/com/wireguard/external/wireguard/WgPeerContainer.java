@@ -4,11 +4,13 @@ import com.wireguard.external.wireguard.dto.WgPeerDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
+import lombok.SneakyThrows;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -99,24 +101,33 @@ public class WgPeerContainer implements PagingAndSortingRepository<WgPeer, Strin
                 .collect(Collectors.toSet());
     }
 
+    @SneakyThrows
     @Override
     public Iterable<WgPeer> findAll(Sort sort) {
-        sort.get().forEach(System.out::println);
-        return null;
+        List<WgPeer> sortedPeers = (List<WgPeer>) sortList(sort.iterator(), peers);
+        return sortedPeers;
     }
 
-    private List<Object> sortList(Iterator<Sort.Order> orders, List<Object> list){
+    private List<?> sortList(Iterator<Sort.Order> orders, List<?> list) throws NoSuchFieldException {
         if (!orders.hasNext()) {
             return list;
         }
         Sort.Order order = orders.next();
-        Comparator<Object> comparator = Comparator.comparing(o -> o.);
+        Field field = list.get(0).getClass().getDeclaredField(order.getProperty());
+        field.setAccessible(true);
+
+        Comparator<Object> comparator = (o1, o2) -> {
+            try {
+                return field.get(o1).toString().compareTo(field.get(o2).toString());
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException("Can't compare. ", e);
+            }
+        };
         if (order.isAscending()) {
             comparator = comparator.reversed();
         }
         list.sort(comparator);
-
-
+        return sortList(orders, list);
     }
 
     @Override
