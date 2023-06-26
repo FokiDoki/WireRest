@@ -24,4 +24,12 @@ public class GlobalExceptionHandler {
                 new AppError(HttpStatus.INTERNAL_SERVER_ERROR.value(),
                         e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @ExceptionHandler
+    public ResponseEntity<AppError> badRequestException(BadRequestException e) {
+        logger.error(e.getMessage(), e);
+        return new ResponseEntity<>(
+                new AppError(HttpStatus.BAD_REQUEST.value(),
+                        e.getMessage()), HttpStatus.BAD_REQUEST);
+    }
 }

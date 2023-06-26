@@ -1,6 +1,7 @@
 package com.wireguard.api.peer;
 
 import com.wireguard.api.AppError;
+import com.wireguard.api.BadRequestException;
 import com.wireguard.api.ResourceNotFoundException;
 import com.wireguard.external.wireguard.ParsingException;
 import com.wireguard.external.wireguard.WgManager;
@@ -11,6 +12,8 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,6 +43,9 @@ public class PeerController {
                     )
             }
             ),
+            @ApiResponse(responseCode = "400", description = "Bad Request",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = AppError.class)) }),
             @ApiResponse(responseCode = "500", description = "Internal Server Error",
                     content = { @Content(mediaType = "application/json",
                             schema = @Schema(implementation = AppError.class)) }) })
@@ -47,10 +53,28 @@ public class PeerController {
     public List<WgPeerDTO> getPeers(
             @RequestParam(value = "page", required = false, defaultValue = "0") int page,
             @RequestParam(value = "limit", required = false, defaultValue = "1000") int limit,
-            @RequestParam(value = "sort", required = false, defaultValue = "publicKey") String sortKey
+            @RequestParam(value = "sort", required = false, defaultValue = "publicKey.asc") String sortKey
     ) throws ParsingException {
-        return wgManager.getPeers(Sort.by(sortKey).ascending());
-    }   
+        List<WgPeerDTO> peers;
+        try {
+            Pageable pageable = PageRequest.of(page, limit, getSort(sortKey));
+            peers = wgManager.getPeers(pageable);
+        } catch (IllegalArgumentException | ParsingException e){
+            throw new BadRequestException(e.getMessage());
+        }
+        return peers;
+    }
+
+
+    public Sort getSort(String sortKey){
+        String[] keys = sortKey.split("\\.");
+        if (keys.length == 1){
+            return Sort.by(sortKey);
+        } else {
+            Sort.Direction direction = Sort.Direction.fromString(keys[1]);
+            return Sort.by(direction, keys[0]);
+        }
+    }
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK",

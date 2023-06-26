@@ -14,6 +14,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
@@ -83,8 +85,13 @@ public class WgManager {
 
     public List<WgPeerDTO> getPeers(Sort sort){
         WgPeerContainer peerContainer = getWgPeerContainer();
-        peerContainer.findAll(sort);
         return iterableToPeer.convert(peerContainer.findAll(sort));
+    }
+
+    public List<WgPeerDTO> getPeers(Pageable pageable){
+        WgPeerContainer peerContainer = getWgPeerContainer();
+        Page<WgPeer> page = peerContainer.findAll(pageable);
+        return iterableToPeer.convert(page);
     }
 
 

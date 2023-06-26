@@ -2,8 +2,9 @@ package com.wireguard.external.wireguard;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.SneakyThrows;
+import org.springframework.beans.support.PagedListHolder;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
@@ -44,11 +45,16 @@ public class WgPeerContainer extends TreeSet<WgPeer> implements IWgPeerContainer
                 .collect(Collectors.toSet());
     }
 
-    @SneakyThrows
+
     @Override
     public Iterable<WgPeer> findAll(Sort sort)  {
-        return sortList(sort.iterator(), new ArrayList<>(this));
+        try{
+            return sortList(sort.iterator(), new ArrayList<>(this));
+        } catch (NoSuchFieldException e){
+            throw new ParsingException("Filed %s not exist".formatted(e.getMessage()), e);
+        }
     }
+
 
     @SuppressWarnings("unchecked")
     private List<WgPeer> sortList(Iterator<Sort.Order> orders, List<WgPeer> list) throws NoSuchFieldException {
@@ -85,6 +91,10 @@ public class WgPeerContainer extends TreeSet<WgPeer> implements IWgPeerContainer
 
     @Override
     public Page<WgPeer> findAll(Pageable pageable) {
-        return null;
+        ArrayList<WgPeer> sorted = (ArrayList<WgPeer>) findAll(pageable.getSort());
+        PagedListHolder<WgPeer> page = new PagedListHolder<>(sorted);
+        page.setPageSize(pageable.getPageSize());
+        page.setPage(pageable.getPageNumber());
+        return new PageImpl<>(new ArrayList<>(page.getPageList()), pageable, this.size());
     }
 }
