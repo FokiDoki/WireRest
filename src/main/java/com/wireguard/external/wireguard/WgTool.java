@@ -6,10 +6,8 @@ import com.wireguard.parser.WgShowDumpParser;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
+import java.util.function.Function;
 
 @Profile("prod")
 @Component
@@ -98,10 +96,12 @@ public class WgTool {
                 peer.getPublicKey()));
         if (!peer.getPresharedKey().isEmpty())
             createFile(presharedKeyPath, peer.getPresharedKey());
-        Map<String, String> arguments = new HashMap<>();
-        arguments.put("preshared-key",  peer.getPresharedKey().isEmpty() ? null : presharedKeyPath);
-        arguments.put("allowed-ips", String.join(",", peer.getAddress()));
-        arguments.put("persistent-keepalive", String.valueOf(peer.getPersistentKeepalive()));
+        List<Argument> arguments = List.of(
+                new Argument("preshared-key",
+                        peer.getPresharedKey().isEmpty() ? null : presharedKeyPath),
+                new Argument("allowed-ips", String.join(",", peer.getAddress()), (value) -> String.join(",", peer.getAddress())),
+                new Argument("persistent-keepalive", String.valueOf(peer.getPersistentKeepalive()))
+        );
         appendArgumentsIfPresentAndNotEmpty(arguments, command);
         try{
             run(command.toString(), true);
@@ -112,12 +112,34 @@ public class WgTool {
         saveConfig(interfaceName);
     }
 
-    public void appendArgumentsIfPresentAndNotEmpty(Map<String, String> arguments, StringBuilder command) {
-        for (Map.Entry<String, String> argument: arguments.entrySet()) {
-            if (argument.getValue()!=null && !argument.getValue().isEmpty()) {
-                command
-                        .append(" ").append(argument.getKey())
-                        .append(" ").append(argument.getValue());
+    private static class Argument{
+        private final String name;
+        private final String value;
+        private final Function<String, String> valueTransformer;
+
+        public Argument(String name, String value, Function<String, String> valueTransformer) {
+            this.name = name;
+            this.value = value;
+            this.valueTransformer = valueTransformer;
+        }
+
+        public Argument(String name, String value) {
+            this(name, value, (v) -> v);
+        }
+
+        public boolean isPresent(){
+            return value != null && !value.isEmpty();
+        }
+
+        public String getCommand(){
+            return String.format(" %s %s", name, valueTransformer.apply(value));
+        }
+    }
+
+    public void appendArgumentsIfPresentAndNotEmpty(List<Argument> arguments, StringBuilder command) {
+        for (Argument argument: arguments) {
+            if (argument.isPresent()) {
+                command.append(argument.getCommand());
             }
         }
 
