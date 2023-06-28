@@ -104,6 +104,7 @@ public class WgManager {
         CreatedPeer createdPeer = new CreatedPeer(publicKey, presharedKey, privateKey,
                 allowedIps.stream().map(Subnet::toString).collect(Collectors.toSet()),
                 persistentKeepalive);
+        logger.debug("Creating peer: %s".formatted(createdPeer.toString()));
         allowedIps.forEach(wgIpResolver::takeSubnet);
         try {
             wgTool.addPeer(wgInterface.getName(), createdPeer);

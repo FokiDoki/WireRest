@@ -3,6 +3,8 @@ package com.wireguard.external.wireguard;
 import com.wireguard.external.shell.ShellRunner;
 import com.wireguard.external.wireguard.dto.CreatedPeer;
 import com.wireguard.parser.WgShowDumpParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
@@ -12,6 +14,7 @@ import java.util.function.Function;
 @Profile("prod")
 @Component
 public class WgTool {
+    private static final Logger logger = LoggerFactory.getLogger(ShellRunner.class);
 
     private static final String WG_SHOW_DUMP_COMMAND = "wg show %s dump";
     private static final String WG_GENKEY_COMMAND = "wg genkey";
@@ -29,6 +32,7 @@ public class WgTool {
 
     private String run(String commandStr, Boolean privileged) {
         String[] command = getCommand(commandStr, privileged);
+        logger.debug("Running command: %s".formatted(String.join(" ", command)));
         return shell.execute(command).strip();
     }
     protected String[] getCommand(String commandStr, Boolean privileged) {
@@ -103,6 +107,7 @@ public class WgTool {
                 new Argument("persistent-keepalive", String.valueOf(peer.getPersistentKeepalive()))
         );
         appendArgumentsIfPresentAndNotEmpty(arguments, command);
+
         try{
             run(command.toString(), true);
         } finally {
@@ -136,7 +141,7 @@ public class WgTool {
         }
     }
 
-    public void appendArgumentsIfPresentAndNotEmpty(List<Argument> arguments, StringBuilder command) {
+    private void appendArgumentsIfPresentAndNotEmpty(List<Argument> arguments, StringBuilder command) {
         for (Argument argument: arguments) {
             if (argument.isPresent()) {
                 command.append(argument.getCommand());
