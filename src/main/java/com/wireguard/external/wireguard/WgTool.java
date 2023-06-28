@@ -6,6 +6,8 @@ import com.wireguard.parser.WgShowDumpParser;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -94,12 +96,13 @@ public class WgTool {
         command.append(WG_ADD_PEER_COMMAND.formatted(
                 interfaceName,
                 peer.getPublicKey()));
-        Map<String, String> arguments = Map.of(
-                "preshared-key",  peer.getPresharedKey(),
-                "allowed-ips", String.join(",", peer.getAddress()),
-                "persistent-keepalive", String.valueOf(peer.getPersistentKeepalive()));
+        if (peer.getPresharedKey()!=null)
+            createFile(presharedKeyPath, peer.getPresharedKey());
+        Map<String, String> arguments = new HashMap<>();
+        arguments.put("preshared-key",  peer.getPresharedKey()==null ? null : presharedKeyPath);
+        arguments.put("allowed-ips", String.join(",", peer.getAddress()));
+        arguments.put("persistent-keepalive", String.valueOf(peer.getPersistentKeepalive()));
         appendArgumentsIfPresentAndNotEmpty(arguments, command);
-        createFile(presharedKeyPath, peer.getPresharedKey());
         try{
             run(command.toString(), true);
         } finally {
