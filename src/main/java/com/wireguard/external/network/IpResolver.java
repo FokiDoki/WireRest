@@ -87,7 +87,7 @@ public class IpResolver {
             availableRanges.addAll(currRangeIndex, insertSubnetIntoIpRange(subnet, availableRange));
             availableIpsCount -= subnet.getIpCount();
         } else {
-            throw new NoFreeIpException("Subnet " + subnet + " is is already used");
+            throw new AlreadyUsedException("Subnet " + subnet + " is is already used");
         }
     }
 

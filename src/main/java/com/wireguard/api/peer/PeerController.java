@@ -4,6 +4,7 @@ import com.wireguard.api.AppError;
 import com.wireguard.api.BadRequestException;
 import com.wireguard.api.ResourceNotFoundException;
 import com.wireguard.external.network.Subnet;
+import com.wireguard.external.shell.CommandExecutionException;
 import com.wireguard.external.wireguard.ParsingException;
 import com.wireguard.external.wireguard.WgManager;
 import com.wireguard.external.wireguard.dto.CreatedPeer;
@@ -136,13 +137,20 @@ public class PeerController {
             @RequestParam(value = "address", required = false) Set<Subnet> address,
             @RequestParam(value = "persistentKeepalive", required = false ) Integer persistentKeepalive
     ) {
-        CreatedPeer createdPeer = wgManager.createPeerGenerateNulls(
-                publicKey,
-                presharedKey,
-                privateKey,
-                address,
-                persistentKeepalive
-        );
+        CreatedPeer createdPeer;
+        try {
+            createdPeer = wgManager.createPeerGenerateNulls(
+                    publicKey,
+                    presharedKey,
+                    privateKey,
+                    address,
+                    persistentKeepalive
+            );
+        } catch (IllegalArgumentException | ParsingException e){
+            throw new BadRequestException(e.getMessage());
+        } catch (CommandExecutionException e){
+            throw new BadRequestException("wireguard returned error: %s".formatted(e.getStderr()));
+        }
         return new ResponseEntity<>(createdPeer, HttpStatus.CREATED);
     }
 

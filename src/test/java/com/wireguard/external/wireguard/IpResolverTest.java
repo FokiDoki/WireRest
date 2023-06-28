@@ -1,5 +1,6 @@
 package com.wireguard.external.wireguard;
 
+import com.wireguard.external.network.AlreadyUsedException;
 import com.wireguard.external.network.IpResolver;
 import com.wireguard.external.network.NoFreeIpException;
 import com.wireguard.external.network.Subnet;
@@ -34,13 +35,13 @@ class IpResolverTest {
     @Test
     void testTakeTaken() {
         ipResolver.takeSubnet(Subnet.valueOf("0.0.0.1/32"));
-        assertThrows(NoFreeIpException.class, () -> ipResolver.takeSubnet(Subnet.valueOf("0.0.0.1/32")));
+        assertThrows(AlreadyUsedException.class, () -> ipResolver.takeSubnet(Subnet.valueOf("0.0.0.1/32")));
     }
 
     @Test
     void testTakeTakenTouching() {
         ipResolver.takeSubnet(Subnet.valueOf("0.0.0.1/28"));
-        assertThrows(NoFreeIpException.class, () -> ipResolver.takeSubnet(Subnet.valueOf("0.0.0.15/29")));
+        assertThrows(AlreadyUsedException.class, () -> ipResolver.takeSubnet(Subnet.valueOf("0.0.0.15/29")));
     }
 
     @Test
