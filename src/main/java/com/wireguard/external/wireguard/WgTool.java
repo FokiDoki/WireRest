@@ -96,10 +96,10 @@ public class WgTool {
         command.append(WG_ADD_PEER_COMMAND.formatted(
                 interfaceName,
                 peer.getPublicKey()));
-        if (peer.getPresharedKey()!=null)
+        if (peer.getPresharedKey().isEmpty())
             createFile(presharedKeyPath, peer.getPresharedKey());
         Map<String, String> arguments = new HashMap<>();
-        arguments.put("preshared-key",  peer.getPresharedKey()==null ? null : presharedKeyPath);
+        arguments.put("preshared-key",  peer.getPresharedKey().isEmpty() ? null : presharedKeyPath);
         arguments.put("allowed-ips", String.join(",", peer.getAddress()));
         arguments.put("persistent-keepalive", String.valueOf(peer.getPersistentKeepalive()));
         appendArgumentsIfPresentAndNotEmpty(arguments, command);
