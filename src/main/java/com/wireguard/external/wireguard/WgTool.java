@@ -6,6 +6,9 @@ import com.wireguard.parser.WgShowDumpParser;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Scanner;
 
 @Profile("prod")
@@ -16,7 +19,7 @@ public class WgTool {
     private static final String WG_GENKEY_COMMAND = "wg genkey";
     private static final String WG_PUBKEY_COMMAND =  "echo %s | wg pubkey";
     private static final String WG_PRESHARED_KEY_COMMAND = "wg genpsk";
-    private static final String WG_ADD_PEER_COMMAND = "wg set %s peer %s preshared-key %s allowed-ips %s persistent-keepalive %d";
+    private static final String WG_ADD_PEER_COMMAND = "wg set %s peer %s";
     private static final String CREATE_FILE_COMMAND = "echo %s > %s";
     private static final String DELETE_FILE_COMMAND = "rm %s";
     private static final String WG_DEL_PEER_COMMAND = "wg set %s peer %s remove";
@@ -89,20 +92,36 @@ public class WgTool {
 
     //I don't know how to do this without creating a file (wg set doesn't accept preshared key as a parameter)
     public void addPeer(String interfaceName, CreatedPeer peer) {
-        createFile(presharedKeyPath, peer.getPresharedKey());
-        try{
-            run(WG_ADD_PEER_COMMAND.formatted(
+        StringBuilder command = new StringBuilder();
+        command.append(WG_ADD_PEER_COMMAND.formatted(
                 interfaceName,
-                peer.getPublicKey(),
-                presharedKeyPath,
-                String.join(",", peer.getAddress()),
-                peer.getPersistentKeepalive()), true);
+                peer.getPublicKey()));
+        if (!peer.getPresharedKey().isEmpty())
+            createFile(presharedKeyPath, peer.getPresharedKey());
+        Map<String, String> arguments = new HashMap<>();
+        arguments.put("preshared-key",  peer.getPresharedKey().isEmpty() ? null : presharedKeyPath);
+        arguments.put("allowed-ips", String.join(",", peer.getAddress()));
+        arguments.put("persistent-keepalive", String.valueOf(peer.getPersistentKeepalive()));
+        appendArgumentsIfPresentAndNotEmpty(arguments, command);
+        try{
+            run(command.toString(), true);
         } finally {
-            deleteFile(presharedKeyPath);
+            if (!peer.getPresharedKey().isEmpty())
+                deleteFile(presharedKeyPath);
         }
         saveConfig(interfaceName);
     }
 
+    public void appendArgumentsIfPresentAndNotEmpty(Map<String, String> arguments, StringBuilder command) {
+        for (Map.Entry<String, String> argument: arguments.entrySet()) {
+            if (argument.getValue()!=null && !argument.getValue().isEmpty()) {
+                command
+                        .append(" ").append(argument.getKey())
+                        .append(" ").append(argument.getValue());
+            }
+        }
+
+    }
     private void saveConfig(String interfaceName) {
         run(WG_SAVE_COMMAND.formatted(interfaceName), true);
     }
