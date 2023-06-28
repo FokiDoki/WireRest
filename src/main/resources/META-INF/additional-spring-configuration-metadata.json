@@ -6,9 +6,14 @@
       "description": "Wireguard interface name (interface should be already created)."
     },
     {
-      "name": "wg.interface.new_client_subnet_mask",
+      "name": "wg.interface.default.mask",
       "type": "java.lang.Integer",
-      "description": "Mask for clients created with default params."
+      "description": "Mask for peers created with default params."
+    },
+    {
+      "name": "wg.inteface.default.persistent_keepalive",
+      "type": "java.lang.String",
+      "description": "Persistent keepalive for peers created with default params."
     }
   ]
 }

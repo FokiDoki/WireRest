@@ -3,6 +3,7 @@ package com.wireguard.api.peer;
 import com.wireguard.api.AppError;
 import com.wireguard.api.BadRequestException;
 import com.wireguard.api.ResourceNotFoundException;
+import com.wireguard.external.network.Subnet;
 import com.wireguard.external.wireguard.ParsingException;
 import com.wireguard.external.wireguard.WgManager;
 import com.wireguard.external.wireguard.dto.CreatedPeer;
@@ -20,8 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 public class PeerController {
@@ -122,8 +122,28 @@ public class PeerController {
                     content = { @Content(mediaType = "application/json",
                             schema = @Schema(implementation = AppError.class)) }) })
     @PostMapping("/peer/create")
-    public ResponseEntity<CreatedPeer> createPeer() {
-        return new ResponseEntity<>(wgManager.createPeer(), HttpStatus.CREATED);
+    @Parameter(name = "publicKey", description = "Public key of the peer (Will be generated if not provided)")
+    @Parameter(name = "presharedKey", description = "Preshared key of empty if no psk required (Will be generated if not provided)", allowEmptyValue = true)
+    @Parameter(name = "privateKey", description = "Private key of the peer " +
+            "(Will be generated if not provided. " +
+            "If provided public key, empty string will be returned)")
+    @Parameter(name = "address", description = "CIDR of new peer in wireguard network interface (Will be generated if not provided)", schema = @Schema(format = "CIDR"))
+    @Parameter(name = "persistentKeepalive", description = "Persistent keepalive interval in seconds (Will be generated if not provided)")
+    public ResponseEntity<CreatedPeer> createPeer( //Добавить возможноть не устанавливать PSK вообще (чтобы в пире его тоже не было)
+            @RequestParam(value = "publicKey", required = false ) String publicKey,
+            @RequestParam(value = "presharedKey", required = false ) String presharedKey,
+            @RequestParam(value = "privateKey", required = false ) String privateKey,
+            @RequestParam(value = "address", required = false) Set<Subnet> address,
+            @RequestParam(value = "persistentKeepalive", required = false ) Integer persistentKeepalive
+    ) {
+        CreatedPeer createdPeer = wgManager.createPeerGenerateNulls(
+                publicKey,
+                presharedKey,
+                privateKey,
+                address,
+                persistentKeepalive
+        );
+        return new ResponseEntity<>(createdPeer, HttpStatus.CREATED);
     }
 
 

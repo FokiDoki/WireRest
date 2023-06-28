@@ -1,6 +1,5 @@
 package com.wireguard.external.wireguard.test;
 
-import com.wireguard.converters.StreamToStringConverter;
 import com.wireguard.external.wireguard.WgPeer;
 import com.wireguard.external.wireguard.WgPeerContainer;
 import com.wireguard.external.wireguard.WgShowDump;
@@ -38,7 +37,6 @@ public class FakeWgTool extends WgTool {
         keyCounter = wgPeerContainer.size();
 
     }
-    private final static StreamToStringConverter streamToStringConverter = new StreamToStringConverter();
     @SneakyThrows
     @Override
     public WgShowDump showDump(String interfaceName) {
