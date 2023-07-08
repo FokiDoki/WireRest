@@ -6,7 +6,7 @@ pipeline {
         RUN_PORT=8081
         POM_VERSION="0.2"
         SERVICE_NAME="wirerest"
-        RUN_ARGS="--spring.profiles.active=${RUN_PROFILES} --server.port=${RUN_PORT}"
+        RUN_ARGS="--spring.profiles.active=${RUN_PROFILES} --server.port=${RUN_PORT} --debug"
     }
     stages {
         stage('Build') {

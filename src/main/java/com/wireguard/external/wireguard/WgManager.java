@@ -3,12 +3,14 @@ package com.wireguard.external.wireguard;
 import com.wireguard.external.network.IpResolver;
 import com.wireguard.external.network.NetworkInterfaceDTO;
 import com.wireguard.external.network.Subnet;
+import com.wireguard.external.shell.CommandExecutionException;
 import com.wireguard.external.shell.ShellRunner;
 import com.wireguard.external.wireguard.converters.WgPeerContainerToWgPeerDTOSet;
 import com.wireguard.external.wireguard.converters.WgPeerIterableToWgPeerDTOList;
 import com.wireguard.external.wireguard.dto.CreatedPeer;
 import com.wireguard.external.wireguard.dto.WgInterfaceDTO;
 import com.wireguard.external.wireguard.dto.WgPeerDTO;
+import jakarta.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 @Scope("singleton")
@@ -29,8 +32,10 @@ public class WgManager {
 
     private static final Logger logger = LoggerFactory.getLogger(ShellRunner.class);
     private final NetworkInterfaceDTO wgInterface;
-    @Value("${wg.interface.new_client_subnet_mask}")
-    private int defaultMaskForNewClients = 32;
+    @Value("${wg.interface.default.mask}")
+    private static int DEFAULT_MASK_FOR_NEW_CLIENTS = 32;
+    @Value("${wg.interface.default.persistent_keepalive}")
+    private static int DEFAULT_PERSISTENT_KEEPALIVE = 0;
     private final IpResolver wgIpResolver;
     private static WgTool wgTool;
     WgPeerContainerToWgPeerDTOSet containerToPeer = new WgPeerContainerToWgPeerDTOSet();
@@ -88,32 +93,42 @@ public class WgManager {
         return iterableToPeer.convert(peerContainer.findAll(sort));
     }
 
-    public List<WgPeerDTO> getPeers(Pageable pageable){
+    public List<WgPeerDTO> getPeers(Pageable pageable) {
         WgPeerContainer peerContainer = getWgPeerContainer();
         Page<WgPeer> page = peerContainer.findAll(pageable);
         return iterableToPeer.convert(page);
     }
 
 
-    public CreatedPeer createPeer(){
-        String privateKey = wgTool.generatePrivateKey();
-        String publicKey = wgTool.generatePublicKey(privateKey);
-        String presharedKey = wgTool.generatePresharedKey();
-        Subnet address = wgIpResolver.takeFreeSubnet(defaultMaskForNewClients);
-        CreatedPeer createdPeer = new CreatedPeer(
-                publicKey,
-                presharedKey,
-                privateKey,
-                Set.of(address.toString()),
-                0);
+    public CreatedPeer createPeer(String privateKey, String publicKey, String presharedKey, Set<Subnet> allowedIps, int persistentKeepalive) {
+        CreatedPeer createdPeer = new CreatedPeer(publicKey, presharedKey, privateKey,
+                allowedIps.stream().map(Subnet::toString).collect(Collectors.toSet()),
+                persistentKeepalive);
+        logger.debug("Creating peer: %s".formatted(createdPeer.toString()));
+        allowedIps.forEach(wgIpResolver::takeSubnet);
         try {
             wgTool.addPeer(wgInterface.getName(), createdPeer);
-            logger.info("Created peer, public key: %s".formatted(publicKey.substring(0, 6)));
-        } catch (Exception e){
-            wgIpResolver.freeSubnet(address);
+        }catch (CommandExecutionException e) {
+            allowedIps.forEach(wgIpResolver::freeSubnet);
             throw e;
         }
+        logger.info("Created peer, public key: %s".formatted(publicKey.substring(0, 6)));
         return createdPeer;
+    }
+
+    public CreatedPeer createPeerGenerateNulls(@Nullable String publicKey, @Nullable String presharedKey,
+                                               @Nullable String privateKey, @Nullable Set<Subnet> allowedIps,
+                                               @Nullable Integer persistentKeepalive){
+        privateKey = privateKey == null ? wgTool.generatePrivateKey() : privateKey;
+        publicKey = publicKey == null ? wgTool.generatePublicKey(privateKey) : publicKey;
+        presharedKey = presharedKey == null ? wgTool.generatePresharedKey() : presharedKey;
+        persistentKeepalive = persistentKeepalive == null ? DEFAULT_PERSISTENT_KEEPALIVE : persistentKeepalive;
+        allowedIps = allowedIps == null ? Set.of(wgIpResolver.findFreeSubnet(DEFAULT_MASK_FOR_NEW_CLIENTS)) : allowedIps;
+        return createPeer(privateKey, publicKey, presharedKey, allowedIps, persistentKeepalive);
+    }
+
+    public CreatedPeer createPeer(){
+        return createPeerGenerateNulls(null, null, null, null, null);
     }
 
     public void deletePeer(String publicKey)  {

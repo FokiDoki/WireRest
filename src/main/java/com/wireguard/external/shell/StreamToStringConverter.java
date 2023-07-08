@@ -1,4 +1,4 @@
-package com.wireguard.converters;
+package com.wireguard.external.shell;
 
 import com.wireguard.external.shell.ShellRunner;
 import jakarta.annotation.Nullable;

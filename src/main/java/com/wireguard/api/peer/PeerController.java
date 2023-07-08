@@ -3,6 +3,8 @@ package com.wireguard.api.peer;
 import com.wireguard.api.AppError;
 import com.wireguard.api.BadRequestException;
 import com.wireguard.api.ResourceNotFoundException;
+import com.wireguard.external.network.Subnet;
+import com.wireguard.external.shell.CommandExecutionException;
 import com.wireguard.external.wireguard.ParsingException;
 import com.wireguard.external.wireguard.WgManager;
 import com.wireguard.external.wireguard.dto.CreatedPeer;
@@ -20,8 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 public class PeerController {
@@ -120,10 +121,40 @@ public class PeerController {
             ),
             @ApiResponse(responseCode = "500", description = "Internal Server Error",
                     content = { @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = AppError.class)) }) })
+                            schema = @Schema(implementation = AppError.class)) }),
+            @ApiResponse(responseCode = "400", description = "Bad request (Invalid parameters values)",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = AppError.class)) })})
     @PostMapping("/peer/create")
-    public ResponseEntity<CreatedPeer> createPeer() {
-        return new ResponseEntity<>(wgManager.createPeer(), HttpStatus.CREATED);
+    @Parameter(name = "publicKey", description = "Public key of the peer (Will be generated if not provided)")
+    @Parameter(name = "presharedKey", description = "Preshared key or empty if no psk required (Will be generated if not provided)", allowEmptyValue = true)
+    @Parameter(name = "privateKey", description = "Private key of the peer " +
+            "(Will be generated if not provided. " +
+            "If provided public key, empty string will be returned)")
+    @Parameter(name = "address", description = "CIDR of new peer in wireguard network interface (Will be generated if not provided)", schema = @Schema(format = "CIDR"), allowEmptyValue = true)
+    @Parameter(name = "persistentKeepalive", description = "Persistent keepalive interval in seconds (0 if not provided)")
+    public ResponseEntity<CreatedPeer> createPeer(
+            @RequestParam(value = "publicKey", required = false ) String publicKey,
+            @RequestParam(value = "presharedKey", required = false ) String presharedKey,
+            @RequestParam(value = "privateKey", required = false ) String privateKey,
+            @RequestParam(value = "address", required = false) Set<Subnet> address,
+            @RequestParam(value = "persistentKeepalive", required = false ) Integer persistentKeepalive
+    ) {
+        CreatedPeer createdPeer;
+        try {
+            createdPeer = wgManager.createPeerGenerateNulls(
+                    publicKey,
+                    presharedKey,
+                    privateKey,
+                    address,
+                    persistentKeepalive
+            );
+        } catch (IllegalArgumentException | ParsingException e){
+            throw new BadRequestException(e.getMessage());
+        } catch (CommandExecutionException e){
+            throw new BadRequestException("Wireguard error: %s".formatted(e.getStderr().strip()));
+        }
+        return new ResponseEntity<>(createdPeer, HttpStatus.CREATED);
     }
 
 

@@ -1,6 +1,5 @@
 package com.wireguard.external.shell;
 
-import com.wireguard.converters.StreamToStringConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +32,7 @@ public class ShellRunner {
         if (!allowedExitCodes.contains(exitCode)) {
             throw new CommandExecutionException(String.join(" ", command), exitCode, stdout, stderr);
         }
+        logger.debug("Command executed successfully: %s".formatted(String.join(" ", command)));
         return stdout;
     }
 

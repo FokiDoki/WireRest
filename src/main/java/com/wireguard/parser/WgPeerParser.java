@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class WgPeerParser {
    public static WgPeer parse(String wgShowPeerDump, String splitter){
@@ -21,12 +22,14 @@ public class WgPeerParser {
                         .formatted(wgShowPeerDumpSource.toString())
         );
         List<String> WgShowPeerDump = Utils.trimAll(wgShowPeerDumpSource);
+        WgShowPeerDump = WgShowPeerDump.stream()
+                .map(s -> s.equals("(none)") ? null : s).collect(Collectors.toList());
 
         Map<IpType, Set<String>> allowedIps = filterAllowedIps(WgShowPeerDump.get(3));
         return WgPeer.
                 publicKey( WgShowPeerDump.get(0))
                 .presharedKey(WgShowPeerDump.get(1))
-                .endpoint(parseEndpoint(WgShowPeerDump.get(2)))
+                .endpoint(WgShowPeerDump.get(2))
                 .allowedIPv4Ips(allowedIps.get(IpType.IPV4))
                 .allowedIPv6Ips(allowedIps.get(IpType.IPV6))
                 .latestHandshake(Long.parseLong(WgShowPeerDump.get(4)))
@@ -36,19 +39,13 @@ public class WgPeerParser {
                 .build();
     }
 
-
-    private static String  parseEndpoint(String endpoint){
-        if (endpoint.equals("(none)")) return null;
-        return endpoint;
-    }
-
     private enum IpType {
         IPV4, IPV6
     }
     private static Map<IpType, Set<String>> filterAllowedIps(String allowedIps){
-        Set<String> allowedIpsStringsList = Set.of(allowedIps.split(","));
         Map<IpType, Set<String>> allowedIpsMap = Map.of(IpType.IPV4, new HashSet<>(), IpType.IPV6, new HashSet<>());
-        if (allowedIps.equals("(none)")) return allowedIpsMap;
+        if (allowedIps==null) return allowedIpsMap;
+        Set<String> allowedIpsStringsList = Set.of(allowedIps.split(","));
         allowedIpsStringsList.forEach(allowedIp -> {
             if (Utils.isIpV4Cidr(allowedIp)){
                 allowedIpsMap.get(IpType.IPV4).add(allowedIp);

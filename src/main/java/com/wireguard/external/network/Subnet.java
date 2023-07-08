@@ -160,4 +160,5 @@ public class Subnet implements Comparable<Subnet> {
     public int compareTo(Subnet o) {
         return Long.compare(getFirstIpNumeric(), o.getFirstIpNumeric());
     }
+
 }

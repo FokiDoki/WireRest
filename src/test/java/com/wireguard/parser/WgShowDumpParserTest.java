@@ -1,7 +1,7 @@
 package com.wireguard.parser;
 
 
-import com.wireguard.converters.StreamToStringConverter;
+import com.wireguard.external.shell.StreamToStringConverter;
 import com.wireguard.external.wireguard.WgPeer;
 import com.wireguard.external.wireguard.WgPeerContainer;
 import com.wireguard.external.wireguard.WgShowDump;

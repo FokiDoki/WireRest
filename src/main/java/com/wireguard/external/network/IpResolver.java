@@ -4,13 +4,11 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 
 public class IpResolver {
@@ -33,23 +31,38 @@ public class IpResolver {
     }
 
     public Subnet takeFreeSubnet(Integer mask){
+        ImmutablePair<Subnet, IpRange> subnetAndRange = findFreeSubnetAndRange(mask);
+        if (subnetAndRange != null){
+            Subnet requestedSubnet = subnetAndRange.getLeft();
+            int requestedSubnetIndex = calculatePreviousRangeIndex(findFirstGreater(requestedSubnet.getFirstIpNumeric()));
+            availableRanges.remove(requestedSubnetIndex);
+            availableRanges.addAll(requestedSubnetIndex, insertSubnetIntoIpRange(requestedSubnet, subnetAndRange.getRight()));
+            availableIpsCount -= requestedSubnet.getIpCount();
+            return requestedSubnet;
+        } else {
+            throw new NoFreeIpException("Cannot find free subnet with mask " + mask);
+        }
+    }
+
+    public Subnet findFreeSubnet(Integer mask){
+        ImmutablePair<Subnet, IpRange> result = findFreeSubnetAndRange(mask);
+        return result==null ? null : result.getLeft();
+    }
+
+    private ImmutablePair<Subnet, IpRange> findFreeSubnetAndRange(Integer mask){
         long addressRequestCount = (long) Math.pow(2, 32-mask);
-        for (int i = 0; i < availableRanges.size(); i++){
-            IpRange range = availableRanges.get(i);
+        for (IpRange range : availableRanges) {
             long firstAddress = Math.ceilDiv(range.getLeast(), addressRequestCount);
-            long addressNeeded = firstAddress*addressRequestCount-range.getLeast()+addressRequestCount;
-            if (addressNeeded > range.getIpsCount()){
+            long addressNeeded = firstAddress * addressRequestCount - range.getLeast() + addressRequestCount;
+            if (addressNeeded > range.getIpsCount()) {
                 continue;
             }
-            Subnet givenSubnet = new Subnet(
-                    numericIpToByte(firstAddress*addressRequestCount),
+            Subnet subnet = new Subnet(
+                    numericIpToByte(firstAddress * addressRequestCount),
                     mask);
-            availableRanges.remove(i);
-            availableRanges.addAll(i, insertSubnetIntoIpRange(givenSubnet, range));
-            availableIpsCount -= givenSubnet.getIpCount();
-            return givenSubnet;
+            return new ImmutablePair<>(subnet, range);
         }
-        throw new NoFreeIpException("Cannot find free subnet with mask "+mask);
+        return null;
     }
 
     public void takeIp(String ip){
@@ -74,7 +87,7 @@ public class IpResolver {
             availableRanges.addAll(currRangeIndex, insertSubnetIntoIpRange(subnet, availableRange));
             availableIpsCount -= subnet.getIpCount();
         } else {
-            throw new NoFreeIpException("Subnet " + subnet + " is is already used");
+            throw new AlreadyUsedException("Subnet " + subnet + " is is already used");
         }
     }
 
