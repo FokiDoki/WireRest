@@ -149,7 +149,7 @@ public class PeerController {
         } catch (IllegalArgumentException | ParsingException e){
             throw new BadRequestException(e.getMessage());
         } catch (CommandExecutionException e){
-            throw new BadRequestException("Wireguard error: %s".formatted(e.getStderr().strip()));
+            throw new BadRequestException("Wireguard error: %s (exit code: %d)".formatted(e.getStderr().strip(), e.getExitCode()));
         }
         return new ResponseEntity<>(createdPeer, HttpStatus.CREATED);
     }
