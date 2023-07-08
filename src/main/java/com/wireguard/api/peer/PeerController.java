@@ -124,11 +124,11 @@ public class PeerController {
                             schema = @Schema(implementation = AppError.class)) }) })
     @PostMapping("/peer/create")
     @Parameter(name = "publicKey", description = "Public key of the peer (Will be generated if not provided)")
-    @Parameter(name = "presharedKey", description = "Preshared key of empty if no psk required (Will be generated if not provided)", allowEmptyValue = true)
+    @Parameter(name = "presharedKey", description = "Preshared key or empty if no psk required (Will be generated if not provided)", allowEmptyValue = true)
     @Parameter(name = "privateKey", description = "Private key of the peer " +
             "(Will be generated if not provided. " +
             "If provided public key, empty string will be returned)")
-    @Parameter(name = "address", description = "CIDR of new peer in wireguard network interface (Will be generated if not provided)", schema = @Schema(format = "CIDR"))
+    @Parameter(name = "address", description = "CIDR of new peer in wireguard network interface (Will be generated if not provided)", schema = @Schema(format = "CIDR"), allowEmptyValue = true)
     @Parameter(name = "persistentKeepalive", description = "Persistent keepalive interval in seconds (Will be generated if not provided)")
     public ResponseEntity<CreatedPeer> createPeer( //Добавить возможноть не устанавливать PSK вообще (чтобы в пире его тоже не было)
             @RequestParam(value = "publicKey", required = false ) String publicKey,
