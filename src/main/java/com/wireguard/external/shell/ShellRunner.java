@@ -30,8 +30,10 @@ public class ShellRunner {
         String stdout = readInputStream(process.getInputStream());
         String stderr = readInputStream(process.getErrorStream());
         if (!allowedExitCodes.contains(exitCode)) {
+            logger.debug("Command failed with exit code %d: %s".formatted(exitCode, String.join(" ", command)));
             throw new CommandExecutionException(String.join(" ", command), exitCode, stdout, stderr);
         }
+        logger.debug("Command executed successfully: %s".formatted(String.join(" ", command)));
         return stdout;
     }
 

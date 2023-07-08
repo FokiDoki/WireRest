@@ -129,7 +129,7 @@ public class PeerController {
             "(Will be generated if not provided. " +
             "If provided public key, empty string will be returned)")
     @Parameter(name = "address", description = "CIDR of new peer in wireguard network interface (Will be generated if not provided)", schema = @Schema(format = "CIDR"), allowEmptyValue = true)
-    @Parameter(name = "persistentKeepalive", description = "Persistent keepalive interval in seconds (Will be generated if not provided)")
+    @Parameter(name = "persistentKeepalive", description = "Persistent keepalive interval in seconds (0 if not provided)")
     public ResponseEntity<CreatedPeer> createPeer( //Добавить возможноть не устанавливать PSK вообще (чтобы в пире его тоже не было)
             @RequestParam(value = "publicKey", required = false ) String publicKey,
             @RequestParam(value = "presharedKey", required = false ) String presharedKey,
@@ -149,7 +149,7 @@ public class PeerController {
         } catch (IllegalArgumentException | ParsingException e){
             throw new BadRequestException(e.getMessage());
         } catch (CommandExecutionException e){
-            throw new BadRequestException("wireguard returned error: %s".formatted(e.getStderr()));
+            throw new BadRequestException("Wireguard error: %s".formatted(e.getStderr().strip()));
         }
         return new ResponseEntity<>(createdPeer, HttpStatus.CREATED);
     }
