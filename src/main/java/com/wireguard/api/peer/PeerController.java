@@ -131,7 +131,7 @@ public class PeerController {
     @Parameter(name = "privateKey", description = "Private key of the peer " +
             "(Will be generated if not provided. " +
             "If provided public key, empty string will be returned)")
-    @Parameter(name = "address", description = "CIDR of new peer in wireguard network interface (Will be generated if not provided)", schema = @Schema(format = "CIDR"), allowEmptyValue = true)
+        @Parameter(name = "address", description = "CIDR of new peer in wireguard network interface, or empty if no address is required (Will be generated if not provided)", schema = @Schema(format = "CIDR"), allowEmptyValue = true)
     @Parameter(name = "persistentKeepalive", description = "Persistent keepalive interval in seconds (0 if not provided)")
     public ResponseEntity<CreatedPeer> createPeer(
             @RequestParam(value = "publicKey", required = false ) String publicKey,
