@@ -33,9 +33,9 @@ public class WgManager {
     private static final Logger logger = LoggerFactory.getLogger(ShellRunner.class);
     private final NetworkInterfaceDTO wgInterface;
     @Value("${wg.interface.default.mask}")
-    private static int DEFAULT_MASK_FOR_NEW_CLIENTS = 32;
+    private final int DEFAULT_MASK_FOR_NEW_CLIENTS = 32;
     @Value("${wg.interface.default.persistent_keepalive}")
-    private static int DEFAULT_PERSISTENT_KEEPALIVE = 0;
+    private final int DEFAULT_PERSISTENT_KEEPALIVE = 0;
     private final IpResolver wgIpResolver;
     private static WgTool wgTool;
     WgPeerContainerToWgPeerDTOSet containerToPeer = new WgPeerContainerToWgPeerDTOSet();
