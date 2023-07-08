@@ -121,7 +121,10 @@ public class PeerController {
             ),
             @ApiResponse(responseCode = "500", description = "Internal Server Error",
                     content = { @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = AppError.class)) }) })
+                            schema = @Schema(implementation = AppError.class)) }),
+            @ApiResponse(responseCode = "400", description = "Bad request (Invalid parameters values)",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = AppError.class)) })})
     @PostMapping("/peer/create")
     @Parameter(name = "publicKey", description = "Public key of the peer (Will be generated if not provided)")
     @Parameter(name = "presharedKey", description = "Preshared key or empty if no psk required (Will be generated if not provided)", allowEmptyValue = true)
@@ -149,7 +152,7 @@ public class PeerController {
         } catch (IllegalArgumentException | ParsingException e){
             throw new BadRequestException(e.getMessage());
         } catch (CommandExecutionException e){
-            throw new BadRequestException("Wireguard error: %s (exit code: %d)".formatted(e.getStderr().strip(), e.getExitCode()));
+            throw new BadRequestException("Wireguard error: %s".formatted(e.getStderr().strip()));
         }
         return new ResponseEntity<>(createdPeer, HttpStatus.CREATED);
     }
