@@ -21,7 +21,7 @@ public class FakeWgTool extends WgTool {
     private int keyCounter;
 
     public FakeWgTool() {
-        super(0);
+        super(1);
         wgInterfaceDTO = new WgInterfaceDTO("privkey", "pubkey", 16666, 0);
         wgPeerContainer.addAll(List.of(
                 WgPeer.publicKey("pubkey1").build(),
