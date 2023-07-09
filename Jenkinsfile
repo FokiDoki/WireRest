@@ -9,7 +9,8 @@ pipeline {
         RUN_ARGS="--spring.profiles.active=${RUN_PROFILES} " +
         "--server.port=${RUN_PORT} " +
         "--wg.interface.name=server " +
-        "--debug "
+        "--debug " +
+        "--logging.level.root=DEBUG "
     }
     stages {
         stage('Build') {
