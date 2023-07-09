@@ -17,6 +17,7 @@ public class LogbackHandler extends UnsynchronizedAppenderBase<ILoggingEvent> im
     private final Queue<ILoggingEvent> logs = new LinkedList<>();
 
     @Value("${logging.api.max-elements}")
+    @Getter
     private int maxElements;
 
     @Override
