@@ -166,7 +166,12 @@ public class WgTool {
     }
     private void saveConfig(String interfaceName) {
         if (configSaveTasks.isEmpty()) {
-            configSaveTasks.add(new Task(() -> run(WG_SAVE_COMMAND.formatted(interfaceName), true)));
+            logger.debug("Scheduling config save for interface %s".formatted(interfaceName));
+            configSaveTasks.add(new Task(() ->
+            {
+                run(WG_SAVE_COMMAND.formatted(interfaceName), true);
+                logger.debug("Config saved for interface %s".formatted(interfaceName));
+            }));
         }
     }
 
