@@ -37,7 +37,7 @@ public class WgTool {
     static String presharedKeyPath = "/tmp/presharedKey";
     protected final ShellRunner shell = new ShellRunner();
 
-    private Queue<Task> configSaveTasks = new LinkedBlockingQueue<>(1);
+    private final Queue<Task> configSaveTasks = new LinkedBlockingQueue<>(1);
     private final RateLimitedExecutorService configSaveExecutor;
 
     @Autowired
