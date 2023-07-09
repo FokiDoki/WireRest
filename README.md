@@ -25,7 +25,7 @@ Java 20 required
 #### Default configuration:
 
 ```shell
-java -jar wirerest-0.2.jar
+java -jar wirerest-0.3.jar
 ```
 Server run on port 8081
 
@@ -51,7 +51,7 @@ mvn clean package
 ___
 - ~~Migration to Spring WebFlux~~
 - Metrics for Prometheus
-- Add peer (Custom configuration)
+- ~~Add peer (Custom configuration)~~
 - ~~Delete peer~~
 - Update peer
 - Oauth2 authorization

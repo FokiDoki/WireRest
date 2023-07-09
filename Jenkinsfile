@@ -4,9 +4,12 @@ pipeline {
     environment {
         RUN_PROFILES="prod"
         RUN_PORT=8081
-        POM_VERSION="0.3"
+        POM_VERSION="0.3.1-MT"
         SERVICE_NAME="wirerest"
-        RUN_ARGS="--spring.profiles.active=${RUN_PROFILES} --server.port=${RUN_PORT} --debug"
+        RUN_ARGS="--spring.profiles.active=${RUN_PROFILES}
+        --server.port=${RUN_PORT}
+        --wg.interface.name=server
+        --debug"
     }
     stages {
         stage('Build') {
