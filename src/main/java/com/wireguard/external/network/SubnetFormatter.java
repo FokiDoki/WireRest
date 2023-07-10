@@ -1,6 +1,8 @@
 package com.wireguard.external.network;
+
 import org.springframework.format.Formatter;
 import org.springframework.stereotype.Component;
+
 import java.util.Locale;
 
 @Component
