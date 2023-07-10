@@ -2,13 +2,20 @@ package com.wireguard.external.wireguard;
 
 import com.wireguard.external.shell.ShellRunner;
 import com.wireguard.external.wireguard.dto.CreatedPeer;
+import com.wireguard.external.wireguard.tools.RateLimitedExecutorService;
 import com.wireguard.parser.WgShowDumpParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
+import org.springframework.scheduling.config.Task;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.List;
+import java.util.Queue;
+import java.util.Scanner;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Function;
 
 @Profile("prod")
@@ -29,6 +36,14 @@ public class WgTool {
 
     static String presharedKeyPath = "/tmp/presharedKey";
     protected final ShellRunner shell = new ShellRunner();
+
+    private final Queue<Task> configSaveTasks = new LinkedBlockingQueue<>(1);
+    private final RateLimitedExecutorService configSaveExecutor;
+
+    @Autowired
+    public WgTool(@Value("${wg.config.save.min-interval}") int configSaveMinInterval) {
+        this.configSaveExecutor = new RateLimitedExecutorService(configSaveTasks, configSaveMinInterval);
+    }
 
     private String run(String commandStr, Boolean privileged) {
         String[] command = getCommand(commandStr, privileged);
@@ -150,8 +165,12 @@ public class WgTool {
 
     }
     private void saveConfig(String interfaceName) {
-        run(WG_SAVE_COMMAND.formatted(interfaceName), true);
+        if (configSaveTasks.isEmpty()) {
+            configSaveTasks.add(new Task(() -> run(WG_SAVE_COMMAND.formatted(interfaceName), true)));
+        }
     }
+
+
 
     public void deletePeer(String interfaceName, String publicKey) {
         run(WG_DEL_PEER_COMMAND.formatted(interfaceName, publicKey), true);

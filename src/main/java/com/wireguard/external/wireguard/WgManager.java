@@ -37,13 +37,13 @@ public class WgManager {
     @Value("${wg.interface.default.persistent_keepalive}")
     private final int DEFAULT_PERSISTENT_KEEPALIVE = 0;
     private final IpResolver wgIpResolver;
-    private static WgTool wgTool;
+    private final WgTool wgTool;
     WgPeerContainerToWgPeerDTOSet containerToPeer = new WgPeerContainerToWgPeerDTOSet();
     WgPeerIterableToWgPeerDTOList iterableToPeer = new WgPeerIterableToWgPeerDTOList();
 
     @Autowired
     public WgManager(WgTool wgTool, IpResolver wgIpResolver, NetworkInterfaceDTO wgInterface) {
-        WgManager.wgTool = wgTool;
+        this.wgTool = wgTool;
         this.wgIpResolver = wgIpResolver;
         this.wgInterface = wgInterface;
     }

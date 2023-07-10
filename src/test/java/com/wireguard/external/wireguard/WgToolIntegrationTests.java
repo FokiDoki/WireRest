@@ -19,7 +19,7 @@ class WgToolIntegrationTests {
     private final static File wgConfigFileSource = new File("src/test/resources/%s.conf".formatted(interfaceName));
     private static File wgConfigFile;
     private final static String interfacePublicKey = "sBdtuH6Q84CmecM+A832NOyAb9Oz0W7rJdPCR/JS63I=";
-    private final static WgTool wgTool = new WgTool();
+    private final static WgTool wgTool = new WgTool(1);
 
     @BeforeAll
     static void setUpEnvironment() throws IOException {
