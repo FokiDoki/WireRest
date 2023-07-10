@@ -40,7 +40,6 @@ public class SubnetSolver implements ISubnetSolver {
             availableRanges.remove(requestedSubnetIndex);
             availableRanges.addAll(requestedSubnetIndex, insertSubnetIntoIpRange(requestedSubnet, subnetAndRange.getRight()));
             availableIpsCount -= requestedSubnet.getIpCount();
-            System.out.println(availableIpsCount);
             return requestedSubnet;
         } else {
             throw new NoFreeIpException("Cannot find free subnet with mask " + mask);
@@ -87,7 +86,6 @@ public class SubnetSolver implements ISubnetSolver {
             availableRanges.remove(currRangeIndex);
             availableRanges.addAll(currRangeIndex, insertSubnetIntoIpRange(subnet, availableRange));
             availableIpsCount -= subnet.getIpCount();
-            System.out.println(availableIpsCount);
         } else {
             throw new AlreadyUsedException("Subnet " + subnet + " is is already used");
         }
