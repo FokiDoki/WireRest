@@ -11,18 +11,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class })
 public class WireguardControllerApplication {
-
-
-    public static void main(String[] args) throws Exception {
-        ConfigurableApplicationContext context = SpringApplication.run(WireguardControllerApplication.class, args);
-        context.start();
-        addCustomAppender(context, (LoggerContext) LoggerFactory.getILoggerFactory());
+    public static void main(String[] args) {
+        SpringApplication.run(WireguardControllerApplication.class, args);
     }
-
-    private static void addCustomAppender(ConfigurableApplicationContext context, LoggerContext loggerContext) {
-        LogbackHandler customAppender = context.getBean(LogbackHandler.class);
-        Logger rootLogger = loggerContext.getLogger(Logger.ROOT_LOGGER_NAME);
-        rootLogger.addAppender(customAppender);
-    }
-
 }
