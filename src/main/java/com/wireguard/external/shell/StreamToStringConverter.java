@@ -1,6 +1,5 @@
 package com.wireguard.external.shell;
 
-import com.wireguard.external.shell.ShellRunner;
 import jakarta.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
