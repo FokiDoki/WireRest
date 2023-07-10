@@ -1,6 +1,6 @@
 package com.wireguard.external.wireguard;
 
-import com.wireguard.external.network.IpResolver;
+import com.wireguard.external.network.SubnetSolver;
 import com.wireguard.external.network.NetworkInterfaceDTO;
 import com.wireguard.external.network.Subnet;
 import com.wireguard.external.wireguard.dto.CreatedPeer;
@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -55,12 +54,12 @@ class WgManagerTest {
         Mockito.when(wgTool.generatePublicKey("generatedPrivateKey")).thenReturn("GeneratedPubKeyFromPrivateKey");
 
         NetworkInterfaceDTO wgInterface = new NetworkInterfaceDTO(wgInterfaceName);
-        IpResolver ipResolver = new IpResolver(Subnet.valueOf("10.0.0.0/16"));
-        ipResolver.takeSubnet(Subnet.valueOf("10.0.0.0/31"));
+        SubnetSolver subnetSolver = new SubnetSolver(Subnet.valueOf("10.0.0.0/16"));
+        subnetSolver.obtain(Subnet.valueOf("10.0.0.0/31"));
 
         wgManager = new WgManager(
                 wgTool,
-                ipResolver,
+                subnetSolver,
                 wgInterface);
     }
 

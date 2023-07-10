@@ -1,8 +1,6 @@
 package com.wireguard.external.wireguard;
 
-import com.wireguard.external.network.IpResolver;
-import com.wireguard.external.network.NetworkInterfaceDTO;
-import com.wireguard.external.network.Subnet;
+import com.wireguard.external.network.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,9 +28,9 @@ public class Config {
 
 
     @Bean
-    public IpResolver ipResolver(NetworkInterfaceDTO wgInterface) {
+    public ISubnetSolver ipResolver(NetworkInterfaceDTO wgInterface) {
 
-        logger.info("Configuring IpResolver...");
+        logger.info("Configuring SubnetSolver...");
         Subnet interfaceSubnet = wgInterface.getCidrV4Address().stream().findFirst().orElseThrow(
                 () -> new RuntimeException("Interface " + wgInterface.getName() + " has no IPv4 address")
         );
@@ -41,21 +39,22 @@ public class Config {
                 interfaceSubnet.toString(),
                 interfaceSubnet.getNumericMask()
                 ));
-        IpResolver ipResolver = new IpResolver(interfaceSubnet);
+        SubnetSolver UnprotectedSubnetSolver = new SubnetSolver(interfaceSubnet);
+        QueuedSubnetSolver subnetSolver = new QueuedSubnetSolver(UnprotectedSubnetSolver);
 
         if (interfaceSubnet.getNumericMask()<=30) {
-            ipResolver.takeIp(interfaceSubnet.getFirstIpString());
-            ipResolver.takeIp(interfaceSubnet.getLastIpString());
-            wgInterface.getIpv4Addresses().forEach(iNet4Address -> ipResolver.takeIp(iNet4Address.getHostAddress()));
+            subnetSolver.obtainIp(interfaceSubnet.getFirstIpString());
+            subnetSolver.obtainIp(interfaceSubnet.getLastIpString());
+            wgInterface.getIpv4Addresses().forEach(iNet4Address -> subnetSolver.obtainIp(iNet4Address.getHostAddress()));
         }
-        consumeUsedIps(ipResolver::takeIp, wgInterface.getName());
+        consumeUsedIps(subnetSolver::obtainIp, wgInterface.getName());
 
-        logger.info("IpResolver configured, available IPs: %d, used IPs: %d, Total: %d".formatted(
-                ipResolver.getAvailableIpsCount(),
-                ipResolver.getUsedIpsCount(),
-                ipResolver.getTotalIpsCount()-2
+        logger.info("SubnetSolver configured, available IPs: %d, used IPs: %d, Total: %d".formatted(
+                subnetSolver.getAvailableIpsCount(),
+                subnetSolver.getUsedIpsCount(),
+                subnetSolver.getTotalIpsCount()-2
         ));
-        return ipResolver;
+        return subnetSolver;
     }
 
 
