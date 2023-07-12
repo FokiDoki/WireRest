@@ -59,12 +59,12 @@ public class PeerController {
     @GetMapping("/peers")
     @Parameter(name = "page", description = "Page number")
     @Parameter(name = "limit", description = "Page size (In case of 0, all peers will be returned)")
-    @Parameter(name = "sort", description = "Sort key and direction separated by a dot. The keys are the same as in the answer. " +
-            "Direction is optional and may have value DESC (High to low) and ASC (Low to high). Default is DESC. ", example = "transferTx.desc")
+    @Parameter(name = "sort", description = "Sort key and direction separated by a dot. The keys are the same as in the answer" +
+            "Direction is optional and may have value DESC (High to low) and ASC (Low to high). Default is allowedSubnets.DESC", example = "transferTx.desc")
     public PageDTO<WgPeerDTO> getPeers(
             @RequestParam(value = "page", required = false, defaultValue = "0") int page,
             @RequestParam(value = "limit", required = false, defaultValue = "1000") int limit,
-            @RequestParam(value = "sort", required = false, defaultValue = "allowedIps.asc") String sortKey
+            @RequestParam(value = "sort", required = false, defaultValue = "allowedSubnets.asc") String sortKey
     ) throws ParsingException {
         Page<WgPeer> peers;
         if (limit == 0){
