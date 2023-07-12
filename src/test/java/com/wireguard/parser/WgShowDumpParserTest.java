@@ -2,9 +2,8 @@ package com.wireguard.parser;
 
 
 import com.wireguard.external.shell.StreamToStringConverter;
-import com.wireguard.external.wireguard.peer.WgPeer;
-import com.wireguard.external.wireguard.peer.WgPeerContainer;
 import com.wireguard.external.wireguard.WgShowDump;
+import com.wireguard.external.wireguard.peer.WgPeer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

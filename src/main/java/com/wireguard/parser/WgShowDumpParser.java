@@ -1,15 +1,16 @@
 package com.wireguard.parser;
 
 
+import com.wireguard.external.wireguard.WgShowDump;
 import com.wireguard.external.wireguard.iface.WgInterface;
 import com.wireguard.external.wireguard.peer.WgPeer;
-import com.wireguard.external.wireguard.WgShowDump;
-import com.wireguard.api.inteface.WgInterfaceDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
 
 
 public class WgShowDumpParser {

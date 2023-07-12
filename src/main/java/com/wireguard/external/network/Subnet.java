@@ -4,7 +4,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.springframework.util.Assert;
 
-import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.util.List;
 

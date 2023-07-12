@@ -1,6 +1,5 @@
 package com.wireguard.external.network;
 
-import java.net.InetAddress;
 import java.util.List;
 
 public interface ISubnet extends Comparable<ISubnet> {

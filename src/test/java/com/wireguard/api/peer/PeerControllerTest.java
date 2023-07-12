@@ -1,29 +1,10 @@
 package com.wireguard.api.peer;
 
-import com.wireguard.api.AppError;
-import com.wireguard.external.network.NoFreeIpException;
-import com.wireguard.external.network.Subnet;
-import com.wireguard.external.wireguard.ParsingException;
 import com.wireguard.external.wireguard.peer.WgPeerService;
-import com.wireguard.external.wireguard.peer.WgPeer;
-import com.wireguard.external.wireguard.peer.CreatedPeer;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.test.web.reactive.server.WebTestClient;
-
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import static org.hamcrest.Matchers.containsString;
 
 @WebFluxTest(PeerController.class)
 class PeerControllerTest {

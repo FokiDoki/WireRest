@@ -1,26 +1,7 @@
 package com.wireguard.external.wireguard;
 
-import com.wireguard.external.network.SubnetSolver;
-import com.wireguard.external.network.NetworkInterfaceDTO;
-import com.wireguard.external.network.Subnet;
 import com.wireguard.api.inteface.WgInterfaceDTO;
-import com.wireguard.api.peer.WgPeerDTO;
-import com.wireguard.external.wireguard.peer.CreatedPeer;
-import com.wireguard.external.wireguard.peer.WgPeer;
 import com.wireguard.external.wireguard.peer.WgPeerService;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
-import java.io.IOException;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.reset;
 
 class WgPeerServiceTest {
     private WgPeerService wgPeerService;

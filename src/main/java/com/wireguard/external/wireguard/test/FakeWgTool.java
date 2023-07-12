@@ -1,13 +1,10 @@
 package com.wireguard.external.wireguard.test;
 
 import com.wireguard.external.network.Subnet;
-import com.wireguard.external.wireguard.iface.WgInterface;
-import com.wireguard.external.wireguard.peer.WgPeer;
-import com.wireguard.external.wireguard.peer.WgPeerContainer;
 import com.wireguard.external.wireguard.WgShowDump;
 import com.wireguard.external.wireguard.WgTool;
-import com.wireguard.external.wireguard.peer.CreatedPeer;
-import com.wireguard.api.inteface.WgInterfaceDTO;
+import com.wireguard.external.wireguard.iface.WgInterface;
+import com.wireguard.external.wireguard.peer.WgPeer;
 import lombok.SneakyThrows;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;

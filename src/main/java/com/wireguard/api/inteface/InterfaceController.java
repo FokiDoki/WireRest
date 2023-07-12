@@ -4,7 +4,6 @@ import com.wireguard.api.AppError;
 import com.wireguard.external.wireguard.ParsingException;
 import com.wireguard.external.wireguard.iface.WgInterface;
 import com.wireguard.external.wireguard.iface.WgInterfaceService;
-import com.wireguard.external.wireguard.peer.WgPeerService;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
