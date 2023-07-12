@@ -1,6 +1,6 @@
 package com.wireguard.parser;
 
-import com.wireguard.external.wireguard.dto.WgInterfaceDTO;
+import com.wireguard.api.inteface.WgInterfaceDTO;
 import org.springframework.util.Assert;
 
 import java.util.List;

@@ -2,8 +2,8 @@ package com.wireguard.parser;
 
 
 import com.wireguard.external.shell.StreamToStringConverter;
-import com.wireguard.external.wireguard.WgPeer;
-import com.wireguard.external.wireguard.WgPeerContainer;
+import com.wireguard.external.wireguard.peer.WgPeer;
+import com.wireguard.external.wireguard.peer.WgPeerContainer;
 import com.wireguard.external.wireguard.WgShowDump;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,7 +46,7 @@ class WgShowDumpParserTest {
         Assertions.assertEquals(11, wgPeers.size());
         WgPeer peer = dump.peers().stream().filter(p -> p.getPublicKey().equals("8avysqyA1N+IIX8d1gergergergergbHf2TfuEfw4ff=")).findFirst().get();
         Assertions.assertEquals(FIRST_PEER_ENDPOINT, peer.getEndpoint());
-        Assertions.assertEquals(Set.of("10.66.66.2/32", "fd42:42:42::2/128"), peer.getAllowedIps().getAll());
+        Assertions.assertEquals(Set.of("10.66.66.2/32", "fd42:42:42::2/128"), peer.getAllowedSubnets().getAll());
         Assertions.assertEquals(FIRST_PEER_PERSISTENT_KEEPALIVE, peer.getPersistentKeepalive());
         Assertions.assertEquals(FIRST_PEER_LAST_HANDSHAKE_TIME, peer.getLatestHandshake());
 

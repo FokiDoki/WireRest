@@ -1,11 +1,10 @@
 package com.wireguard.external.wireguard.converters;
 
-import com.wireguard.external.wireguard.WgPeer;
-import com.wireguard.external.wireguard.dto.WgPeerDTO;
+import com.wireguard.external.wireguard.peer.WgPeer;
+import com.wireguard.api.peer.WgPeerDTO;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 

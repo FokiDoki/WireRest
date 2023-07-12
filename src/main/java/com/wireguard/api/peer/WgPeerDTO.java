@@ -1,6 +1,6 @@
-package com.wireguard.external.wireguard.dto;
+package com.wireguard.api.peer;
 
-import com.wireguard.external.wireguard.WgPeer;
+import com.wireguard.external.wireguard.peer.WgPeer;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -26,7 +26,7 @@ public class WgPeerDTO {
         wgPeerDTO.publicKey = wgPeer.getPublicKey();
         wgPeerDTO.presharedKey = wgPeer.getPresharedKey();
         wgPeerDTO.endpoint = wgPeer.getEndpoint();
-        wgPeerDTO.allowedIps = wgPeer.getAllowedIps().getAll();
+        wgPeerDTO.allowedIps = wgPeer.getAllowedSubnets().getAll();
         wgPeerDTO.latestHandshake = wgPeer.getLatestHandshake();
         wgPeerDTO.transferRx = wgPeer.getTransferRx();
         wgPeerDTO.transferTx = wgPeer.getTransferTx();

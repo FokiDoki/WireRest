@@ -1,4 +1,4 @@
-package com.wireguard.external.wireguard.dto;
+package com.wireguard.api.inteface;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -8,12 +8,12 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class WgInterfaceDTO {
-    private String privateKey;
-    private String publicKey;
+    private final String privateKey;
+    private final String publicKey;
     @Min(1)
     @Max(65535)
-    private int listenPort;
-    private int fwMark;
+    private final int listenPort;
+    private final int fwMark;
 
 
 }

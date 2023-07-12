@@ -1,7 +1,10 @@
 package com.wireguard.external.wireguard;
 
+import com.wireguard.external.network.Subnet;
 import com.wireguard.external.shell.ShellRunner;
-import com.wireguard.external.wireguard.dto.CreatedPeer;
+import com.wireguard.external.wireguard.iface.WgInterface;
+import com.wireguard.external.wireguard.peer.CreatedPeer;
+import com.wireguard.external.wireguard.peer.WgPeer;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
@@ -47,7 +50,7 @@ class WgToolIntegrationTests {
     void showDump() throws IOException {
         WgShowDump dump = wgTool.showDump(interfaceName);
         Assertions.assertNotNull(dump);
-        Assertions.assertEquals(interfacePublicKey, dump.wgInterfaceDTO().getPrivateKey());
+        Assertions.assertEquals(interfacePublicKey, dump.wgInterface().getPrivateKey());
         Assertions.assertEquals(3, dump.peers().size());
     }
 
@@ -79,16 +82,18 @@ class WgToolIntegrationTests {
         String privateKey = wgTool.generatePrivateKey();
         String publicKey = wgTool.generatePublicKey(privateKey);
         String presharedKey = wgTool.generatePresharedKey();
-        String allowedIps = "10.112.112.10/32";
-        CreatedPeer createdPeer = new CreatedPeer(publicKey, presharedKey, privateKey,
-                Set.of(allowedIps), 0);
+        Subnet allowedIp = Subnet.valueOf("10.112.112.10/32");
+        WgPeer createdPeer = WgPeer.publicKey(publicKey)
+                .presharedKey(presharedKey)
+                .allowedIPv4Subnets(Set.of(allowedIp))
+                .build();
         wgTool.addPeer(interfaceName, createdPeer);
         WgShowDump dump = wgTool.showDump(interfaceName);
         Optional<WgPeer> addedPeer = dump.peers().stream().filter(peer -> peer.getPublicKey().equals(publicKey)).findFirst();
         Assertions.assertTrue(addedPeer.isPresent());
         Assertions.assertEquals(publicKey, addedPeer.get().getPublicKey());
         Assertions.assertEquals(presharedKey, addedPeer.get().getPresharedKey());
-        Assertions.assertEquals(allowedIps, addedPeer.get().getAllowedIps().toString());
+        Assertions.assertEquals(allowedIp, addedPeer.get().getAllowedSubnets().toString());
     }
 
     @Test

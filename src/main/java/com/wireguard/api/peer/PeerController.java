@@ -6,9 +6,8 @@ import com.wireguard.api.ResourceNotFoundException;
 import com.wireguard.external.network.Subnet;
 import com.wireguard.external.shell.CommandExecutionException;
 import com.wireguard.external.wireguard.ParsingException;
-import com.wireguard.external.wireguard.WgManager;
-import com.wireguard.external.wireguard.dto.CreatedPeer;
-import com.wireguard.external.wireguard.dto.WgPeerDTO;
+import com.wireguard.external.wireguard.peer.WgPeerService;
+import com.wireguard.external.wireguard.peer.CreatedPeer;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -29,10 +28,10 @@ import java.util.Set;
 @RestController
 public class PeerController {
 
-    WgManager wgManager;
+    WgPeerService wgPeerService;
 
-    public PeerController(WgManager wgManager) {
-        this.wgManager = wgManager;
+    public PeerController(WgPeerService wgPeerService) {
+        this.wgPeerService = wgPeerService;
     }
 
 
@@ -69,7 +68,7 @@ public class PeerController {
         }
         try {
             Pageable pageable = PageRequest.of(page, limit, getSort(sortKey));
-            peers = wgManager.getPeers(pageable);
+            peers = wgPeerService.getPeers(pageable);
         } catch (IllegalArgumentException | ParsingException e){
             throw new BadRequestException(e.getMessage());
         }
@@ -104,7 +103,7 @@ public class PeerController {
                             schema = @Schema(implementation = AppError.class)) }) })
     @GetMapping("/peer")
     public WgPeerDTO getPeerByPublicKey(String publicKey) throws ParsingException {
-        Optional<WgPeerDTO> peer =  wgManager.getPeerDTOByPublicKey(publicKey);
+        Optional<WgPeerDTO> peer =  wgPeerService.getPeerDTOByPublicKey(publicKey);
         if (peer.isPresent()){
             return peer.get();
         } else {
@@ -144,7 +143,7 @@ public class PeerController {
     ) {
         CreatedPeer createdPeer;
         try {
-            createdPeer = wgManager.createPeerGenerateNulls(
+            createdPeer = wgPeerService.createPeerGenerateNulls(
                     publicKey,
                     presharedKey,
                     privateKey,
@@ -178,11 +177,11 @@ public class PeerController {
                             schema = @Schema(implementation = AppError.class)) }) })
     @DeleteMapping("/peer/delete")
     public WgPeerDTO deletePeer(String publicKey) throws ParsingException {
-        Optional<WgPeerDTO> peer = wgManager.getPeerDTOByPublicKey(publicKey);
+        Optional<WgPeerDTO> peer = wgPeerService.getPeerDTOByPublicKey(publicKey);
         if (peer.isEmpty()){
             throw new ResourceNotFoundException("Peer with public key %s not found".formatted(publicKey));
         }
-        wgManager.deletePeer(publicKey);
+        wgPeerService.deletePeer(publicKey);
         return peer.get();
     }
 

@@ -1,11 +1,11 @@
 package com.wireguard.external.wireguard.test;
 
-import com.wireguard.external.wireguard.WgPeer;
-import com.wireguard.external.wireguard.WgPeerContainer;
+import com.wireguard.external.wireguard.peer.WgPeer;
+import com.wireguard.external.wireguard.peer.WgPeerContainer;
 import com.wireguard.external.wireguard.WgShowDump;
 import com.wireguard.external.wireguard.WgTool;
-import com.wireguard.external.wireguard.dto.CreatedPeer;
-import com.wireguard.external.wireguard.dto.WgInterfaceDTO;
+import com.wireguard.external.wireguard.peer.CreatedPeer;
+import com.wireguard.api.inteface.WgInterfaceDTO;
 import lombok.SneakyThrows;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -27,12 +27,12 @@ public class FakeWgTool extends WgTool {
                 WgPeer.publicKey("pubkey1").build(),
                 WgPeer.publicKey("pubkey2").presharedKey("presharedKey2").build(),
                 WgPeer.publicKey("PubKey3").presharedKey("presharedKey3").endpoint("10.0.0.1").build(),
-                WgPeer.publicKey("PubKey4").presharedKey("presharedKey4").allowedIPv4Ips(Set.of("10.0.0.2/32")).build(),
-                WgPeer.publicKey("PubKey5").presharedKey("presharedKey5").allowedIPv4Ips(Set.of("10.0.0.3/32")).build(),
-                WgPeer.publicKey("PubKey6").presharedKey("presharedKey6").allowedIPv4Ips(Set.of("10.0.0.4/32","10.0.0.5/32")).build(),
-                WgPeer.publicKey("PubKey7").presharedKey("presharedKey7").allowedIPv4Ips(Set.of("10.0.0.6/32"))
+                WgPeer.publicKey("PubKey4").presharedKey("presharedKey4").allowedIPv4Subnets(Set.of("10.0.0.2/32")).build(),
+                WgPeer.publicKey("PubKey5").presharedKey("presharedKey5").allowedIPv4Subnets(Set.of("10.0.0.3/32")).build(),
+                WgPeer.publicKey("PubKey6").presharedKey("presharedKey6").allowedIPv4Subnets(Set.of("10.0.0.4/32","10.0.0.5/32")).build(),
+                WgPeer.publicKey("PubKey7").presharedKey("presharedKey7").allowedIPv4Subnets(Set.of("10.0.0.6/32"))
                         .latestHandshake(100000).transferRx(12345).transferTx(54321).build(),
-                WgPeer.publicKey("PubKey8").presharedKey("presharedKey8").allowedIPv4Ips(Set.of("10.0.0.7/32"))
+                WgPeer.publicKey("PubKey8").presharedKey("presharedKey8").allowedIPv4Subnets(Set.of("10.0.0.7/32"))
                         .latestHandshake(200000).transferRx(12345).transferTx(54321).build()
         ));
         keyCounter = wgPeerContainer.size();
@@ -53,7 +53,7 @@ public class FakeWgTool extends WgTool {
     synchronized public void addPeer(String interfaceName, CreatedPeer peer) {
         wgPeerContainer.add(WgPeer.publicKey(peer.getPublicKey())
                 .presharedKey(peer.getPresharedKey())
-                .allowedIPv4Ips(peer.getAddress())
+                .allowedIPv4Subnets(peer.getAddress())
                 .persistentKeepalive(peer.getPersistentKeepalive()).build()
         );
     }

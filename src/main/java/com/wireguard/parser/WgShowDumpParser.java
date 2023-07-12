@@ -1,9 +1,9 @@
 package com.wireguard.parser;
 
 
-import com.wireguard.external.wireguard.WgPeer;
+import com.wireguard.external.wireguard.peer.WgPeer;
 import com.wireguard.external.wireguard.WgShowDump;
-import com.wireguard.external.wireguard.dto.WgInterfaceDTO;
+import com.wireguard.api.inteface.WgInterfaceDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;

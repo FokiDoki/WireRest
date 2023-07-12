@@ -1,6 +1,6 @@
 package com.wireguard.parser;
 
-import com.wireguard.external.wireguard.WgPeer;
+import com.wireguard.external.wireguard.peer.WgPeer;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,7 +41,7 @@ public class WgPeerParserTest {
         Assertions.assertThat(wgPeer.getPublicKey()).isEqualTo(data.get(0));
         Assertions.assertThat(wgPeer.getPresharedKey()).isEqualTo(data.get(1));
         Assertions.assertThat(wgPeer.getEndpoint()).isEqualTo("90.90.90.90:2222");
-        Assertions.assertThat(wgPeer.getAllowedIps().toString()).isEqualTo("10.66.66.10/24");
+        Assertions.assertThat(wgPeer.getAllowedSubnets().toString()).isEqualTo("10.66.66.10/24");
         Assertions.assertThat(wgPeer.getLatestHandshake()).isEqualTo(12345678L);
         Assertions.assertThat(wgPeer.getTransferRx()).isEqualTo(2222);
         Assertions.assertThat(wgPeer.getTransferTx()).isEqualTo(1111);

@@ -1,8 +1,8 @@
 package com.wireguard.external.wireguard.converters;
 
-import com.wireguard.external.wireguard.WgPeer;
-import com.wireguard.external.wireguard.WgPeerContainer;
-import com.wireguard.external.wireguard.dto.WgPeerDTO;
+import com.wireguard.external.wireguard.peer.WgPeer;
+import com.wireguard.external.wireguard.peer.WgPeerContainer;
+import com.wireguard.api.peer.WgPeerDTO;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;

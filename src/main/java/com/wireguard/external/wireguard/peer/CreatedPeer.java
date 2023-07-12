@@ -1,5 +1,6 @@
-package com.wireguard.external.wireguard.dto;
+package com.wireguard.external.wireguard.peer;
 
+import com.wireguard.external.network.Subnet;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -15,6 +16,6 @@ public class CreatedPeer {
     private String publicKey;
     private String presharedKey;
     private String privateKey;
-    private Set<String> address;
+    private Set<Subnet> address;
     private int persistentKeepalive;
 }

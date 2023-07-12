@@ -1,7 +1,7 @@
 package com.wireguard.external.wireguard;
 
 import com.wireguard.external.shell.ShellRunner;
-import com.wireguard.external.wireguard.dto.CreatedPeer;
+import com.wireguard.external.wireguard.peer.WgPeer;
 import com.wireguard.external.wireguard.tools.RateLimitedExecutorService;
 import com.wireguard.parser.WgShowDumpParser;
 import org.slf4j.Logger;
@@ -109,7 +109,7 @@ public class WgTool {
     }
 
     //I don't know how to do this without creating a file (wg set doesn't accept preshared key as a parameter)
-    public void addPeer(String interfaceName, CreatedPeer peer) {
+    public void addPeer(String interfaceName, WgPeer peer) {
         StringBuilder command = new StringBuilder();
         String filePath = presharedKeyPath+getRandomFileName();
         command.append(WG_ADD_PEER_COMMAND.formatted(
@@ -120,7 +120,7 @@ public class WgTool {
         List<Argument> arguments = List.of(
                 new Argument("preshared-key",
                         peer.getPresharedKey().isEmpty() ? null : filePath),
-                new Argument("allowed-ips", String.join(",", peer.getAddress()), (value) -> String.join(",", peer.getAddress())),
+                new Argument("allowed-ips", peer.getAllowedSubnets().toString()),
                 new Argument("persistent-keepalive", String.valueOf(peer.getPersistentKeepalive()))
         );
         appendArgumentsIfPresentAndNotEmpty(arguments, command);

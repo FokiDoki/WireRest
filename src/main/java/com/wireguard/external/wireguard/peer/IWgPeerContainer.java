@@ -1,4 +1,4 @@
-package com.wireguard.external.wireguard;
+package com.wireguard.external.wireguard.peer;
 
 import org.springframework.data.repository.PagingAndSortingRepository;
 

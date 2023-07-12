@@ -1,6 +1,6 @@
 package com.wireguard.parser;
 
-import com.wireguard.external.wireguard.WgPeer;
+import com.wireguard.external.wireguard.peer.WgPeer;
 import org.springframework.util.Assert;
 
 import java.util.HashSet;
@@ -30,8 +30,8 @@ public class WgPeerParser {
                 publicKey( WgShowPeerDump.get(0))
                 .presharedKey(WgShowPeerDump.get(1))
                 .endpoint(WgShowPeerDump.get(2))
-                .allowedIPv4Ips(allowedIps.get(IpType.IPV4))
-                .allowedIPv6Ips(allowedIps.get(IpType.IPV6))
+                .allowedIPv4Subnets(allowedIps.get(IpType.IPV4))
+                .allowedIPv6Subnets(allowedIps.get(IpType.IPV6))
                 .latestHandshake(Long.parseLong(WgShowPeerDump.get(4)))
                 .transferRx(Long.parseLong(WgShowPeerDump.get(5)))
                 .transferTx(Long.parseLong(WgShowPeerDump.get(6)))

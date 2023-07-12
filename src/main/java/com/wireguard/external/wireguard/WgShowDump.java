@@ -1,10 +1,12 @@
 package com.wireguard.external.wireguard;
 
 
-import com.wireguard.external.wireguard.dto.WgInterfaceDTO;
+import com.wireguard.api.inteface.WgInterfaceDTO;
+import com.wireguard.external.wireguard.iface.WgInterface;
+import com.wireguard.external.wireguard.peer.WgPeer;
 
-import java.util.Set;
+import java.util.List;
 
-public record WgShowDump(WgInterfaceDTO wgInterfaceDTO,
-                         Set<WgPeer> peers) {
+public record WgShowDump(WgInterface wgInterface,
+                         List<WgPeer> peers) {
 }

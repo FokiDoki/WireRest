@@ -2,8 +2,9 @@ package com.wireguard.api.inteface;
 
 import com.wireguard.api.AppError;
 import com.wireguard.external.wireguard.ParsingException;
-import com.wireguard.external.wireguard.WgManager;
-import com.wireguard.external.wireguard.dto.WgInterfaceDTO;
+import com.wireguard.external.wireguard.iface.WgInterface;
+import com.wireguard.external.wireguard.iface.WgInterfaceService;
+import com.wireguard.external.wireguard.peer.WgPeerService;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -15,11 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class InterfaceController {
 
-    WgManager wgManager;
+    WgInterfaceService interfaceService;
 
     @Autowired
-    public InterfaceController(WgManager wgManager) {
-        this.wgManager = wgManager;
+    public InterfaceController(WgInterfaceService interfaceService) {
+        this.interfaceService = interfaceService;
     }
 
 
@@ -32,6 +33,11 @@ public class InterfaceController {
                             schema = @Schema(implementation = AppError.class)) }) })
     @GetMapping("/interface")
     public WgInterfaceDTO getInterface() throws ParsingException {
-        return wgManager.getInterface();
+        return convertToDto(interfaceService.getInterface());
+    }
+
+    private WgInterfaceDTO convertToDto(WgInterface wgInterface) {
+        return new WgInterfaceDTO(wgInterface.getPrivateKey(), wgInterface.getPublicKey(),
+                wgInterface.getListenPort(), wgInterface.getFwMark());
     }
 }
