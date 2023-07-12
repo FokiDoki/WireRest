@@ -9,12 +9,13 @@ import org.springframework.stereotype.Component;
 
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 @Component
 public class LogbackHandler extends UnsynchronizedAppenderBase<ILoggingEvent> implements SmartLifecycle {
 
     @Getter
-    private final Queue<ILoggingEvent> logs = new LinkedList<>();
+    private final Queue<ILoggingEvent> logs = new LinkedBlockingQueue<>();
 
     @Value("${logging.api.max-elements}")
     @Getter

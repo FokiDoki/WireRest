@@ -1,8 +1,5 @@
 package com.wireguard.external.network;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 
@@ -12,20 +9,21 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Future;
 
 
-public class IpResolver {
+public class SubnetSolver implements ISubnetSolver {
 
 
 
-    private final List<IpRange> availableRanges = new ArrayList<>();
+    private final List<IpRange> availableRanges =  Collections.synchronizedList(new ArrayList<>());
     private final IpRange totalAvailableRange;
     @Getter
     private final long totalIpsCount;
     @Getter
     private long availableIpsCount;
 
-    public IpResolver(Subnet allowedIpsSubnet){
+    public SubnetSolver(Subnet allowedIpsSubnet){
         long firstAddress = allowedIpsSubnet.getFirstIpNumeric();
         long lastAddress = allowedIpsSubnet.getLastIpNumeric();
         availableIpsCount = totalIpsCount = lastAddress - firstAddress + 1;
@@ -33,7 +31,8 @@ public class IpResolver {
         totalAvailableRange = new IpRange(firstAddress, lastAddress);
     }
 
-    public Subnet takeFreeSubnet(Integer mask){
+    @Override
+    public Subnet obtainFree(int mask){
         ImmutablePair<Subnet, IpRange> subnetAndRange = findFreeSubnetAndRange(mask);
         if (subnetAndRange != null){
             Subnet requestedSubnet = subnetAndRange.getLeft();
@@ -47,13 +46,9 @@ public class IpResolver {
         }
     }
 
-    public Subnet findFreeSubnet(Integer mask){
-        ImmutablePair<Subnet, IpRange> result = findFreeSubnetAndRange(mask);
-        return result==null ? null : result.getLeft();
-    }
-
     private ImmutablePair<Subnet, IpRange> findFreeSubnetAndRange(Integer mask){
         long addressRequestCount = (long) Math.pow(2, 32-mask);
+
         for (IpRange range : availableRanges) {
             long firstAddress = Math.ceilDiv(range.getLeast(), addressRequestCount);
             long addressNeeded = firstAddress * addressRequestCount - range.getLeast() + addressRequestCount;
@@ -68,11 +63,13 @@ public class IpResolver {
         return null;
     }
 
-    public void takeIp(String ip){
-        takeSubnet(Subnet.valueOf(ip+"/32"));
+    @Override
+    public void obtainIp(String ip){
+        obtain(Subnet.valueOf(ip+"/32"));
     }
 
-    public void takeSubnet(Subnet subnet){
+
+    public void obtain(Subnet subnet){
         long firstAddress = subnet.getFirstIpNumeric();
         long lastAddress = subnet.getLastIpNumeric();
         if (!isIpsInRange(firstAddress, lastAddress, totalAvailableRange)){
@@ -110,8 +107,8 @@ public class IpResolver {
         }
     }
 
-
-    public void freeSubnet(Subnet subnet){
+    @Override
+    public void release(Subnet subnet){
         long firstAddress = subnet.getFirstIpNumeric();
         long lastAddress = subnet.getLastIpNumeric();
         if (!isIpsInRange(firstAddress, lastAddress, totalAvailableRange)){
@@ -180,6 +177,7 @@ public class IpResolver {
         }
     }
 
+    @Override
     public long getUsedIpsCount(){
         return totalIpsCount - availableIpsCount;
     }
@@ -187,7 +185,6 @@ public class IpResolver {
     public List<IpRange> getAvailableRanges(){
         return Collections.unmodifiableList(availableRanges);
     }
-
 
     private byte[] numericIpToByte(long ip){
         byte[] result = new byte[4];
@@ -198,14 +195,5 @@ public class IpResolver {
         return result;
     }
 
-    @Data
-    @AllArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class IpRange {
-        private long least;
-        private long biggest;
-        public long getIpsCount(){
-            return biggest - least + 1;
-        }
-    }
 
 }

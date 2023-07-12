@@ -80,7 +80,6 @@ class WgPeerContainerTest {
     void findAllSort() {
         Iterable<WgPeer> peers = container.findAll(Sort.by("latestHandshake").descending());
         List<WgPeer> iter = (List<WgPeer>) IterableUtil.toCollection(peers);
-        System.out.println(iter);
         assertNotNull(peers);
         assertEquals(5, iter.get(0).getLatestHandshake());
         assertEquals(2, iter.get(1).getLatestHandshake());

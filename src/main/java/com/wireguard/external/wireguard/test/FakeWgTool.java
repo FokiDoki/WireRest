@@ -50,7 +50,7 @@ public class FakeWgTool extends WgTool {
     }
 
     @Override
-    public void addPeer(String interfaceName, CreatedPeer peer) {
+    synchronized public void addPeer(String interfaceName, CreatedPeer peer) {
         wgPeerContainer.add(WgPeer.publicKey(peer.getPublicKey())
                 .presharedKey(peer.getPresharedKey())
                 .allowedIPv4Ips(peer.getAddress())

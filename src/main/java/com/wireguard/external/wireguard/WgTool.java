@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Queue;
 import java.util.Scanner;
+import java.util.UUID;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Function;
 
@@ -34,7 +35,7 @@ public class WgTool {
     private static final String WG_SAVE_COMMAND = "wg-quick save %s";
     private static final String WG_SHOW_CONF_COMMAND = "wg showconf %s";
 
-    static String presharedKeyPath = "/tmp/presharedKey";
+    static String presharedKeyPath = "/tmp/";
     protected final ShellRunner shell = new ShellRunner();
 
     private final Queue<Task> configSaveTasks = new LinkedBlockingQueue<>(1);
@@ -110,14 +111,15 @@ public class WgTool {
     //I don't know how to do this without creating a file (wg set doesn't accept preshared key as a parameter)
     public void addPeer(String interfaceName, CreatedPeer peer) {
         StringBuilder command = new StringBuilder();
+        String filePath = presharedKeyPath+getRandomFileName();
         command.append(WG_ADD_PEER_COMMAND.formatted(
                 interfaceName,
                 peer.getPublicKey()));
         if (!peer.getPresharedKey().isEmpty())
-            createFile(presharedKeyPath, peer.getPresharedKey());
+            createFile(filePath, peer.getPresharedKey());
         List<Argument> arguments = List.of(
                 new Argument("preshared-key",
-                        peer.getPresharedKey().isEmpty() ? null : presharedKeyPath),
+                        peer.getPresharedKey().isEmpty() ? null : filePath),
                 new Argument("allowed-ips", String.join(",", peer.getAddress()), (value) -> String.join(",", peer.getAddress())),
                 new Argument("persistent-keepalive", String.valueOf(peer.getPersistentKeepalive()))
         );
@@ -127,9 +129,13 @@ public class WgTool {
             run(command.toString(), true);
         } finally {
             if (!peer.getPresharedKey().isEmpty())
-                deleteFile(presharedKeyPath);
+                deleteFile(filePath);
         }
         saveConfig(interfaceName);
+    }
+
+    private String getRandomFileName() {
+        return UUID.randomUUID().toString();
     }
 
     private static class Argument{
