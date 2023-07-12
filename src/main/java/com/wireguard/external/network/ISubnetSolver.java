@@ -4,8 +4,6 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.concurrent.Future;
-
 public interface ISubnetSolver {
 
     Subnet obtainFree(int mask);

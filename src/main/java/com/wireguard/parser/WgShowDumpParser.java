@@ -1,16 +1,15 @@
 package com.wireguard.parser;
 
 
-import com.wireguard.external.wireguard.WgPeer;
-import com.wireguard.external.wireguard.WgShowDump;
-import com.wireguard.external.wireguard.dto.WgInterfaceDTO;
+import com.wireguard.external.wireguard.iface.WgInterface;
+import com.wireguard.external.wireguard.peer.WgPeer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
-import java.util.Set;
 
 
 public class WgShowDumpParser {
@@ -29,9 +28,9 @@ public class WgShowDumpParser {
         }
         String dumpHeader = dump.nextLine();
         try {
-            WgInterfaceDTO wgInterfaceDTO = parseInterface(dumpHeader);
-            Set<WgPeer> peers = parsePeers(dump);
-            return new WgShowDump(wgInterfaceDTO, peers);
+            WgInterface wgInterface = parseInterface(dumpHeader);
+            List<WgPeer> peers = parsePeers(dump);
+            return new WgShowDump(wgInterface, peers);
         } catch (Exception e) {
             logger.error("Error while parsing dump \n%s".formatted(dump.toString()));
             throw e;
@@ -39,8 +38,8 @@ public class WgShowDumpParser {
     }
 
 
-    private static Set<WgPeer> parsePeers(Scanner peersDump) {
-        Set<WgPeer> peers = new HashSet<>();
+    private static List<WgPeer> parsePeers(Scanner peersDump) {
+        List<WgPeer> peers = new ArrayList<>();
         while (peersDump.hasNextLine()) {
             String line = peersDump.nextLine();
             logger.trace("Parsing peer "+line);
@@ -50,7 +49,7 @@ public class WgShowDumpParser {
         return peers;
     }
 
-    private static WgInterfaceDTO parseInterface(String wgShowInterfaceLine) {
+    private static WgInterface parseInterface(String wgShowInterfaceLine) {
         logger.trace("Parsing interface "+wgShowInterfaceLine);
         Assert.notNull(wgShowInterfaceLine, "Wg interface dump is null");
         return WgInterfaceParser.parse(wgShowInterfaceLine, SPLITTER);

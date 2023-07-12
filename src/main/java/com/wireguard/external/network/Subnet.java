@@ -4,16 +4,15 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.springframework.util.Assert;
 
-import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.util.List;
 
 @EqualsAndHashCode
-public class Subnet implements Comparable<Subnet> {
+public class Subnet implements ISubnet {
     private final byte[] ip;
     private final byte[] mask;
     @Getter private final int numericMask;
     private static final String IP_VALIDATE_REGEX = "^((25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)(\\.(?!$)|$)){4}$";
-
 
     public static Subnet valueOf(String subnet){
         Assert.isTrue(subnet.contains("/"), subnet+ " is not a valid subnet");
@@ -22,7 +21,7 @@ public class Subnet implements Comparable<Subnet> {
         return new Subnet(parseIp(ip), mask);
     }
 
-    public static Subnet valueOf(Inet4Address inet4Address, int mask){
+    public static Subnet valueOf(InetAddress inet4Address, int mask){
         return new Subnet(inet4Address.getAddress(), mask);
     }
 
@@ -32,10 +31,12 @@ public class Subnet implements Comparable<Subnet> {
         this.numericMask = mask;
     }
 
+    @Override
     public long getIpCount(){
         return (long) Math.pow(2, 32 - numericMask);
     }
 
+    @Override
     public byte[] getFirstIpBytes(){
         byte[] firstIp = new byte[4];
         for(int i = 0; i < 4; i++){
@@ -49,6 +50,7 @@ public class Subnet implements Comparable<Subnet> {
         return getIpString() + "/" + numericMask;
     }
 
+    @Override
     public byte[] getLastIpBytes(){
         byte[] lastIp = new byte[4];
         for (int i = 0; i < 4; i++){
@@ -58,10 +60,12 @@ public class Subnet implements Comparable<Subnet> {
     }
 
 
+    @Override
     public long getLastIpNumeric(){
         return byteToNumericIp(getLastIpBytes());
     }
 
+    @Override
     public long getFirstIpNumeric(){
         return byteToNumericIp(getFirstIpBytes());
     }
@@ -75,6 +79,7 @@ public class Subnet implements Comparable<Subnet> {
         );
     }
 
+    @Override
     public List<Integer> getIp(){
         return byteIpToIntList(ip);
     }
@@ -88,22 +93,27 @@ public class Subnet implements Comparable<Subnet> {
         );
     }
 
+    @Override
     public String getIpString(){
         return bytesIpToString(ip);
     }
 
+    @Override
     public String getFirstIpString(){
         return bytesIpToString(getFirstIpBytes());
     }
 
+    @Override
     public String getLastIpString(){
         return bytesIpToString(getLastIpBytes());
     }
 
+    @Override
     public List<Integer> getFirstIp(){
         return byteIpToIntList(getFirstIpBytes());
     }
 
+    @Override
     public List<Integer> getLastIp(){
         return byteIpToIntList(getLastIpBytes());
     }
@@ -156,9 +166,9 @@ public class Subnet implements Comparable<Subnet> {
         return maskBytes;
     }
 
+
     @Override
-    public int compareTo(Subnet o) {
+    public int compareTo(ISubnet o) {
         return Long.compare(getFirstIpNumeric(), o.getFirstIpNumeric());
     }
-
 }

@@ -1,9 +1,9 @@
 package com.wireguard.external.wireguard;
 
 import com.wireguard.external.network.AlreadyUsedException;
-import com.wireguard.external.network.SubnetSolver;
 import com.wireguard.external.network.NoFreeIpException;
 import com.wireguard.external.network.Subnet;
+import com.wireguard.external.network.SubnetSolver;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

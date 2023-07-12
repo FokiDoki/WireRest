@@ -1,13 +1,8 @@
 package com.wireguard.api;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.context.annotation.Bean;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class AppErrorTest {
     AppError appError;

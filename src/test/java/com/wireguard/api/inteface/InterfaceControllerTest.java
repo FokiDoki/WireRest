@@ -1,7 +1,8 @@
 package com.wireguard.api.inteface;
 
-import com.wireguard.external.wireguard.WgManager;
-import com.wireguard.external.wireguard.dto.WgInterfaceDTO;
+import com.wireguard.external.wireguard.iface.WgInterface;
+import com.wireguard.external.wireguard.iface.WgInterfaceService;
+import com.wireguard.external.wireguard.peer.WgPeerService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,15 +18,14 @@ class InterfaceControllerTest {
     private WebTestClient webClient;
 
     @MockBean
-    WgManager wgManager;
-
+    WgInterfaceService wgInterfaceService;
     @Test
     void getInterface() {
-        WgInterfaceDTO wgInterface = new WgInterfaceDTO("PrivateKey", "PublicKey", 1234, 5678);
-        Mockito.when(wgManager.getInterface()).thenReturn(wgInterface);
+        WgInterface wgInterface = new WgInterface("PrivateKey", "PublicKey", 1234, 5678);
+        Mockito.when(wgInterfaceService.getInterface()).thenReturn(wgInterface);
         webClient.get().uri("/interface").accept(MediaType.APPLICATION_JSON).exchange()
                 .expectStatus().isOk()
-                .expectBody(WgInterfaceDTO.class).isEqualTo(wgInterface);
+                .expectBody(WgInterfaceDTO.class).isEqualTo(WgInterfaceDTO.from(wgInterface));
 
     }
 }

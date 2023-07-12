@@ -1,6 +1,6 @@
 package com.wireguard.parser;
 
-import com.wireguard.external.wireguard.dto.WgInterfaceDTO;
+import com.wireguard.external.wireguard.iface.WgInterface;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -40,21 +40,21 @@ class WgInterfaceDTOParserTests {
     @Test
     void validStringParsingTest(){
         String validString =   "%s\t%s\t1234\t321  ".formatted(validbase64,validbase64);
-        WgInterfaceDTO wgInterfaceDTO = WgInterfaceParser.parse(validString, "\t");
-        assertEquals(wgInterfaceDTO.getPrivateKey(), validbase64);
-        assertEquals(wgInterfaceDTO.getPublicKey(), validbase64);
-        assertEquals(wgInterfaceDTO.getListenPort(), 1234);
-        assertEquals(wgInterfaceDTO.getFwMark(), 321);
+        WgInterface wgInterface = WgInterfaceParser.parse(validString, "\t");
+        assertEquals(wgInterface.getPrivateKey(), validbase64);
+        assertEquals(wgInterface.getPublicKey(), validbase64);
+        assertEquals(wgInterface.getListenPort(), 1234);
+        assertEquals(wgInterface.getFwMark(), 321);
     }
 
     @Test
     void validStringWithOffFwmark(){
         String validString =   "%s\t%s\t64444\toff  ".formatted(validbase64,validbase64);
-        WgInterfaceDTO wgInterfaceDTO = WgInterfaceParser.parse(validString, "\t");
-        assertEquals(wgInterfaceDTO.getPrivateKey(), validbase64);
-        assertEquals(wgInterfaceDTO.getPublicKey(), validbase64);
-        assertEquals(wgInterfaceDTO.getListenPort(), 64444);
-        assertEquals(wgInterfaceDTO.getFwMark(), 0);
+        WgInterface wgInterface = WgInterfaceParser.parse(validString, "\t");
+        assertEquals(wgInterface.getPrivateKey(), validbase64);
+        assertEquals(wgInterface.getPublicKey(), validbase64);
+        assertEquals(wgInterface.getListenPort(), 64444);
+        assertEquals(wgInterface.getFwMark(), 0);
     }
 
 
