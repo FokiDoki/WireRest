@@ -1,7 +1,6 @@
 package com.wireguard.parser;
 
 
-import com.wireguard.external.wireguard.WgShowDump;
 import com.wireguard.external.wireguard.iface.WgInterface;
 import com.wireguard.external.wireguard.peer.WgPeer;
 import org.slf4j.Logger;

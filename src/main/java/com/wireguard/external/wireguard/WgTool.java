@@ -3,6 +3,7 @@ package com.wireguard.external.wireguard;
 import com.wireguard.external.shell.ShellRunner;
 import com.wireguard.external.wireguard.peer.WgPeer;
 import com.wireguard.external.wireguard.tools.RateLimitedExecutorService;
+import com.wireguard.parser.WgShowDump;
 import com.wireguard.parser.WgShowDumpParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

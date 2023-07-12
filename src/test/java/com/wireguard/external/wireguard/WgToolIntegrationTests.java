@@ -3,6 +3,7 @@ package com.wireguard.external.wireguard;
 import com.wireguard.external.network.Subnet;
 import com.wireguard.external.shell.ShellRunner;
 import com.wireguard.external.wireguard.peer.WgPeer;
+import com.wireguard.parser.WgShowDump;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;

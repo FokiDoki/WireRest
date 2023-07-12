@@ -1,4 +1,4 @@
-package com.wireguard.external.wireguard;
+package com.wireguard.parser;
 
 
 import com.wireguard.external.wireguard.iface.WgInterface;

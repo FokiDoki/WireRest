@@ -1,7 +1,7 @@
 package com.wireguard.external.wireguard.test;
 
 import com.wireguard.external.network.Subnet;
-import com.wireguard.external.wireguard.WgShowDump;
+import com.wireguard.parser.WgShowDump;
 import com.wireguard.external.wireguard.WgTool;
 import com.wireguard.external.wireguard.iface.WgInterface;
 import com.wireguard.external.wireguard.peer.WgPeer;
