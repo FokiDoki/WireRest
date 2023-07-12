@@ -34,16 +34,15 @@ class WgShowDumpParserTest {
     void fromDumpTest() throws IOException {
         WgShowDump dump = WgShowDumpParser.fromDump(wgShowDump);
 
-        Assertions.assertEquals(16666, dump.wgInterfaceDTO().getListenPort());
-        Assertions.assertEquals("Ds123123312G859AO3s1I8vhTgrgrgrgrgrgt9LKF8B=", dump.wgInterfaceDTO().getPrivateKey());
-        Assertions.assertEquals("Z1xHdYc+enfengren+nvrenbvnbmegw3gjrejgvfnvn=", dump.wgInterfaceDTO().getPublicKey());
+        Assertions.assertEquals(16666, dump.wgInterface().getListenPort());
+        Assertions.assertEquals("Ds123123312G859AO3s1I8vhTgrgrgrgrgrgt9LKF8B=", dump.wgInterface().getPrivateKey());
+        Assertions.assertEquals("Z1xHdYc+enfengren+nvrenbvnbmegw3gjrejgvfnvn=", dump.wgInterface().getPublicKey());
     }
 
     @Test
     void fromDumpTestPeerParsing() throws IOException {
         WgShowDump dump = WgShowDumpParser.fromDump(wgShowDump);
-        WgPeerContainer wgPeers = new WgPeerContainer(dump.peers());
-        Assertions.assertEquals(11, wgPeers.size());
+        Assertions.assertEquals(11, dump.peers().size());
         WgPeer peer = dump.peers().stream().filter(p -> p.getPublicKey().equals("8avysqyA1N+IIX8d1gergergergergbHf2TfuEfw4ff=")).findFirst().get();
         Assertions.assertEquals(FIRST_PEER_ENDPOINT, peer.getEndpoint());
         Assertions.assertEquals(Set.of("10.66.66.2/32", "fd42:42:42::2/128"), peer.getAllowedSubnets().getAll());

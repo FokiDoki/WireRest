@@ -93,7 +93,7 @@ class WgToolIntegrationTests {
         Assertions.assertTrue(addedPeer.isPresent());
         Assertions.assertEquals(publicKey, addedPeer.get().getPublicKey());
         Assertions.assertEquals(presharedKey, addedPeer.get().getPresharedKey());
-        Assertions.assertEquals(allowedIp, addedPeer.get().getAllowedSubnets().toString());
+        Assertions.assertEquals(allowedIp, addedPeer.get().getAllowedSubnets().getIPv4Subnets().stream().findFirst().get());
     }
 
     @Test

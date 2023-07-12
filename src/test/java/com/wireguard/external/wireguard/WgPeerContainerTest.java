@@ -1,5 +1,6 @@
 package com.wireguard.external.wireguard;
 
+import com.wireguard.external.network.Subnet;
 import com.wireguard.external.wireguard.peer.WgPeer;
 import com.wireguard.external.wireguard.peer.WgPeerContainer;
 import org.assertj.core.util.IterableUtil;
@@ -26,9 +27,9 @@ class WgPeerContainerTest {
                 WgPeer.publicKey("pub4").presharedKey("psk12").build(),
                 WgPeer.publicKey("pub5").latestHandshake(1).build(),
                 WgPeer.publicKey("pub6").latestHandshake(2).build(),
-                WgPeer.publicKey("pub7").latestHandshake(5).allowedIPv4Subnets(Set.of("10.0.0.0/32")).build(),
-                WgPeer.publicKey("pub8").allowedIPv4Subnets(Set.of("10.0.0.1/32")).build(),
-                WgPeer.publicKey("pub9").allowedIPv4Subnets(Set.of("10.0.0.5/32")).build()
+                WgPeer.publicKey("pub7").latestHandshake(5).allowedIPv4Subnets(Set.of(Subnet.valueOf("10.0.0.0/32"))).build(),
+                WgPeer.publicKey("pub8").allowedIPv4Subnets(Set.of(Subnet.valueOf("10.0.0.1/32"))).build(),
+                WgPeer.publicKey("pub9").allowedIPv4Subnets(Set.of(Subnet.valueOf("10.0.0.5/32"))).build()
 
 
         ));

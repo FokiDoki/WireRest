@@ -53,7 +53,7 @@ public class WgPeerService {
         CreatedPeer createdPeer = wgPeerCreator.createPeerGenerateNulls(publicKey, presharedKey, privateKey, allowedIps, persistentKeepalive);
         wgPeerRepository.add(WgPeer.publicKey(createdPeer.getPublicKey())
                 .presharedKey(createdPeer.getPresharedKey())
-                .allowedIPv4Subnets(createdPeer.getAddress())
+                .allowedIPv4Subnets(createdPeer.getAllowedSubnets())
                 .persistentKeepalive(createdPeer.getPersistentKeepalive())
                 .build());
         return createdPeer;
