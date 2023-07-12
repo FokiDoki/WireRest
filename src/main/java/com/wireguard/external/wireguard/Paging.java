@@ -13,12 +13,17 @@ import java.util.Iterator;
 import java.util.List;
 
 public class Paging<T> {
+    Class<T> genericType;
+
+    public Paging(Class<T> genericType) {
+        this.genericType = genericType;
+    }
 
     public Page<T> apply(Pageable pageable, List<T> list) {
         return buildPage(pageable, list);
     }
     
-    private List<T> sort(Sort sort, List<T> list)  {
+    private ArrayList<T> sort(Sort sort, ArrayList<T> list)  {
         try{
             return sortList(sort.iterator(), list);
         } catch (NoSuchFieldException e){
@@ -28,21 +33,21 @@ public class Paging<T> {
 
 
     @SuppressWarnings("unchecked")
-    private List<T> sortList(Iterator<Sort.Order> orders, List<T> list) throws NoSuchFieldException {
+    private ArrayList<T> sortList(Iterator<Sort.Order> orders, ArrayList<T> list) throws NoSuchFieldException {
         if (!orders.hasNext() || list.isEmpty()) {
             return list;
         }
         Sort.Order order = orders.next();
-        Field field = list.get(0).getClass().getDeclaredField(order.getProperty());
+        Field field = genericType.getDeclaredField(order.getProperty());
         field.setAccessible(true);
 
         Comparator<Object> comparator = (o1, o2) -> {
             try {
-                if (field.get(o1) == null && field.get(o2) == null) {
+                if ((o1 == null && o2 == null) || (!(o1==null || o2==null) && (field.get(o1) == null && field.get(o2) == null))) {
                     return 0;
-                } else if (field.get(o1) == null) {
+                } else if (o1 == null || field.get(o1) == null) {
                     return -1;
-                } else if (field.get(o2) == null) {
+                } else if (o2 == null || field.get(o2) == null) {
                     return 1;
                 }
                 if (field.get(o1) instanceof Comparable){
@@ -61,7 +66,7 @@ public class Paging<T> {
     }
 
     private Page<T> buildPage(Pageable pageable, List<T> list) {
-        ArrayList<T> sorted = new ArrayList<T>(sort(pageable.getSort(), list));
+        ArrayList<T> sorted = sort(pageable.getSort(), new ArrayList<T>(list));
         PagedListHolder<T> page = new PagedListHolder<>(sorted);
         page.setPageSize(pageable.getPageSize());
         page.setPage(pageable.getPageNumber());

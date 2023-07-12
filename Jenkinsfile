@@ -36,7 +36,7 @@ pipeline {
 
         stage('Check'){
             steps {
-                sleep 10
+                sleep 15
                 sh 'curl -s http://127.0.0.1:${RUN_PORT}/interface  > /dev/null'
             }
         }

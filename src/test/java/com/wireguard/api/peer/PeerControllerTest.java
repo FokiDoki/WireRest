@@ -42,7 +42,7 @@ class PeerControllerTest {
                     .endpoint("1.1.1.1")
                     .build()
     );
-    Paging<WgPeer> paging = new Paging<>();
+    Paging<WgPeer> paging = new Paging<>(WgPeer.class);
 
 
     @Test
