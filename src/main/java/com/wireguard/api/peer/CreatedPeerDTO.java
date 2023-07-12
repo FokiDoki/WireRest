@@ -2,6 +2,7 @@ package com.wireguard.api.peer;
 
 import com.wireguard.external.wireguard.peer.CreatedPeer;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.util.Set;
@@ -9,6 +10,7 @@ import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Getter
+@EqualsAndHashCode
 public class CreatedPeerDTO {
     private final String publicKey;
     private final String presharedKey;

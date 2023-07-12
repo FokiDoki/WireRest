@@ -32,11 +32,8 @@ public class InterfaceController {
                             schema = @Schema(implementation = AppError.class)) }) })
     @GetMapping("/interface")
     public WgInterfaceDTO getInterface() throws ParsingException {
-        return convertToDto(interfaceService.getInterface());
+        return WgInterfaceDTO.from(interfaceService.getInterface());
     }
 
-    private WgInterfaceDTO convertToDto(WgInterface wgInterface) {
-        return new WgInterfaceDTO(wgInterface.getPrivateKey(), wgInterface.getPublicKey(),
-                wgInterface.getListenPort(), wgInterface.getFwMark());
-    }
+
 }

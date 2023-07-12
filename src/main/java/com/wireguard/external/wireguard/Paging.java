@@ -18,7 +18,7 @@ public class Paging<T> {
         return buildPage(pageable, list);
     }
     
-    private Iterable<T> sort(Sort sort, List<T> list)  {
+    private List<T> sort(Sort sort, List<T> list)  {
         try{
             return sortList(sort.iterator(), list);
         } catch (NoSuchFieldException e){
@@ -61,7 +61,7 @@ public class Paging<T> {
     }
 
     private Page<T> buildPage(Pageable pageable, List<T> list) {
-        ArrayList<T> sorted = (ArrayList<T>) sort(pageable.getSort(), list);
+        ArrayList<T> sorted = new ArrayList<T>(sort(pageable.getSort(), list));
         PagedListHolder<T> page = new PagedListHolder<>(sorted);
         page.setPageSize(pageable.getPageSize());
         page.setPage(pageable.getPageNumber());
