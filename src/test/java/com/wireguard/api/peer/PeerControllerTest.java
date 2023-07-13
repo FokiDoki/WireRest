@@ -4,8 +4,10 @@ import com.wireguard.api.AppError;
 import com.wireguard.api.dto.PageDTO;
 import com.wireguard.external.network.NoFreeIpException;
 import com.wireguard.external.network.Subnet;
+import com.wireguard.external.wireguard.EmptyPeerCreationRequest;
 import com.wireguard.external.wireguard.Paging;
 import com.wireguard.external.wireguard.ParsingException;
+import com.wireguard.external.wireguard.PeerCreationRequest;
 import com.wireguard.external.wireguard.peer.CreatedPeer;
 import com.wireguard.external.wireguard.peer.WgPeer;
 import com.wireguard.external.wireguard.peer.WgPeerService;
@@ -166,7 +168,7 @@ class PeerControllerTest {
                 Set.of(Subnet.valueOf("10.0.0.0/32")),
                 0
         );
-        Mockito.when(wgPeerService.createPeerGenerateNulls(null, null, null, null, null)).thenReturn(newPeer);
+        Mockito.when(wgPeerService.createPeerGenerateNulls(Mockito.any())).thenReturn(newPeer);
         webClient.post().uri("/peer/create").exchange()
                 .expectStatus().isCreated()
                 .expectBody(CreatedPeerDTO.class)
@@ -181,17 +183,17 @@ class PeerControllerTest {
                 "PrivateKeyParams",
                 Set.of(Subnet.valueOf("10.0.0.10/32")),
                 25);
-        Mockito.when(wgPeerService.createPeerGenerateNulls(newPeer.getPublicKey(),
+        Mockito.when(wgPeerService.createPeerGenerateNulls(new PeerCreationRequest(newPeer.getPublicKey(),
                 newPeer.getPresharedKey(),
                 newPeer.getPrivateKey(),
                 newPeer.getAllowedSubnets(),
-                25)).thenReturn(newPeer);
+                25))).thenReturn(newPeer);
         webClient.post().uri(uriBuilder -> uriBuilder
                         .path("/peer/create")
                         .queryParam("publicKey", newPeer.getPublicKey())
                         .queryParam("presharedKey", newPeer.getPresharedKey())
                         .queryParam("privateKey", newPeer.getPrivateKey())
-                        .queryParam("address", newPeer.getAllowedSubnets())
+                        .queryParam("allowedIps", newPeer.getAllowedSubnets())
                         .queryParam("persistentKeepalive", 25)
                         .build())
                 .exchange()
@@ -202,8 +204,7 @@ class PeerControllerTest {
 
     @Test
     void createPeerWhenNoFreeIps() {
-        Mockito.when(wgPeerService.createPeerGenerateNulls(null, null, null,
-                null, null)).thenThrow(new NoFreeIpException("No free ip"));
+        Mockito.when(wgPeerService.createPeerGenerateNulls(Mockito.any())).thenThrow(new NoFreeIpException("No free ip"));
         webClient.post().uri("/peer/create").exchange()
                 .expectStatus().is5xxServerError()
                 .expectBody()

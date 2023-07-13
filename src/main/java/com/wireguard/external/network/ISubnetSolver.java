@@ -8,7 +8,7 @@ public interface ISubnetSolver {
 
     Subnet obtainFree(int mask);
 
-    void obtain(Subnet subnet);
+    void obtain(Subnet subnet) throws AlreadyUsedException;
 
     void obtainIp(String ip);
 

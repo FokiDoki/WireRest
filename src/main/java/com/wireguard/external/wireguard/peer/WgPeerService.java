@@ -3,9 +3,7 @@ package com.wireguard.external.wireguard.peer;
 import com.wireguard.external.network.NetworkInterfaceDTO;
 import com.wireguard.external.network.Subnet;
 import com.wireguard.external.shell.ShellRunner;
-import com.wireguard.external.wireguard.ParsingException;
-import com.wireguard.external.wireguard.Repository;
-import com.wireguard.external.wireguard.RepositoryPageable;
+import com.wireguard.external.wireguard.*;
 import com.wireguard.external.wireguard.peer.spec.FindByPublicKey;
 import jakarta.annotation.Nullable;
 import org.slf4j.Logger;
@@ -49,10 +47,8 @@ public class WgPeerService {
         return wgPeerRepository.getAll(pageable);
     }
 
-    public CreatedPeer createPeerGenerateNulls(@Nullable String publicKey, @Nullable String presharedKey,
-                                               @Nullable String privateKey, @Nullable Set<Subnet> allowedIps,
-                                               @Nullable Integer persistentKeepalive){
-        CreatedPeer createdPeer = wgPeerCreator.createPeerGenerateNulls(publicKey, presharedKey, privateKey, allowedIps, persistentKeepalive);
+    public CreatedPeer createPeerGenerateNulls(PeerCreationRequest peerCreationRequest){
+        CreatedPeer createdPeer = wgPeerCreator.createPeerGenerateNulls(peerCreationRequest);
         wgPeerRepository.add(WgPeer.publicKey(createdPeer.getPublicKey())
                 .presharedKey(createdPeer.getPresharedKey())
                 .allowedIPv4Subnets(createdPeer.getAllowedSubnets())
@@ -62,8 +58,7 @@ public class WgPeerService {
     }
 
     public CreatedPeer createPeer(){
-        return createPeerGenerateNulls(null, null,
-                null, null, null);
+        return createPeerGenerateNulls(new EmptyPeerCreationRequest());
     }
 
     public void deletePeer(String publicKey)  {

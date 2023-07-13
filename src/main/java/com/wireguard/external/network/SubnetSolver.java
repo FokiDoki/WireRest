@@ -68,7 +68,7 @@ public class SubnetSolver implements ISubnetSolver {
     }
 
 
-    public void obtain(Subnet subnet){
+    public void obtain(Subnet subnet) throws AlreadyUsedException {
         long firstAddress = subnet.getFirstIpNumeric();
         long lastAddress = subnet.getLastIpNumeric();
         if (!isIpsInRange(firstAddress, lastAddress, totalAvailableRange)){

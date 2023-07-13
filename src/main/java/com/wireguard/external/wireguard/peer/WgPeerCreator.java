@@ -1,10 +1,9 @@
 package com.wireguard.external.wireguard.peer;
 
-import com.wireguard.external.network.ISubnetSolver;
-import com.wireguard.external.network.NetworkInterfaceDTO;
-import com.wireguard.external.network.Subnet;
+import com.wireguard.external.network.*;
 import com.wireguard.external.shell.CommandExecutionException;
 import com.wireguard.external.shell.ShellRunner;
+import com.wireguard.external.wireguard.PeerCreationRequest;
 import com.wireguard.external.wireguard.WgTool;
 import jakarta.annotation.Nullable;
 import org.slf4j.Logger;
@@ -13,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Component
@@ -33,27 +33,33 @@ public class WgPeerCreator {
         this.wgSubnetSolver = wgSubnetSolver;
     }
 
-    public CreatedPeer createPeerGenerateNulls(@Nullable String publicKey, @Nullable String presharedKey,
-                                               @Nullable String privateKey, @Nullable Set<Subnet> allowedIps,
-                                               @Nullable Integer persistentKeepalive){
-        privateKey = privateKey == null ? wgTool.generatePrivateKey() : privateKey;
-        publicKey = publicKey == null ? wgTool.generatePublicKey(privateKey) : publicKey;
-        presharedKey = presharedKey == null ? wgTool.generatePresharedKey() : presharedKey;
-        persistentKeepalive = persistentKeepalive == null ? DEFAULT_PERSISTENT_KEEPALIVE : persistentKeepalive;
-        try {
-            if (allowedIps != null) {
-                allowedIps.forEach(wgSubnetSolver::obtain);
-            } else {
-                allowedIps = Set.of(wgSubnetSolver.obtainFree(DEFAULT_MASK_FOR_NEW_CLIENTS));
-            }
-        } catch (Exception e) {
-            assert allowedIps != null;
-            allowedIps.forEach(wgSubnetSolver::release);
-            throw e;
+
+    public CreatedPeer createPeerGenerateNulls(PeerCreationRequest peerCreationRequest) {
+        String privateKey = peerCreationRequest.getPrivateKey() == null ? wgTool.generatePrivateKey() : peerCreationRequest.getPrivateKey();
+        String publicKey = peerCreationRequest.getPublicKey() == null ? wgTool.generatePublicKey(privateKey) : peerCreationRequest.getPublicKey();
+        String presharedKey = peerCreationRequest.getPresharedKey() == null ? wgTool.generatePresharedKey() : peerCreationRequest.getPresharedKey();
+        int persistentKeepalive = peerCreationRequest.getPersistentKeepalive() == null ? DEFAULT_PERSISTENT_KEEPALIVE : peerCreationRequest.getPersistentKeepalive();
+        Set<Subnet> allowedIps = peerCreationRequest.getAllowedIps();
+        if (allowedIps == null) {
+            allowedIps = Set.of(wgSubnetSolver.obtainFree(DEFAULT_MASK_FOR_NEW_CLIENTS));
         }
-        logger.info("Created peer, public key: %s".formatted(publicKey.substring(0, 6)));
+        obtainSubnets(allowedIps);
+        logger.info("Created peer, public key: %s".formatted(publicKey.substring(0, Math.min(6, publicKey.length()))));
         return new CreatedPeer(publicKey, presharedKey, privateKey, allowedIps, persistentKeepalive);
 
+    }
+
+    private void obtainSubnets(Set<Subnet> subnets) {
+        Set<Subnet> obtainedSubnets = new HashSet<>();
+        try{
+            subnets.forEach((subnet) -> {
+                wgSubnetSolver.obtain(subnet);
+                obtainedSubnets.add(subnet);
+            });
+        } catch (Exception e){
+            obtainedSubnets.forEach(wgSubnetSolver::release);
+            throw e;
+        }
     }
 
 }

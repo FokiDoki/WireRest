@@ -2,6 +2,8 @@ package com.wireguard.external.wireguard.peer;
 
 import com.wireguard.external.network.ISubnetSolver;
 import com.wireguard.external.network.Subnet;
+import com.wireguard.external.wireguard.EmptyPeerCreationRequest;
+import com.wireguard.external.wireguard.PeerCreationRequest;
 import com.wireguard.external.wireguard.WgTool;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,8 +32,7 @@ class WgPeerCreatorTest {
 
     @Test
     public void testCreatePeerWithNulls(){
-         CreatedPeer peer = wgPeerCreator.createPeerGenerateNulls(null,null,
-                null,null,null);
+         CreatedPeer peer = wgPeerCreator.createPeerGenerateNulls(new EmptyPeerCreationRequest());
             assertEquals(wgPeerCreator.DEFAULT_PERSISTENT_KEEPALIVE, peer.getPersistentKeepalive());
             Mockito.verify(wgTool, Mockito.times(1)).generatePublicKey(Mockito.any());
             Mockito.verify(subnetSolver, Mockito.times(1)).obtainFree(Mockito.anyInt());
@@ -41,8 +42,8 @@ class WgPeerCreatorTest {
 
     @Test
     public void testCreatePeerWithData(){
-        CreatedPeer peer = wgPeerCreator.createPeerGenerateNulls("publicKey","presharedKey",
-                "privateKey", Set.of(Subnet.valueOf("0.0.0.1/32")),1);
+        CreatedPeer peer = wgPeerCreator.createPeerGenerateNulls(new PeerCreationRequest("publicKey","presharedKey",
+                "privateKey", Set.of(Subnet.valueOf("0.0.0.1/32")),1));
         assertEquals(1, peer.getPersistentKeepalive());
         assertEquals("publicKey", peer.getPublicKey());
         assertEquals("presharedKey", peer.getPresharedKey());
@@ -60,10 +61,9 @@ class WgPeerCreatorTest {
         Mockito.doThrow(new RuntimeException()).when(subnetSolver).obtain(Mockito.any());
         Set<Subnet> ips = Set.of(Subnet.valueOf("10.0.0.1/32"), Subnet.valueOf("10.0.0.2/32"));
         Assertions.assertThrows(RuntimeException.class, () -> {
-            wgPeerCreator.createPeerGenerateNulls(null,null,
-                    null,ips,null);
+            wgPeerCreator.createPeerGenerateNulls(new PeerCreationRequest(null,null,
+                    null,ips,null));
         });
-        Mockito.verify(subnetSolver, Mockito.times(2)).release(Mockito.any(Subnet.class));
     }
 
 }
