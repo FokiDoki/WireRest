@@ -1,5 +1,6 @@
 package com.wireguard.external.wireguard.peer;
 
+import com.wireguard.external.network.AlreadyUsedException;
 import com.wireguard.external.network.ISubnetSolver;
 import com.wireguard.external.network.NetworkInterfaceDTO;
 import com.wireguard.external.network.Subnet;
@@ -34,6 +35,7 @@ public class WgPeerCreator {
         this.wgSubnetSolver = wgSubnetSolver;
     }
 
+
     public CreatedPeer createPeerGenerateNulls(PeerCreationRequest peerCreationRequest) {
         String privateKey = peerCreationRequest.getPrivateKey() == null ? wgTool.generatePrivateKey() : peerCreationRequest.getPrivateKey();
         String publicKey = peerCreationRequest.getPublicKey() == null ? wgTool.generatePublicKey(privateKey) : peerCreationRequest.getPublicKey();
@@ -46,12 +48,14 @@ public class WgPeerCreator {
             } else {
                 allowedIps = Set.of(wgSubnetSolver.obtainFree(DEFAULT_MASK_FOR_NEW_CLIENTS));
             }
+        } catch (AlreadyUsedException e) {
+            throw e;
         } catch (Exception e) {
             assert allowedIps != null;
             allowedIps.forEach(wgSubnetSolver::release);
             throw e;
         }
-        logger.info("Created peer, public key: %s".formatted(publicKey.substring(0, 6)));
+        logger.info("Created peer, public key: %s".formatted(publicKey.substring(0, Math.min(6, publicKey.length()))));
         return new CreatedPeer(publicKey, presharedKey, privateKey, allowedIps, persistentKeepalive);
 
     }

@@ -1,6 +1,8 @@
 package com.wireguard.external.network;
 
 
+import lombok.SneakyThrows;
+
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -28,18 +30,27 @@ public class QueuedSubnetSolver implements ISubnetSolver{
     }
 
     @Override
-    public void obtain(Subnet subnet) {
-        executor.submit(() -> subnetSolver.obtain(subnet));
+    public void obtain(Subnet subnet) throws AlreadyUsedException{
+        await(executor.submit(() -> subnetSolver.obtain(subnet)));
     }
 
     @Override
     public void obtainIp(String ip) {
-        executor.submit(() -> subnetSolver.obtainIp(ip));
+        await(executor.submit(() -> subnetSolver.obtainIp(ip)));
     }
 
     @Override
     public void release(Subnet subnet) {
-        executor.submit(() -> subnetSolver.release(subnet));
+        await(executor.submit(() -> subnetSolver.release(subnet)));
+    }
+
+    @SneakyThrows
+    private void await(Future<?> future){
+        try {
+            future.get();
+        } catch (ExecutionException e) {
+            throw e.getCause();
+        }
     }
 
     @Override
