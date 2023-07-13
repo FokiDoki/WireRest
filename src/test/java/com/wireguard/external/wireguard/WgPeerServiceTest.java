@@ -1,84 +1,120 @@
 package com.wireguard.external.wireguard;
 
 import com.wireguard.api.inteface.WgInterfaceDTO;
-import com.wireguard.external.wireguard.peer.WgPeerService;
+import com.wireguard.api.peer.WgPeerDTO;
+import com.wireguard.external.network.NetworkInterfaceDTO;
+import com.wireguard.external.network.Subnet;
+import com.wireguard.external.network.SubnetSolver;
+import com.wireguard.external.wireguard.peer.*;
+import com.wireguard.external.wireguard.peer.spec.FindByPublicKey;
+import com.wireguard.parser.WgShowDump;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+
+import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class WgPeerServiceTest {
     private WgPeerService wgPeerService;
-    private static WgTool wgTool;
-    final static String wgInterfaceName = "wg0";
-    final static WgInterfaceDTO wgInterfaceDTO = new WgInterfaceDTO(
-            "privateKey",
-            "publicKey",
-            1234,
-            321
-    );
-    /*
-    final static Set<WgPeer> peers = Set.of(
-            WgPeer.publicKey("pubKey1")
-                    .presharedKey("presharedKey1")
-                    .allowedIPv4Subnets(Set.of("10.0.0.1/32"))
-                    .latestHandshake(0)
-                    .transferRx(0)
-                    .transferTx(0)
-                    .build(),
-            WgPeer.publicKey("pubKey2").build(),
-            WgPeer.publicKey("pubKey3")
-                    .allowedIPv4Subnets(Set.of("10.0.0.0/32"))
-                    .build()
-    );
+
+    WgPeerCreator wgPeerCreator;
+    WgPeerRepository wgPeerRepository;
+
     @BeforeEach
-    void setUp() throws IOException {
-        wgTool = Mockito.mock(WgTool.class);
-        Mockito.when(wgTool.showDump(wgInterfaceName)).thenReturn(
-                new WgShowDump(wgInterfaceDTO, peers)
-        );
-        Mockito.when(wgTool.generatePrivateKey()).thenReturn("generatedPrivateKey");
-        Mockito.when(wgTool.generatePresharedKey()).thenReturn("generatedPsk");
-        Mockito.when(wgTool.generatePublicKey("generatedPrivateKey")).thenReturn("GeneratedPubKeyFromPrivateKey");
-
-        NetworkInterfaceDTO wgInterface = new NetworkInterfaceDTO(wgInterfaceName);
-        SubnetSolver subnetSolver = new SubnetSolver(Subnet.valueOf("10.0.0.0/16"));
-        subnetSolver.obtain(Subnet.valueOf("10.0.0.0/31"));
-
-        wgPeerService = new WgPeerService(
-                wgTool,
-                subnetSolver,
-                wgInterface);
-    }
-
-    @AfterAll
-    static void tearDown() {
-        reset(wgTool);
-    }
-
-
-    @Test
-    void getInterface() {
-        WgInterfaceDTO wgInterface = wgPeerService.getInterface();
-        assertEquals(wgInterfaceDTO, wgInterface);
+    public void setup() {
+        wgPeerRepository = Mockito.mock(WgPeerRepository.class);
+        wgPeerCreator = Mockito.mock(WgPeerCreator.class);
+        wgPeerService = new WgPeerService(wgPeerCreator, wgPeerRepository);
     }
 
     @Test
-    void getPeerByPublicKey() {
-        Optional<WgPeerDTO> peer = wgPeerService.getPeerDTOByPublicKey("pubKey1");
-        assertTrue(peer.isPresent());
-        assertEquals(WgPeerDTO.from(peers.stream().filter(p -> p.getPublicKey().equals("pubKey1")).findFirst().get()), peer.get());
+    public void testGetPeerByPublicKeyFound() {
+        Mockito.when(wgPeerRepository.getBySpecification(new FindByPublicKey("publicKey")))
+                .thenReturn(List.of(WgPeer.publicKey("publicKey").build()));
+        Optional<WgPeer> peer = wgPeerService.getPeerByPublicKey("publicKey");
+        Assertions.assertTrue(peer.isPresent());
+        WgPeer wgPeer = peer.get();
+        assertEquals("publicKey", wgPeer.getPublicKey());
+        Mockito.verify(wgPeerRepository, Mockito.times(1)).getBySpecification(new FindByPublicKey("publicKey"));
     }
 
     @Test
-    void getPeers() {
-        Set<WgPeerDTO> ManagerPeers = wgPeerService.getPeers();
-        assertEquals(peers.size(), ManagerPeers.size());
-        assertTrue(peers.stream().allMatch(Objects::nonNull));
+    public void testGetPeerByPublicKeyNotFound() {
+        Mockito.when(wgPeerRepository.getBySpecification(new FindByPublicKey("publicKey")))
+                .thenReturn(List.of());
+        Optional<WgPeer> peer = wgPeerService.getPeerByPublicKey("publicKey");
+        Assertions.assertFalse(peer.isPresent());
+        Mockito.verify(wgPeerRepository, Mockito.times(1)).getBySpecification(new FindByPublicKey("publicKey"));
     }
 
     @Test
-    void createPeer() {
-        CreatedPeer peer = wgPeerService.createPeer();
-        assertEquals(Set.of("10.0.0.2/32"), peer.getAddress());
-        assertEquals("generatedPsk", peer.getPresharedKey());
-        assertEquals("GeneratedPubKeyFromPrivateKey", peer.getPublicKey());
-        assertEquals("generatedPrivateKey", peer.getPrivateKey());
-    }*/
+    public void testGetPeers() {
+        Mockito.when(wgPeerRepository.getAll())
+                .thenReturn(List.of(WgPeer.publicKey("publicKey").build()));
+        List<WgPeer> peers = wgPeerService.getPeers();
+        Assertions.assertEquals(1, peers.size());
+        Assertions.assertNotNull(peers.get(0));
+        Assertions.assertEquals("publicKey", peers.get(0).getPublicKey());
+        Mockito.verify(wgPeerRepository, Mockito.times(1)).getAll();
+    }
+
+    @Test
+    public void testGetPeersWhenNoPeers() {
+        Mockito.when(wgPeerRepository.getAll())
+                .thenReturn(List.of());
+        List<WgPeer> peers = wgPeerService.getPeers();
+        Assertions.assertEquals(0, peers.size());
+        Mockito.verify(wgPeerRepository, Mockito.times(1)).getAll();
+    }
+
+    @Test
+    public void testGetPeersPageable() {
+        Mockito.when(wgPeerRepository.getAll(Pageable.ofSize(2)))
+                .thenReturn(Page.empty());
+        Page<WgPeer> page = wgPeerService.getPeers(Pageable.ofSize(2));
+        Assertions.assertEquals(0, page.getTotalElements());
+        Mockito.verify(wgPeerRepository, Mockito.times(1)).getAll(Pageable.ofSize(2));
+    }
+
+    @Test
+    public void testCreatePeerGenerateNulls() {
+        CreatedPeer shouldBeReturned = new CreatedPeer("publicKey", "Psk", "Ppk", Set.of(Subnet.valueOf("10.66.66.1/32")), 0);
+        Mockito.when(wgPeerCreator.createPeerGenerateNulls("publicKey", "Psk", "Ppk", null, 0))
+                .thenReturn(shouldBeReturned);
+        CreatedPeer createdPeer = wgPeerService.createPeerGenerateNulls("publicKey", "Psk", "Ppk", null, 0);
+        Assertions.assertNotNull(createdPeer);
+        Assertions.assertEquals(shouldBeReturned, createdPeer);
+        Mockito.verify(wgPeerCreator, Mockito.times(1)).createPeerGenerateNulls(
+                shouldBeReturned.getPublicKey(), shouldBeReturned.getPresharedKey(), shouldBeReturned.getPrivateKey(),
+                null, shouldBeReturned.getPersistentKeepalive());
+        Mockito.verify(wgPeerRepository, Mockito.times(1)).add(Mockito.any(WgPeer.class));
+    }
+
+    @Test
+    public void testCreatePeer() {
+        Mockito.when(wgPeerCreator.createPeerGenerateNulls(null, null, null, null, null))
+                .thenReturn(new CreatedPeer("publicKey", "Psk", "Ppk", Set.of(Subnet.valueOf("0.0.0.0/32")), 0));
+        wgPeerService.createPeer();
+        Mockito.verify(wgPeerCreator, Mockito.times(1)).createPeerGenerateNulls(
+                null, null, null, null, null);
+        Mockito.verify(wgPeerRepository, Mockito.times(1)).add(Mockito.any(WgPeer.class));
+    }
+
+    @Test
+    public void deletePeer(){
+        wgPeerService.deletePeer("publicKey");
+        Mockito.verify(wgPeerRepository, Mockito.times(1)).remove(Mockito.any());
+    }
 }
