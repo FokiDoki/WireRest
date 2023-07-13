@@ -7,6 +7,7 @@ import com.wireguard.api.dto.PageDTO;
 import com.wireguard.external.network.Subnet;
 import com.wireguard.external.shell.CommandExecutionException;
 import com.wireguard.external.wireguard.ParsingException;
+import com.wireguard.external.wireguard.PeerCreationRequest;
 import com.wireguard.external.wireguard.peer.CreatedPeer;
 import com.wireguard.external.wireguard.peer.WgPeer;
 import com.wireguard.external.wireguard.peer.WgPeerService;
@@ -16,6 +17,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +26,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -142,23 +145,17 @@ public class PeerController {
     @Parameter(name = "privateKey", description = "Private key of the peer " +
             "(Will be generated if not provided. " +
             "If provided public key, empty string will be returned)")
-        @Parameter(name = "address", description = "CIDR of new peer in wireguard network interface, or empty if no address is required (Will be generated if not provided)", schema = @Schema(format = "CIDR"), allowEmptyValue = true)
-    @Parameter(name = "persistentKeepalive", description = "Persistent keepalive interval in seconds (0 if not provided)")
+        @Parameter(name = "allowedIps", description = "CIDR of new peer in wireguard network interface, or empty if no" +
+                " address is required (Will be generated if not provided). Example: 10.0.0.11/32", array = @ArraySchema(arraySchema = @Schema(implementation = String.class), uniqueItems=true),allowEmptyValue = true)
+    @Parameter(name = "persistentKeepalive", description = "Persistent keepalive interval in seconds (0 if not provided)", schema = @Schema(implementation = Integer.class, defaultValue = "0", example = "0", minimum = "0", maximum = "65535"))
+    @Parameter(name = "peerCreationRequestDTO", hidden = true)
     public ResponseEntity<CreatedPeerDTO> createPeer(
-            @RequestParam(value = "publicKey", required = false ) String publicKey,
-            @RequestParam(value = "presharedKey", required = false ) String presharedKey,
-            @RequestParam(value = "privateKey", required = false ) String privateKey,
-            @RequestParam(value = "address", required = false) Set<Subnet> address,
-            @RequestParam(value = "persistentKeepalive", required = false ) Integer persistentKeepalive
+            PeerCreationRequestDTO peerCreationRequestDTO
     ) {
         CreatedPeer createdPeer;
         try {
             createdPeer = wgPeerService.createPeerGenerateNulls(
-                    publicKey,
-                    presharedKey,
-                    privateKey,
-                    address,
-                    persistentKeepalive
+                    peerCreationRequestDTOToPeerCreationRequest(peerCreationRequestDTO)
             );
         } catch (IllegalArgumentException | ParsingException e){
             throw new BadRequestException(e.getMessage());
@@ -168,6 +165,15 @@ public class PeerController {
         return new ResponseEntity<>(CreatedPeerDTO.from(createdPeer), HttpStatus.CREATED);
     }
 
+    private PeerCreationRequest peerCreationRequestDTOToPeerCreationRequest(PeerCreationRequestDTO peerCreationRequestDTO) throws ParsingException {
+        return new PeerCreationRequest(
+                peerCreationRequestDTO.getPublicKey(),
+                peerCreationRequestDTO.getPresharedKey(),
+                peerCreationRequestDTO.getPrivateKey(),
+                peerCreationRequestDTO.getAllowedIps().stream().map(Subnet::valueOf).collect(Collectors.toSet()),
+                peerCreationRequestDTO.getPersistentKeepalive()
+        );
+    }
 
 
     @ApiResponses(value = {

@@ -5,6 +5,7 @@ import com.wireguard.external.network.NetworkInterfaceDTO;
 import com.wireguard.external.network.Subnet;
 import com.wireguard.external.shell.CommandExecutionException;
 import com.wireguard.external.shell.ShellRunner;
+import com.wireguard.external.wireguard.PeerCreationRequest;
 import com.wireguard.external.wireguard.WgTool;
 import jakarta.annotation.Nullable;
 import org.slf4j.Logger;
@@ -33,13 +34,12 @@ public class WgPeerCreator {
         this.wgSubnetSolver = wgSubnetSolver;
     }
 
-    public CreatedPeer createPeerGenerateNulls(@Nullable String publicKey, @Nullable String presharedKey,
-                                               @Nullable String privateKey, @Nullable Set<Subnet> allowedIps,
-                                               @Nullable Integer persistentKeepalive){
-        privateKey = privateKey == null ? wgTool.generatePrivateKey() : privateKey;
-        publicKey = publicKey == null ? wgTool.generatePublicKey(privateKey) : publicKey;
-        presharedKey = presharedKey == null ? wgTool.generatePresharedKey() : presharedKey;
-        persistentKeepalive = persistentKeepalive == null ? DEFAULT_PERSISTENT_KEEPALIVE : persistentKeepalive;
+    public CreatedPeer createPeerGenerateNulls(PeerCreationRequest peerCreationRequest) {
+        String privateKey = peerCreationRequest.getPrivateKey() == null ? wgTool.generatePrivateKey() : peerCreationRequest.getPrivateKey();
+        String publicKey = peerCreationRequest.getPublicKey() == null ? wgTool.generatePublicKey(privateKey) : peerCreationRequest.getPublicKey();
+        String presharedKey = peerCreationRequest.getPresharedKey() == null ? wgTool.generatePresharedKey() : peerCreationRequest.getPresharedKey();
+        int persistentKeepalive = peerCreationRequest.getPersistentKeepalive() == null ? DEFAULT_PERSISTENT_KEEPALIVE : peerCreationRequest.getPersistentKeepalive();
+        Set<Subnet> allowedIps = peerCreationRequest.getAllowedIps();
         try {
             if (allowedIps != null) {
                 allowedIps.forEach(wgSubnetSolver::obtain);

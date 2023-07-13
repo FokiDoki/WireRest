@@ -91,24 +91,24 @@ class WgPeerServiceTest {
     @Test
     public void testCreatePeerGenerateNulls() {
         CreatedPeer shouldBeReturned = new CreatedPeer("publicKey", "Psk", "Ppk", Set.of(Subnet.valueOf("10.66.66.1/32")), 0);
-        Mockito.when(wgPeerCreator.createPeerGenerateNulls("publicKey", "Psk", "Ppk", null, 0))
+        Mockito.when(wgPeerCreator.createPeerGenerateNulls(new PeerCreationRequest("publicKey", "Psk", "Ppk", null, 0)))
                 .thenReturn(shouldBeReturned);
-        CreatedPeer createdPeer = wgPeerService.createPeerGenerateNulls("publicKey", "Psk", "Ppk", null, 0);
+        CreatedPeer createdPeer = wgPeerService.createPeerGenerateNulls(new PeerCreationRequest("publicKey", "Psk", "Ppk", null, 0));
         Assertions.assertNotNull(createdPeer);
         Assertions.assertEquals(shouldBeReturned, createdPeer);
         Mockito.verify(wgPeerCreator, Mockito.times(1)).createPeerGenerateNulls(
-                shouldBeReturned.getPublicKey(), shouldBeReturned.getPresharedKey(), shouldBeReturned.getPrivateKey(),
-                null, shouldBeReturned.getPersistentKeepalive());
+                new PeerCreationRequest( shouldBeReturned.getPublicKey(), shouldBeReturned.getPresharedKey(), shouldBeReturned.getPrivateKey(),
+                null, shouldBeReturned.getPersistentKeepalive()));
         Mockito.verify(wgPeerRepository, Mockito.times(1)).add(Mockito.any(WgPeer.class));
     }
 
     @Test
     public void testCreatePeer() {
-        Mockito.when(wgPeerCreator.createPeerGenerateNulls(null, null, null, null, null))
+        Mockito.when(wgPeerCreator.createPeerGenerateNulls(new PeerCreationRequest(null, null, null, null, null)))
                 .thenReturn(new CreatedPeer("publicKey", "Psk", "Ppk", Set.of(Subnet.valueOf("0.0.0.0/32")), 0));
         wgPeerService.createPeer();
         Mockito.verify(wgPeerCreator, Mockito.times(1)).createPeerGenerateNulls(
-                null, null, null, null, null);
+                new PeerCreationRequest(null, null, null, null, null));
         Mockito.verify(wgPeerRepository, Mockito.times(1)).add(Mockito.any(WgPeer.class));
     }
 
