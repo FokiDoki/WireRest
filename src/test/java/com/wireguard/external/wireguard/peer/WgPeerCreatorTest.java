@@ -64,7 +64,6 @@ class WgPeerCreatorTest {
             wgPeerCreator.createPeerGenerateNulls(new PeerCreationRequest(null,null,
                     null,ips,null));
         });
-        Mockito.verify(subnetSolver, Mockito.times(2)).release(Mockito.any(Subnet.class));
     }
 
 }

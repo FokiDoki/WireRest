@@ -154,6 +154,8 @@ public class PeerController {
     ) {
         CreatedPeer createdPeer;
         try {
+            System.out.println(peerCreationRequestDTO);
+            System.out.println(peerCreationRequestDTOToPeerCreationRequest(peerCreationRequestDTO));
             createdPeer = wgPeerService.createPeerGenerateNulls(
                     peerCreationRequestDTOToPeerCreationRequest(peerCreationRequestDTO)
             );

@@ -1,9 +1,6 @@
 package com.wireguard.external.wireguard.peer;
 
-import com.wireguard.external.network.AlreadyUsedException;
-import com.wireguard.external.network.ISubnetSolver;
-import com.wireguard.external.network.NetworkInterfaceDTO;
-import com.wireguard.external.network.Subnet;
+import com.wireguard.external.network.*;
 import com.wireguard.external.shell.CommandExecutionException;
 import com.wireguard.external.shell.ShellRunner;
 import com.wireguard.external.wireguard.PeerCreationRequest;
@@ -15,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Component
@@ -42,22 +40,26 @@ public class WgPeerCreator {
         String presharedKey = peerCreationRequest.getPresharedKey() == null ? wgTool.generatePresharedKey() : peerCreationRequest.getPresharedKey();
         int persistentKeepalive = peerCreationRequest.getPersistentKeepalive() == null ? DEFAULT_PERSISTENT_KEEPALIVE : peerCreationRequest.getPersistentKeepalive();
         Set<Subnet> allowedIps = peerCreationRequest.getAllowedIps();
-        try {
-            if (allowedIps != null) {
-                allowedIps.forEach(wgSubnetSolver::obtain);
-            } else {
-                allowedIps = Set.of(wgSubnetSolver.obtainFree(DEFAULT_MASK_FOR_NEW_CLIENTS));
-            }
-        } catch (AlreadyUsedException e) {
-            throw e;
-        } catch (Exception e) {
-            assert allowedIps != null;
-            allowedIps.forEach(wgSubnetSolver::release);
-            throw e;
+        if (allowedIps == null) {
+            allowedIps = Set.of(wgSubnetSolver.obtainFree(DEFAULT_MASK_FOR_NEW_CLIENTS));
         }
+        obtainSubnets(allowedIps);
         logger.info("Created peer, public key: %s".formatted(publicKey.substring(0, Math.min(6, publicKey.length()))));
         return new CreatedPeer(publicKey, presharedKey, privateKey, allowedIps, persistentKeepalive);
 
+    }
+
+    private void obtainSubnets(Set<Subnet> subnets) {
+        Set<Subnet> obtainedSubnets = new HashSet<>();
+        try{
+            subnets.forEach((subnet) -> {
+                wgSubnetSolver.obtain(subnet);
+                obtainedSubnets.add(subnet);
+            });
+        } catch (Exception e){
+            obtainedSubnets.forEach(wgSubnetSolver::release);
+            throw e;
+        }
     }
 
 }

@@ -104,11 +104,11 @@ class WgPeerServiceTest {
 
     @Test
     public void testCreatePeer() {
-        Mockito.when(wgPeerCreator.createPeerGenerateNulls(new PeerCreationRequest(null, null, null, null, null)))
+        Mockito.when(wgPeerCreator.createPeerGenerateNulls(new EmptyPeerCreationRequest()))
                 .thenReturn(new CreatedPeer("publicKey", "Psk", "Ppk", Set.of(Subnet.valueOf("0.0.0.0/32")), 0));
         wgPeerService.createPeer();
         Mockito.verify(wgPeerCreator, Mockito.times(1)).createPeerGenerateNulls(
-                new PeerCreationRequest(null, null, null, null, null));
+                new EmptyPeerCreationRequest());
         Mockito.verify(wgPeerRepository, Mockito.times(1)).add(Mockito.any(WgPeer.class));
     }
 
