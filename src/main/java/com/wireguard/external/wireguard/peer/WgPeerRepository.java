@@ -19,7 +19,7 @@ public class WgPeerRepository implements RepositoryPageable<WgPeer> {
 
     private final WgTool wgTool;
     private final NetworkInterfaceDTO wgInterface;
-    private final Paging<WgPeer> paging = new Paging<>();
+    private final Paging<WgPeer> paging = new Paging<>(WgPeer.class);
 
     @Autowired
     public WgPeerRepository(WgTool wgTool, NetworkInterfaceDTO wgInterface) {

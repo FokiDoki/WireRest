@@ -4,6 +4,8 @@ import com.wireguard.external.network.NetworkInterfaceDTO;
 import com.wireguard.external.network.Subnet;
 import com.wireguard.external.shell.ShellRunner;
 import com.wireguard.external.wireguard.ParsingException;
+import com.wireguard.external.wireguard.Repository;
+import com.wireguard.external.wireguard.RepositoryPageable;
 import com.wireguard.external.wireguard.peer.spec.FindByPublicKey;
 import jakarta.annotation.Nullable;
 import org.slf4j.Logger;
@@ -24,10 +26,10 @@ public class WgPeerService {
 
     private static final Logger logger = LoggerFactory.getLogger(ShellRunner.class);
     WgPeerCreator wgPeerCreator;
-    WgPeerRepository wgPeerRepository;
+    RepositoryPageable<WgPeer> wgPeerRepository;
 
     @Autowired
-    public WgPeerService(NetworkInterfaceDTO wgInterface, WgPeerCreator wgPeerCreator, WgPeerRepository wgPeerRepository) {
+    public WgPeerService(WgPeerCreator wgPeerCreator, RepositoryPageable<WgPeer> wgPeerRepository) {
         this.wgPeerCreator = wgPeerCreator;
         this.wgPeerRepository = wgPeerRepository;
     }

@@ -22,23 +22,15 @@ public class WgPeerCreator {
     @Value("${wg.interface.default.mask}")
     private final int DEFAULT_MASK_FOR_NEW_CLIENTS = 32;
     @Value("${wg.interface.default.persistent_keepalive}")
-    private final int DEFAULT_PERSISTENT_KEEPALIVE = 0;
+    public final int DEFAULT_PERSISTENT_KEEPALIVE = 0;
 
     private final ISubnetSolver wgSubnetSolver;
     private final WgTool wgTool;
 
     @Autowired
-    public WgPeerCreator(WgTool wgTool, ISubnetSolver wgSubnetSolver, NetworkInterfaceDTO wgInterface) {
+    public WgPeerCreator(WgTool wgTool, ISubnetSolver wgSubnetSolver) {
         this.wgTool = wgTool;
         this.wgSubnetSolver = wgSubnetSolver;
-    }
-
-    private CreatedPeer createPeer(String privateKey, String publicKey, String presharedKey, Set<Subnet> allowedIps, int persistentKeepalive) {
-        CreatedPeer createdPeer = new CreatedPeer(publicKey, presharedKey, privateKey,
-                allowedIps,
-                persistentKeepalive);
-        logger.info("Created peer, public key: %s".formatted(publicKey.substring(0, 6)));
-        return createdPeer;
     }
 
     public CreatedPeer createPeerGenerateNulls(@Nullable String publicKey, @Nullable String presharedKey,
@@ -48,17 +40,20 @@ public class WgPeerCreator {
         publicKey = publicKey == null ? wgTool.generatePublicKey(privateKey) : publicKey;
         presharedKey = presharedKey == null ? wgTool.generatePresharedKey() : presharedKey;
         persistentKeepalive = persistentKeepalive == null ? DEFAULT_PERSISTENT_KEEPALIVE : persistentKeepalive;
-        if (allowedIps != null) {
-            allowedIps.forEach(wgSubnetSolver::obtain);
-        } else {
-            allowedIps = Set.of(wgSubnetSolver.obtainFree(DEFAULT_MASK_FOR_NEW_CLIENTS));
-        }
         try {
-            return createPeer(privateKey, publicKey, presharedKey, allowedIps, persistentKeepalive);
-        } catch (CommandExecutionException e) {
+            if (allowedIps != null) {
+                allowedIps.forEach(wgSubnetSolver::obtain);
+            } else {
+                allowedIps = Set.of(wgSubnetSolver.obtainFree(DEFAULT_MASK_FOR_NEW_CLIENTS));
+            }
+        } catch (Exception e) {
+            assert allowedIps != null;
             allowedIps.forEach(wgSubnetSolver::release);
             throw e;
         }
+        logger.info("Created peer, public key: %s".formatted(publicKey.substring(0, 6)));
+        return new CreatedPeer(publicKey, presharedKey, privateKey, allowedIps, persistentKeepalive);
+
     }
 
 }
