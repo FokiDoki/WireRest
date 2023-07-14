@@ -7,6 +7,7 @@ import com.wireguard.external.wireguard.RepositoryPageable;
 import com.wireguard.external.wireguard.Specification;
 import com.wireguard.external.wireguard.WgTool;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
+@ConditionalOnProperty(value = "api.cache.enabled", havingValue = "false")
 public class WgPeerRepository implements RepositoryPageable<WgPeer> {
 
     private final WgTool wgTool;
