@@ -40,10 +40,10 @@ public class WgPeerCreator {
         String presharedKey = peerCreationRequest.getPresharedKey() == null ? wgTool.generatePresharedKey() : peerCreationRequest.getPresharedKey();
         int persistentKeepalive = peerCreationRequest.getPersistentKeepalive() == null ? DEFAULT_PERSISTENT_KEEPALIVE : peerCreationRequest.getPersistentKeepalive();
         Set<Subnet> allowedIps = peerCreationRequest.getAllowedIps();
-        if (allowedIps == null) {
-            allowedIps = Set.of(wgSubnetSolver.obtainFree(DEFAULT_MASK_FOR_NEW_CLIENTS));
-        }
         obtainSubnets(allowedIps);
+        for (int i = 0; i < peerCreationRequest.getCountOfIpsToGenerate(); i++) {
+            allowedIps.add(wgSubnetSolver.obtainFree(DEFAULT_MASK_FOR_NEW_CLIENTS));
+        }
         logger.info("Created peer, public key: %s".formatted(publicKey.substring(0, Math.min(6, publicKey.length()))));
         return new CreatedPeer(publicKey, presharedKey, privateKey, allowedIps, persistentKeepalive);
 
