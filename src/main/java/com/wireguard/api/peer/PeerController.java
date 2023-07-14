@@ -132,7 +132,7 @@ public class PeerController {
 
     private PageDTO<WgPeerDTO> pagePeerToPageDTOPeerDTO(Page<WgPeer> peers){
         List<WgPeerDTO> peerDTOs = peers.getContent().stream().map(WgPeerDTO::from).collect(Collectors.toList());
-        return new PageDTO<>(peers.getTotalPages(), peers.getNumber(), peers.getSize(), peerDTOs);
+        return new PageDTO<>(peers.getTotalPages()-1, peers.getNumber(), peerDTOs);
     }
 
 
