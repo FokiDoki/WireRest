@@ -4,7 +4,9 @@ import com.github.benmanes.caffeine.cache.AsyncLoadingCache;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.wireguard.external.network.ISubnetSolver;
 import com.wireguard.external.network.NetworkInterfaceDTO;
+import com.wireguard.external.network.SubnetSolver;
 import com.wireguard.external.wireguard.RepositoryPageable;
 import com.wireguard.external.wireguard.Specification;
 import com.wireguard.external.wireguard.WgTool;
@@ -29,16 +31,15 @@ public class CachedWgPeerRepository extends WgPeerRepository implements Reposito
     private final ScheduledExecutorService cacheUpdateScheduler = Executors.newSingleThreadScheduledExecutor();
     private final int UPDATE_INTERVAL_SECONDS;
 
-
     @Autowired
-    public CachedWgPeerRepository(WgTool wgTool, NetworkInterfaceDTO wgInterface,
+    public CachedWgPeerRepository(WgTool wgTool, NetworkInterfaceDTO wgInterface, ISubnetSolver subnetSolver,
                                   @Value("${wg.cache.update-interval}") int cacheUpdateIntervalSeconds) {
         super(wgTool, wgInterface);
         UPDATE_INTERVAL_SECONDS = cacheUpdateIntervalSeconds;
         wgPeerCache = Caffeine.newBuilder()
                 .refreshAfterWrite(UPDATE_INTERVAL_SECONDS, TimeUnit.SECONDS)
                 .build(key -> super.getBySpecification(new FindByPublicKey(key)).stream().findFirst().orElse(null));
-        cacheUpdateScheduler.scheduleAtFixedRate(this::updateCache, 0, UPDATE_INTERVAL_SECONDS, TimeUnit.SECONDS);
+        cacheUpdateScheduler.scheduleAtFixedRate(() -> updateCache(subnetSolver), 0, UPDATE_INTERVAL_SECONDS, TimeUnit.SECONDS);
 
     }
 
@@ -60,10 +61,13 @@ public class CachedWgPeerRepository extends WgPeerRepository implements Reposito
         super.update(oldT, newT);
     }
 
-    private void updateCache() {
+    private void updateCache(ISubnetSolver subnetSolver) {
         wgPeerCache.invalidateAll();
         for (WgPeer wgPeer : super.getAll()) {
             wgPeerCache.put(wgPeer.getPublicKey(), wgPeer);
+            wgPeer.getAllowedSubnets().getIPv4Subnets().stream()
+                    .filter(subnet -> !subnetSolver.isUsed(subnet))
+                    .forEach(subnetSolver::obtain);
         }
     }
 

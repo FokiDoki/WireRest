@@ -14,6 +14,8 @@ public interface ISubnetSolver {
 
     void release(Subnet subnet);
 
+    boolean isUsed(Subnet subnet);
+
     long getAvailableIpsCount();
 
     long getTotalIpsCount();

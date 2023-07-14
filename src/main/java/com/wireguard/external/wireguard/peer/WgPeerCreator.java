@@ -18,7 +18,7 @@ import java.util.Set;
 @Component
 public class WgPeerCreator {
 
-    private static final Logger logger = LoggerFactory.getLogger(ShellRunner.class);
+    private static final Logger logger = LoggerFactory.getLogger(WgPeerCreator.class);
     @Value("${wg.interface.default.mask}")
     private final int DEFAULT_MASK_FOR_NEW_CLIENTS = 32;
     @Value("${wg.interface.default.persistent_keepalive}")
