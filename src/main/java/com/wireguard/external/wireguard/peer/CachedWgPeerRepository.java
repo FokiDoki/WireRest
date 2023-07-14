@@ -10,6 +10,7 @@ import com.wireguard.external.wireguard.Specification;
 import com.wireguard.external.wireguard.WgTool;
 import com.wireguard.external.wireguard.peer.spec.FindByPublicKey;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,17 +22,19 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 @Component
-@ConditionalOnProperty(value = "api.cache.enabled", havingValue = "true")
+@ConditionalOnProperty(value = "wg.cache.enabled", havingValue = "true")
 public class CachedWgPeerRepository extends WgPeerRepository implements RepositoryPageable<WgPeer> {
 
     private final LoadingCache<String, WgPeer> wgPeerCache;
     private final ScheduledExecutorService cacheUpdateScheduler = Executors.newSingleThreadScheduledExecutor();
-    private final static int UPDATE_INTERVAL_SECONDS = 10;
+    private final int UPDATE_INTERVAL_SECONDS;
 
 
     @Autowired
-    public CachedWgPeerRepository(WgTool wgTool, NetworkInterfaceDTO wgInterface) {
+    public CachedWgPeerRepository(WgTool wgTool, NetworkInterfaceDTO wgInterface,
+                                  @Value("${wg.cache.update-interval}") int cacheUpdateIntervalSeconds) {
         super(wgTool, wgInterface);
+        UPDATE_INTERVAL_SECONDS = cacheUpdateIntervalSeconds;
         wgPeerCache = Caffeine.newBuilder()
                 .refreshAfterWrite(UPDATE_INTERVAL_SECONDS, TimeUnit.SECONDS)
                 .build(key -> super.getBySpecification(new FindByPublicKey(key)).stream().findFirst().orElse(null));

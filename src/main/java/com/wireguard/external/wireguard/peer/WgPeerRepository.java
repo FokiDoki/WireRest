@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-@ConditionalOnProperty(value = "api.cache.enabled", havingValue = "false")
+@ConditionalOnProperty(value = "wg.cache.enabled", havingValue = "false")
 public class WgPeerRepository implements RepositoryPageable<WgPeer> {
 
     private final WgTool wgTool;
