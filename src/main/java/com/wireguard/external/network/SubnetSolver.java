@@ -1,7 +1,10 @@
 package com.wireguard.external.network;
 
+import com.wireguard.external.wireguard.peer.WgPeerCreator;
 import lombok.Getter;
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -13,7 +16,7 @@ import java.util.List;
 
 public class SubnetSolver implements ISubnetSolver {
 
-
+    private static final Logger logger = LoggerFactory.getLogger(SubnetSolver.class);
 
     private final List<IpRange> availableRanges =  Collections.synchronizedList(new ArrayList<>());
     private final IpRange totalAvailableRange;
@@ -39,6 +42,7 @@ public class SubnetSolver implements ISubnetSolver {
             availableRanges.remove(requestedSubnetIndex);
             availableRanges.addAll(requestedSubnetIndex, insertSubnetIntoIpRange(requestedSubnet, subnetAndRange.getRight()));
             availableIpsCount -= requestedSubnet.getIpCount();
+            logger.debug("Obtained free subnet " + requestedSubnet + " from range " + subnetAndRange.getRight());
             return requestedSubnet;
         } else {
             throw new NoFreeIpException("Cannot find free subnet with mask " + mask);
@@ -85,6 +89,7 @@ public class SubnetSolver implements ISubnetSolver {
             availableRanges.remove(currRangeIndex);
             availableRanges.addAll(currRangeIndex, insertSubnetIntoIpRange(subnet, availableRange));
             availableIpsCount -= subnet.getIpCount();
+            logger.debug("Obtained subnet " + subnet + " from range " + availableRange);
         } else {
             throw new AlreadyUsedException("Subnet " + subnet + " is is already used");
         }
@@ -137,9 +142,18 @@ public class SubnetSolver implements ISubnetSolver {
                 availableRanges.add(leastIndex, new IpRange(firstAddress, lastAddress));
             }
             availableIpsCount += subnet.getIpCount();
+            logger.debug("Released subnet " + subnet);
         } else {
             throw new UncheckedIOException(new IOException("This subnet is not used"));
         }
+    }
+
+    @Override
+    public boolean isUsed(Subnet subnet) {
+        int firstGreater = findFirstGreater(subnet.getFirstIpNumeric());
+        int currRangeIndex = calculatePreviousRangeIndex(firstGreater);
+        IpRange availableRange = availableRanges.get(currRangeIndex);
+        return !isIpsInRange(subnet.getFirstIpNumeric(), subnet.getLastIpNumeric(), availableRange);
     }
 
     private int findFirstGreater(long ip){

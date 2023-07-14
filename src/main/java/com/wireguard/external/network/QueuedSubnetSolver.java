@@ -45,6 +45,14 @@ public class QueuedSubnetSolver implements ISubnetSolver{
     }
 
     @SneakyThrows
+    @Override
+    public boolean isUsed(Subnet subnet) {
+        Future<Boolean> isUsedFuture = executor.submit(() -> subnetSolver.isUsed(subnet));
+        await(isUsedFuture);
+        return isUsedFuture.get();
+    }
+
+    @SneakyThrows
     private void await(Future<?> future){
         try {
             future.get();

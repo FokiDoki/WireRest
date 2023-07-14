@@ -1,6 +1,7 @@
-package com.wireguard.external.wireguard;
+package com.wireguard.external.wireguard.config;
 
 import com.wireguard.external.network.*;
+import com.wireguard.external.wireguard.WgTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
