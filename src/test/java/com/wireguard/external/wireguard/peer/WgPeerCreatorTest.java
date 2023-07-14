@@ -35,7 +35,7 @@ class WgPeerCreatorTest {
          CreatedPeer peer = wgPeerCreator.createPeerGenerateNulls(new EmptyPeerCreationRequest());
             assertEquals(wgPeerCreator.DEFAULT_PERSISTENT_KEEPALIVE, peer.getPersistentKeepalive());
             Mockito.verify(wgTool, Mockito.times(1)).generatePublicKey(Mockito.any());
-            Mockito.verify(subnetSolver, Mockito.times(1)).obtainFree(Mockito.anyInt());
+            Mockito.verify(subnetSolver, Mockito.times(0)).obtainFree(Mockito.anyInt());
             Mockito.verify(wgTool, Mockito.times(1)).generatePrivateKey();
             Mockito.verify(wgTool, Mockito.times(1)).generatePresharedKey();
     }
@@ -43,7 +43,7 @@ class WgPeerCreatorTest {
     @Test
     public void testCreatePeerWithData(){
         CreatedPeer peer = wgPeerCreator.createPeerGenerateNulls(new PeerCreationRequest("publicKey","presharedKey",
-                "privateKey", Set.of(Subnet.valueOf("0.0.0.1/32")),1));
+                "privateKey", Set.of(Subnet.valueOf("0.0.0.1/32")),1, 0));
         assertEquals(1, peer.getPersistentKeepalive());
         assertEquals("publicKey", peer.getPublicKey());
         assertEquals("presharedKey", peer.getPresharedKey());
@@ -62,7 +62,7 @@ class WgPeerCreatorTest {
         Set<Subnet> ips = Set.of(Subnet.valueOf("10.0.0.1/32"), Subnet.valueOf("10.0.0.2/32"));
         Assertions.assertThrows(RuntimeException.class, () -> {
             wgPeerCreator.createPeerGenerateNulls(new PeerCreationRequest(null,null,
-                    null,ips,null));
+                    null,ips,null, 0));
         });
     }
 

@@ -91,14 +91,16 @@ class WgPeerServiceTest {
     @Test
     public void testCreatePeerGenerateNulls() {
         CreatedPeer shouldBeReturned = new CreatedPeer("publicKey", "Psk", "Ppk", Set.of(Subnet.valueOf("10.66.66.1/32")), 0);
-        Mockito.when(wgPeerCreator.createPeerGenerateNulls(new PeerCreationRequest("publicKey", "Psk", "Ppk", null, 0)))
+        Mockito.when(wgPeerCreator.createPeerGenerateNulls(
+                new PeerCreationRequest("publicKey", "Psk", "Ppk",
+                        null, 0, 1)))
                 .thenReturn(shouldBeReturned);
-        CreatedPeer createdPeer = wgPeerService.createPeerGenerateNulls(new PeerCreationRequest("publicKey", "Psk", "Ppk", null, 0));
+        CreatedPeer createdPeer = wgPeerService.createPeerGenerateNulls(new PeerCreationRequest("publicKey", "Psk", "Ppk", null, 0, 1));
         Assertions.assertNotNull(createdPeer);
         Assertions.assertEquals(shouldBeReturned, createdPeer);
         Mockito.verify(wgPeerCreator, Mockito.times(1)).createPeerGenerateNulls(
-                new PeerCreationRequest( shouldBeReturned.getPublicKey(), shouldBeReturned.getPresharedKey(), shouldBeReturned.getPrivateKey(),
-                null, shouldBeReturned.getPersistentKeepalive()));
+                new PeerCreationRequest(shouldBeReturned.getPublicKey(), shouldBeReturned.getPresharedKey(), shouldBeReturned.getPrivateKey(),
+                null, shouldBeReturned.getPersistentKeepalive(), 1));
         Mockito.verify(wgPeerRepository, Mockito.times(1)).add(Mockito.any(WgPeer.class));
     }
 

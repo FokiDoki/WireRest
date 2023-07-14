@@ -187,7 +187,7 @@ class PeerControllerTest {
                 newPeer.getPresharedKey(),
                 newPeer.getPrivateKey(),
                 newPeer.getAllowedSubnets(),
-                25))).thenReturn(newPeer);
+                25, 0))).thenReturn(newPeer);
         webClient.post().uri(uriBuilder -> uriBuilder
                         .path("/peer/create")
                         .queryParam("publicKey", newPeer.getPublicKey())

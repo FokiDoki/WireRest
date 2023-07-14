@@ -67,7 +67,7 @@ public class PeerController {
     public PageDTO<WgPeerDTO> getPeers(
             @RequestParam(value = "page", required = false, defaultValue = "0") int page,
             @RequestParam(value = "limit", required = false, defaultValue = "1000") int limit,
-            @RequestParam(value = "sort", required = false, defaultValue = "allowedSubnets.asc") String sortKey
+            @RequestParam(value = "sort", required = false, defaultValue = "allowedSubnets.desc") String sortKey
     ) throws ParsingException {
         Page<WgPeer> peers;
         if (limit == 0){
@@ -145,19 +145,19 @@ public class PeerController {
     @Parameter(name = "privateKey", description = "Private key of the peer " +
             "(Will be generated if not provided. " +
             "If provided public key, empty string will be returned)")
-        @Parameter(name = "allowedIps", description = "CIDR of new peer in wireguard network interface, or empty if no" +
+    @Parameter(name = "allowedIps", description = "Ip of new peer in wireguard network interface, or empty if no" +
                 " address is required (Will be generated if not provided). Example: 10.0.0.11/32", array = @ArraySchema(arraySchema = @Schema(implementation = String.class), uniqueItems=true),allowEmptyValue = true)
     @Parameter(name = "persistentKeepalive", description = "Persistent keepalive interval in seconds (0 if not provided)", schema = @Schema(implementation = Integer.class, defaultValue = "0", example = "0", minimum = "0", maximum = "65535"))
     @Parameter(name = "peerCreationRequestDTO", hidden = true)
     public ResponseEntity<CreatedPeerDTO> createPeer(
-            PeerCreationRequestDTO peerCreationRequestDTO
+            PeerCreationRequestDTO peerCreationRequestDTO,
+            @RequestParam(value = "allowedIps", required = false) Set<String> allowedIps
     ) {
         CreatedPeer createdPeer;
         try {
-            System.out.println(peerCreationRequestDTO);
-            System.out.println(peerCreationRequestDTOToPeerCreationRequest(peerCreationRequestDTO));
+            int countOfIpsToGenerate = allowedIps == null ? 1 : 0;
             createdPeer = wgPeerService.createPeerGenerateNulls(
-                    peerCreationRequestDTOToPeerCreationRequest(peerCreationRequestDTO)
+                    peerCreationRequestDTOToPeerCreationRequest(peerCreationRequestDTO,countOfIpsToGenerate)
             );
         } catch (IllegalArgumentException | ParsingException e){
             throw new BadRequestException(e.getMessage());
@@ -167,13 +167,16 @@ public class PeerController {
         return new ResponseEntity<>(CreatedPeerDTO.from(createdPeer), HttpStatus.CREATED);
     }
 
-    private PeerCreationRequest peerCreationRequestDTOToPeerCreationRequest(PeerCreationRequestDTO peerCreationRequestDTO) throws ParsingException {
+    private PeerCreationRequest peerCreationRequestDTOToPeerCreationRequest(PeerCreationRequestDTO peerCreationRequestDTO,
+                                                                            int countOfIpsToGenerate) throws ParsingException {
+
         return new PeerCreationRequest(
                 peerCreationRequestDTO.getPublicKey(),
                 peerCreationRequestDTO.getPresharedKey(),
                 peerCreationRequestDTO.getPrivateKey(),
                 peerCreationRequestDTO.getAllowedIps().stream().map(Subnet::valueOf).collect(Collectors.toSet()),
-                peerCreationRequestDTO.getPersistentKeepalive()
+                peerCreationRequestDTO.getPersistentKeepalive(),
+                countOfIpsToGenerate
         );
     }
 
