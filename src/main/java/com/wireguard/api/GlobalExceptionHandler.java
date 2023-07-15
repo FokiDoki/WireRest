@@ -58,7 +58,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<AppError> commandExecutionException(CommandExecutionException e) {
         logger.error(e.getMessage(), e);
         return new ResponseEntity<>(
-                new AppError(HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                        "Wireguard error: %s".formatted(e.getStderr().strip())), HttpStatus.INTERNAL_SERVER_ERROR);
+                new AppError(HttpStatus.BAD_REQUEST.value(),
+                        "Wireguard error: %s".formatted(e.getStderr().strip())), HttpStatus.BAD_REQUEST);
     }
 }
