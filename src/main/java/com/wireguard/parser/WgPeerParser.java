@@ -42,6 +42,7 @@ public class WgPeerParser {
     }
 
     private static Set<String> splitToStringSet(String string, String splitter){
+        if (string==null) return Set.of();
         return Set.of(string.split(splitter));
     }
 
