@@ -122,7 +122,8 @@ public class WgTool {
                 new Argument("preshared-key",
                         peer.getPresharedKey().isEmpty() ? null : filePath),
                 new Argument("allowed-ips", peer.getAllowedSubnets().toString()),
-                new Argument("persistent-keepalive", String.valueOf(peer.getPersistentKeepalive()))
+                new Argument("persistent-keepalive", String.valueOf(peer.getPersistentKeepalive())),
+                new Argument("endpoint", peer.getEndpoint())
         );
         appendArgumentsIfPresentAndNotEmpty(arguments, command);
 
@@ -188,6 +189,4 @@ public class WgTool {
         run(WG_DEL_PEER_COMMAND.formatted(interfaceName, publicKey), true);
         saveConfig(interfaceName);
     }
-
-
 }
