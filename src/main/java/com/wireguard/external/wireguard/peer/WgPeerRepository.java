@@ -1,6 +1,7 @@
 package com.wireguard.external.wireguard.peer;
 
 
+import com.wireguard.external.network.ISubnetSolver;
 import com.wireguard.external.network.NetworkInterfaceDTO;
 import com.wireguard.external.wireguard.Paging;
 import com.wireguard.external.wireguard.RepositoryPageable;
@@ -21,12 +22,14 @@ public class WgPeerRepository implements RepositoryPageable<WgPeer> {
 
     private final WgTool wgTool;
     private final NetworkInterfaceDTO wgInterface;
+    private final ISubnetSolver subnetSolver;
     private final Paging<WgPeer> paging = new Paging<>(WgPeer.class);
 
     @Autowired
-    public WgPeerRepository(WgTool wgTool, NetworkInterfaceDTO wgInterface) {
+    public WgPeerRepository(WgTool wgTool, NetworkInterfaceDTO wgInterface, ISubnetSolver subnetSolver) {
         this.wgTool = wgTool;
         this.wgInterface = wgInterface;
+        this.subnetSolver = subnetSolver;
     }
 
     @Override
@@ -41,7 +44,10 @@ public class WgPeerRepository implements RepositoryPageable<WgPeer> {
 
     @Override
     public void update(WgPeer oldT, WgPeer newT) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if (!oldT.getPublicKey().equals(newT.getPublicKey())) {
+            wgTool.deletePeer(wgInterface.getName(), oldT.getPublicKey());
+        }
+        wgTool.addPeer(wgInterface.getName(), newT);
     }
 
     @Override
@@ -70,4 +76,5 @@ public class WgPeerRepository implements RepositoryPageable<WgPeer> {
         List<WgPeer> peers = getAll();
         return paging.apply(pageable, peers);
     }
+
 }

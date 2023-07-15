@@ -9,21 +9,19 @@ import lombok.SneakyThrows;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Profile("test")
 @Component
 public class FakeWgTool extends WgTool {
-    private List<WgPeer> peers = new ArrayList<>();
+    private Map<String, WgPeer> peers = new HashMap<>();
     private WgInterface wgInterface;
     private int keyCounter;
 
     public FakeWgTool() {
         super(1);
         wgInterface = new WgInterface("privkey", "pubkey", 16666, 0);
-        peers.addAll(List.of(
+        List.of(
                 WgPeer.publicKey("pubkey1").build(),
                 WgPeer.publicKey("pubkey2").presharedKey("presharedKey2").build(),
                 WgPeer.publicKey("PubKey3").presharedKey("presharedKey3").endpoint("10.0.0.1").build(),
@@ -35,13 +33,13 @@ public class FakeWgTool extends WgTool {
                         .latestHandshake(100000).transferRx(12345).transferTx(54321).build(),
                 WgPeer.publicKey("PubKey8").presharedKey("presharedKey8").allowedIPv4Subnets(Set.of(Subnet.valueOf("10.0.0.7/32")))
                         .latestHandshake(200000).transferRx(12345).transferTx(54321).build()
-        ));
+        ).forEach(peer -> peers.put(peer.getPublicKey(), peer));
         keyCounter = peers.size()+1;
     }
     @SneakyThrows
     @Override
     public WgShowDump showDump(String interfaceName) {
-        return new WgShowDump(wgInterface, peers);
+        return new WgShowDump(wgInterface, peers.values().stream().toList());
     }
 
     @Override
@@ -50,17 +48,18 @@ public class FakeWgTool extends WgTool {
     }
 
     @Override
-    synchronized public void addPeer(String interfaceName, WgPeer peer) {
-        peers.add(WgPeer.publicKey(peer.getPublicKey())
-                .presharedKey(peer.getPresharedKey())
-                .allowedIPv4Subnets(peer.getAllowedSubnets().getIPv4Subnets())
-                .persistentKeepalive(peer.getPersistentKeepalive()).build()
-        );
+    synchronized public void addPeer(String interfaceName, WgPeer newPeer) {
+        WgPeer.Builder peerBuilder = WgPeer.from(peers.getOrDefault(newPeer.getPublicKey(), newPeer));
+        if (newPeer.getPresharedKey()!= null) peerBuilder.presharedKey(newPeer.getPresharedKey());
+        peerBuilder.allowedIPv4Subnets(newPeer.getAllowedSubnets().getIPv4Subnets());
+        if (newPeer.getEndpoint()!= null) peerBuilder.endpoint(newPeer.getEndpoint());
+        peerBuilder.persistentKeepalive(newPeer.getPersistentKeepalive());
+        peers.put(newPeer.getPublicKey(), peerBuilder.build());
     }
 
     @Override
     public void deletePeer(String interfaceName, String publicKey) {
-        peers.stream().filter(peer -> peer.getPublicKey().equals(publicKey)).findFirst().ifPresent(peers::remove);
+        peers.remove(publicKey);
     }
 
 

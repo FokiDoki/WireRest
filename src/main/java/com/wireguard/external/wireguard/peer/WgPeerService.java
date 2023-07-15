@@ -1,6 +1,5 @@
 package com.wireguard.external.wireguard.peer;
 
-import com.wireguard.external.network.NetworkInterfaceDTO;
 import com.wireguard.external.network.Subnet;
 import com.wireguard.external.shell.ShellRunner;
 import com.wireguard.external.wireguard.*;
@@ -17,6 +16,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 
 @Component
 @Scope("singleton")
@@ -39,7 +39,7 @@ public class WgPeerService {
                 .findFirst();
     }
 
-    public List<WgPeer> getPeers(){
+    public List<WgPeer> getPeers() {
         return wgPeerRepository.getAll();
     }
 
@@ -47,7 +47,7 @@ public class WgPeerService {
         return wgPeerRepository.getAll(pageable);
     }
 
-    public CreatedPeer createPeerGenerateNulls(PeerCreationRequest peerCreationRequest){
+    public CreatedPeer createPeerGenerateNulls(PeerCreationRequest peerCreationRequest) {
         CreatedPeer createdPeer = wgPeerCreator.createPeerGenerateNulls(peerCreationRequest);
         wgPeerRepository.add(WgPeer.publicKey(createdPeer.getPublicKey())
                 .presharedKey(createdPeer.getPresharedKey())
@@ -57,11 +57,43 @@ public class WgPeerService {
         return createdPeer;
     }
 
-    public CreatedPeer createPeer(){
+
+
+    public WgPeer updatePeer(PeerUpdateRequest updateRequest) {
+        WgPeer oldPeer = wgPeerRepository.getBySpecification(new FindByPublicKey(updateRequest.getCurrentPublicKey()))
+                .stream()
+                .findFirst().orElseThrow();
+        WgPeer.Builder newPeerBuilder = WgPeer.from(oldPeer);
+        newPeerBuilder.publicKey(
+                updateRequest.getNewPublicKey() != null ? updateRequest.getNewPublicKey() : oldPeer.getPublicKey());
+        consumeIfNotNullElseDefault(updateRequest.getPresharedKey(), oldPeer.getPresharedKey(), psk -> newPeerBuilder.presharedKey((String) psk));
+        consumeIfNotNullElseDefault(updateRequest.getAllowedV4Ips(), oldPeer.getAllowedSubnets().getIPv4Subnets(),
+                subnets -> newPeerBuilder.allowedIPv4Subnets((Set<Subnet>) subnets));
+        consumeIfNotNullElseDefault(updateRequest.getAllowedV6Ips(), oldPeer.getAllowedSubnets().getIPv6Subnets(),
+                subnets -> newPeerBuilder.allowedIPv6Subnets((Set<String>) subnets));
+        consumeIfNotNullElseDefault(updateRequest.getEndpoint(), oldPeer.getEndpoint(),
+                endpoint -> newPeerBuilder.endpoint((String) endpoint));
+        consumeIfNotNullElseDefault(updateRequest.getPersistentKeepalive(), oldPeer.getPersistentKeepalive(),
+                pk -> newPeerBuilder.persistentKeepalive((Integer) pk));
+        WgPeer newPeer = newPeerBuilder.build();
+        wgPeerRepository.update(oldPeer, newPeer);
+        return newPeer;
+    }
+
+    private void consumeIfNotNullElseDefault(@Nullable Object object, Object defaultVal, Consumer<Object> consumer) {
+        if (object != null) {
+            consumer.accept(object);
+        } else {
+            consumer.accept(defaultVal);
+        }
+    }
+
+
+    public CreatedPeer createPeer() {
         return createPeerGenerateNulls(new EmptyPeerCreationRequest());
     }
 
-    public void deletePeer(String publicKey)  {
+    public void deletePeer(String publicKey) {
         wgPeerRepository.remove(
                 WgPeer.publicKey(publicKey).build()
         );

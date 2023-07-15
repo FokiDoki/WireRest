@@ -8,9 +8,12 @@ import com.wireguard.external.network.Subnet;
 import com.wireguard.external.shell.CommandExecutionException;
 import com.wireguard.external.wireguard.ParsingException;
 import com.wireguard.external.wireguard.PeerCreationRequest;
+import com.wireguard.external.wireguard.PeerUpdateRequest;
 import com.wireguard.external.wireguard.peer.CreatedPeer;
 import com.wireguard.external.wireguard.peer.WgPeer;
 import com.wireguard.external.wireguard.peer.WgPeerService;
+import com.wireguard.utils.IpUtils;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -26,10 +29,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.net.Inet4Address;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -83,6 +84,52 @@ public class PeerController {
         return pagePeerToPageDTOPeerDTO(peers);
     }
 
+    @Operation(summary = "Update peer by public key", description = "Update peer by public key. " +
+            "Do not provide fields that you do not want to change.")
+    @Parameter(name = "currentPublicKey", description = "Public key of peer", required = true)
+    @Parameter(name = "newPublicKey", description = "New public key of peer")
+    @Parameter(name = "presharedKey", description = "Preshared key or empty if no psk required (Empty if not provided)",
+            allowEmptyValue = true)
+    @Parameter(name = "allowedIps", description = "New ips of peer (Exists will be replaced)  Example: 10.0.0.11/32",
+            array = @ArraySchema(arraySchema = @Schema(implementation = String.class), uniqueItems=true), allowEmptyValue = true)
+    @Parameter(name = "persistentKeepalive", description = "New persistent keepalive interval in seconds (0 if not provided)", schema = @Schema(implementation = Integer.class, defaultValue = "0", example = "0", minimum = "0", maximum = "65535"))
+    @Parameter(name = "peerUpdateRequestDTO", hidden = true)
+    @RequestMapping(value = "/peer/update", method = RequestMethod.PATCH)
+    public WgPeerDTO updatePeer(
+        PeerUpdateRequestDTO peerUpdateRequestDTO
+    ){
+        try {
+            System.out.println(peerUpdateRequestDTO);
+            System.out.println(peerUpdateRequestDTOToPeerUpdateRequest(peerUpdateRequestDTO));
+            WgPeer wgPeer = wgPeerService.updatePeer(
+                    peerUpdateRequestDTOToPeerUpdateRequest(peerUpdateRequestDTO));
+            return WgPeerDTO.from(wgPeer);
+        } catch (IllegalArgumentException | NoSuchElementException e) {
+            throw new BadRequestException(e.getMessage());
+        }
+    }
+
+    private PeerUpdateRequest peerUpdateRequestDTOToPeerUpdateRequest(PeerUpdateRequestDTO peerUpdateRequestDTO){
+        Set<Subnet> allowedV4Ips = null;
+        Set<String> allowedV6Ips = null;
+        if (peerUpdateRequestDTO.getAllowedIps()!=null){
+            Map<IpUtils.IpType, Set<String>> allowedIps = IpUtils.splitIpv4AndIpv6(peerUpdateRequestDTO.getAllowedIps());
+            allowedV4Ips = allowedIps.get(IpUtils.IpType.IPV4).stream().map(Subnet::valueOf).collect(Collectors.toSet());
+            allowedV6Ips = allowedIps.get(IpUtils.IpType.IPV6);
+        }
+
+        PeerUpdateRequest peerUpdateRequest = new PeerUpdateRequest(
+                peerUpdateRequestDTO.getCurrentPublicKey(),
+                peerUpdateRequestDTO.getNewPublicKey(),
+                peerUpdateRequestDTO.getPresharedKey(),
+                allowedV4Ips,
+                allowedV6Ips,
+                peerUpdateRequestDTO.getEndpoint(),
+                peerUpdateRequestDTO.getPersistentKeepalive()
+        );
+        return peerUpdateRequest;
+    }
+
     private PageDTO<WgPeerDTO> pagePeerToPageDTOPeerDTO(Page<WgPeer> peers){
         List<WgPeerDTO> peerDTOs = peers.getContent().stream().map(WgPeerDTO::from).collect(Collectors.toList());
         return new PageDTO<>(peers.getTotalPages(), peers.getNumber(), peers.getSize(), peerDTOs);
@@ -101,6 +148,7 @@ public class PeerController {
             return Sort.by(direction, keys[0]);
         }
     }
+
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK",

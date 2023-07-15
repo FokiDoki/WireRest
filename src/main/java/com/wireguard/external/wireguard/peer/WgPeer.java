@@ -13,7 +13,7 @@ import java.util.Set;
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class WgPeer implements Comparable<WgPeer> {
-    private String publicKey;
+    private final String publicKey;
     private String presharedKey;
     private String endpoint;
     private AllowedSubnets allowedSubnets;
@@ -23,6 +23,9 @@ public class WgPeer implements Comparable<WgPeer> {
     private int persistentKeepalive;
     public static Builder publicKey(String publicKey) {
         return new Builder().publicKey(publicKey);
+    }
+    public static Builder from(WgPeer wgPeer) {
+        return new Builder().from(wgPeer);
     }
 
     @Override
@@ -145,8 +148,20 @@ public class WgPeer implements Comparable<WgPeer> {
             return this;
         }
 
+        public Builder from(WgPeer wgPeer) {
+            this.publicKey = wgPeer.publicKey;
+            this.presharedKey = wgPeer.presharedKey;
+            this.endpoint = wgPeer.endpoint;
+            this.allowedSubnets = wgPeer.allowedSubnets;
+            this.latestHandshake = wgPeer.latestHandshake;
+            this.transferRx = wgPeer.transferRx;
+            this.transferTx = wgPeer.transferTx;
+            this.persistentKeepalive = wgPeer.persistentKeepalive;
+            return this;
+        }
+
         public WgPeer build(){
-            Assert.notNull(publicKey, "Public key must not be null");
+            Assert.notNull(publicKey, "WgPeer.Builder: Public key must not be null");
             return new WgPeer(publicKey,
                     presharedKey,
                     endpoint,
