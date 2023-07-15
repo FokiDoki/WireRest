@@ -28,7 +28,7 @@ public class CachedWgPeerRepository extends WgPeerRepository implements Reposito
     @Autowired
     public CachedWgPeerRepository(WgTool wgTool, NetworkInterfaceDTO wgInterface, ISubnetSolver subnetSolver,
                                   @Value("${wg.cache.update-interval}") int cacheUpdateIntervalSeconds) {
-        super(wgTool, wgInterface);
+        super(wgTool, wgInterface, subnetSolver);
         UPDATE_INTERVAL_SECONDS = cacheUpdateIntervalSeconds;
         wgPeerCache = Caffeine.newBuilder()
                 .refreshAfterWrite(UPDATE_INTERVAL_SECONDS, TimeUnit.SECONDS)
