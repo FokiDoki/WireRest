@@ -8,14 +8,14 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-public class NetworkInterfaceDTO {
+public class NetworkInterfaceData {
     @Getter  private final String name;
 
 
     private final Set<Subnet> ipv4Subnets = new HashSet<>();
     private final Set<Inet4Address> ipv4Addresses = new HashSet<>();
 
-    public NetworkInterfaceDTO(String name){
+    public NetworkInterfaceData(String name){
         this.name = name;
     }
 
@@ -29,7 +29,7 @@ public class NetworkInterfaceDTO {
 
     public void addInterfaceAddress(InterfaceAddress interfaceAddress){
         if (interfaceAddress.getAddress() instanceof Inet4Address)
-            ipv4Subnets.add(Subnet.valueOf((Inet4Address) interfaceAddress.getAddress(),
+            ipv4Subnets.add(Subnet.valueOf(interfaceAddress.getAddress(),
                     interfaceAddress.getNetworkPrefixLength()));
         else throw new IllegalArgumentException("Only IPv4 addresses are supported");
     }

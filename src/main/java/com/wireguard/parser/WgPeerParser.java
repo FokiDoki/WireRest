@@ -1,12 +1,11 @@
 package com.wireguard.parser;
 
-import com.wireguard.external.network.Subnet;
+import com.wireguard.external.network.ISubnet;
 import com.wireguard.external.wireguard.peer.WgPeer;
+import com.wireguard.utils.IpUtils;
 import org.springframework.util.Assert;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -26,13 +25,12 @@ public class WgPeerParser {
         WgShowPeerDump = WgShowPeerDump.stream()
                 .map(s -> s.equals("(none)") ? null : s).collect(Collectors.toList());
 
-        Map<IpType, Set<String>> allowedIps = filterAllowedIps(WgShowPeerDump.get(3));
+        Set<ISubnet> allowedIps = IpUtils.stringToSubnetSet(splitToStringSet(WgShowPeerDump.get(3), ","));
         return WgPeer.
                 publicKey( WgShowPeerDump.get(0))
                 .presharedKey(WgShowPeerDump.get(1))
                 .endpoint(WgShowPeerDump.get(2))
-                .allowedIPv4Subnets(allowedIps.get(IpType.IPV4).stream().map(Subnet::valueOf).collect(Collectors.toSet()))
-                .allowedIPv6Subnets(allowedIps.get(IpType.IPV6))
+                .allowedIps(allowedIps)
                 .latestHandshake(Long.parseLong(WgShowPeerDump.get(4)))
                 .transferRx(Long.parseLong(WgShowPeerDump.get(5)))
                 .transferTx(Long.parseLong(WgShowPeerDump.get(6)))
@@ -40,23 +38,9 @@ public class WgPeerParser {
                 .build();
     }
 
-    private enum IpType {
-        IPV4, IPV6
-    }
-    private static Map<IpType, Set<String>> filterAllowedIps(String allowedIps){
-        Map<IpType, Set<String>> allowedIpsMap = Map.of(IpType.IPV4, new HashSet<>(), IpType.IPV6, new HashSet<>());
-        if (allowedIps==null) return allowedIpsMap;
-        Set<String> allowedIpsStringsList = Set.of(allowedIps.split(","));
-        allowedIpsStringsList.forEach(allowedIp -> {
-            if (Utils.isIpV4Cidr(allowedIp)){
-                allowedIpsMap.get(IpType.IPV4).add(allowedIp);
-            } else if (Utils.isIpV6Cidr(allowedIp)){
-                allowedIpsMap.get(IpType.IPV6).add(allowedIp);
-            } else {
-                throw new IllegalArgumentException("WgPeerParser.parseAllowedIps: invalid IP address %s".formatted(allowedIp));
-            }
-        });
-        return allowedIpsMap;
+    private static Set<String> splitToStringSet(String string, String splitter){
+        if (string==null) return Set.of();
+        return Set.of(string.split(splitter));
     }
 
     private static int parsePersistentKeepalive(String persistentKeepalive){

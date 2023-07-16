@@ -4,7 +4,7 @@ import com.wireguard.api.AppError;
 import com.wireguard.api.dto.PageDTO;
 import com.wireguard.external.network.NoFreeIpException;
 import com.wireguard.external.network.Subnet;
-import com.wireguard.external.wireguard.EmptyPeerCreationRequest;
+import com.wireguard.external.network.SubnetV6;
 import com.wireguard.external.wireguard.Paging;
 import com.wireguard.external.wireguard.ParsingException;
 import com.wireguard.external.wireguard.PeerCreationRequest;
@@ -14,13 +14,18 @@ import com.wireguard.external.wireguard.peer.WgPeerService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.support.PagedListHolder;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 import static org.hamcrest.Matchers.containsString;
 
@@ -37,7 +42,7 @@ class PeerControllerTest {
             WgPeer.publicKey("PubKey2")
                     .presharedKey("PresharedKey2")
                     .allowedIPv4Subnets(Set.of(Subnet.valueOf("10.0.0.1/32"),Subnet.valueOf("10.1.1.1/30")))
-                    .allowedIPv6Subnets(Set.of("2001:db8::/32"))
+                    .allowedIPv6Subnets(Set.of(SubnetV6.valueOf("2001:db8::/32")))
                     .transferTx(100)
                     .transferRx(200)
                     .latestHandshake(300)
@@ -198,8 +203,8 @@ class PeerControllerTest {
                         .build())
                 .exchange()
                 .expectStatus().isCreated()
-                .expectBody(CreatedPeer.class)
-                .isEqualTo(newPeer);
+                .expectBody(CreatedPeerDTO.class)
+                .isEqualTo(CreatedPeerDTO.from(newPeer));
     }
 
     @Test

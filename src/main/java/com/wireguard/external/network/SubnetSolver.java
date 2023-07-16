@@ -1,6 +1,5 @@
 package com.wireguard.external.network;
 
-import com.wireguard.external.wireguard.peer.WgPeerCreator;
 import lombok.Getter;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.slf4j.Logger;
@@ -14,7 +13,7 @@ import java.util.Collections;
 import java.util.List;
 
 
-public class SubnetSolver implements ISubnetSolver {
+public class SubnetSolver implements IV4SubnetSolver {
 
     private static final Logger logger = LoggerFactory.getLogger(SubnetSolver.class);
 
@@ -41,7 +40,7 @@ public class SubnetSolver implements ISubnetSolver {
             int requestedSubnetIndex = calculatePreviousRangeIndex(findFirstGreater(requestedSubnet.getFirstIpNumeric()));
             availableRanges.remove(requestedSubnetIndex);
             availableRanges.addAll(requestedSubnetIndex, insertSubnetIntoIpRange(requestedSubnet, subnetAndRange.getRight()));
-            availableIpsCount -= requestedSubnet.getIpCount();
+            availableIpsCount -= requestedSubnet.getIpCount().longValue();
             logger.debug("Obtained free subnet " + requestedSubnet + " from range " + subnetAndRange.getRight());
             return requestedSubnet;
         } else {
@@ -88,7 +87,7 @@ public class SubnetSolver implements ISubnetSolver {
         if (isIpsInRange(firstAddress, lastAddress, availableRange)){
             availableRanges.remove(currRangeIndex);
             availableRanges.addAll(currRangeIndex, insertSubnetIntoIpRange(subnet, availableRange));
-            availableIpsCount -= subnet.getIpCount();
+            availableIpsCount -= subnet.getIpCount().longValue();
             logger.debug("Obtained subnet " + subnet + " from range " + availableRange);
         } else {
             throw new AlreadyUsedException("Subnet " + subnet + " is is already used");
@@ -120,7 +119,7 @@ public class SubnetSolver implements ISubnetSolver {
         }
         if (getAvailableIpsCount()==0L){
             availableRanges.add(new IpRange(firstAddress, lastAddress));
-            availableIpsCount += subnet.getIpCount();
+            availableIpsCount += subnet.getIpCount().longValue();
             return;
         }
 
@@ -141,7 +140,7 @@ public class SubnetSolver implements ISubnetSolver {
             } else {
                 availableRanges.add(leastIndex, new IpRange(firstAddress, lastAddress));
             }
-            availableIpsCount += subnet.getIpCount();
+            availableIpsCount += subnet.getIpCount().longValue();
             logger.debug("Released subnet " + subnet);
         } else {
             throw new UncheckedIOException(new IOException("This subnet is not used"));

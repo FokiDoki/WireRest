@@ -4,20 +4,23 @@ import com.wireguard.api.AppError;
 import com.wireguard.api.BadRequestException;
 import com.wireguard.api.ResourceNotFoundException;
 import com.wireguard.api.dto.PageDTO;
+import com.wireguard.external.network.ISubnet;
 import com.wireguard.external.network.Subnet;
 import com.wireguard.external.shell.CommandExecutionException;
 import com.wireguard.external.wireguard.ParsingException;
 import com.wireguard.external.wireguard.PeerCreationRequest;
+import com.wireguard.external.wireguard.PeerUpdateRequest;
 import com.wireguard.external.wireguard.peer.CreatedPeer;
 import com.wireguard.external.wireguard.peer.WgPeer;
 import com.wireguard.external.wireguard.peer.WgPeerService;
+import com.wireguard.utils.IpUtils;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,10 +29,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -83,6 +83,50 @@ public class PeerController {
         return pagePeerToPageDTOPeerDTO(peers);
     }
 
+    @Operation(summary = "Update peer by public key", description = "Update peer by public key. " +
+            "Do not provide fields that you do not want to change.")
+    @Parameter(name = "currentPublicKey", description = "Public key of peer", required = true)
+    @Parameter(name = "newPublicKey", description = "New public key of peer. Warning: If you change the public key, latest handshake and transfer data will be lost. "
+            , allowEmptyValue = true)
+    @Parameter(name = "presharedKey", description = "Preshared key or empty if no psk required (Empty if not provided)",
+            allowEmptyValue = true)
+    @Parameter(name = "allowedIps", description = "New ips of peer (Exists will be replaced)  Example: 10.0.0.11/32",
+            array = @ArraySchema(arraySchema = @Schema(implementation = String.class), uniqueItems=true), allowEmptyValue = true)
+    @Parameter(name = "persistentKeepalive", description = "New persistent keepalive interval in seconds (0 if not provided)", schema = @Schema(implementation = Integer.class, defaultValue = "0", example = "0", minimum = "0", maximum = "65535"))
+    @Parameter(name = "peerUpdateRequestDTO", hidden = true)
+    @RequestMapping(value = "/peer/update", method = RequestMethod.PATCH)
+    public WgPeerDTO updatePeer(
+        PeerUpdateRequestDTO peerUpdateRequestDTO
+    ){
+        try {
+            System.out.println(peerUpdateRequestDTO);
+            System.out.println(peerUpdateRequestDTOToPeerUpdateRequest(peerUpdateRequestDTO));
+            WgPeer wgPeer = wgPeerService.updatePeer(
+                    peerUpdateRequestDTOToPeerUpdateRequest(peerUpdateRequestDTO));
+            return WgPeerDTO.from(wgPeer);
+        } catch (IllegalArgumentException | NoSuchElementException e) {
+            throw new BadRequestException(e.getMessage());
+        }
+    }
+
+    private PeerUpdateRequest peerUpdateRequestDTOToPeerUpdateRequest(PeerUpdateRequestDTO peerUpdateRequestDTO){
+        Set<ISubnet> allowedIps = new HashSet<>();
+        if (peerUpdateRequestDTO.getAllowedIps()!=null){
+            Map<IpUtils.IpType, Set<ISubnet>> allowedIpsSorted = IpUtils.splitIpv4AndIpv6(peerUpdateRequestDTO.getAllowedIps());
+            allowedIps.addAll(allowedIpsSorted.get(IpUtils.IpType.IPV4));
+            allowedIps.addAll(allowedIpsSorted.get(IpUtils.IpType.IPV6));
+        }
+        PeerUpdateRequest peerUpdateRequest = new PeerUpdateRequest(
+                peerUpdateRequestDTO.getCurrentPublicKey(),
+                peerUpdateRequestDTO.getNewPublicKey(),
+                peerUpdateRequestDTO.getPresharedKey(),
+                allowedIps,
+                peerUpdateRequestDTO.getEndpoint(),
+                peerUpdateRequestDTO.getPersistentKeepalive()
+        );
+        return peerUpdateRequest;
+    }
+
     private PageDTO<WgPeerDTO> pagePeerToPageDTOPeerDTO(Page<WgPeer> peers){
         List<WgPeerDTO> peerDTOs = peers.getContent().stream().map(WgPeerDTO::from).collect(Collectors.toList());
         return new PageDTO<>(peers.getTotalPages()-1, peers.getNumber(), peerDTOs);
@@ -101,6 +145,7 @@ public class PeerController {
             return Sort.by(direction, keys[0]);
         }
     }
+
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK",
@@ -177,7 +222,10 @@ public class PeerController {
                 peerCreationRequestDTO.getPublicKey(),
                 peerCreationRequestDTO.getPresharedKey(),
                 peerCreationRequestDTO.getPrivateKey(),
-                peerCreationRequestDTO.getAllowedIps().stream().map(Subnet::valueOf).collect(Collectors.toSet()),
+                IpUtils.stringToSubnetSet(
+                        Optional.ofNullable(
+                                peerCreationRequestDTO.getAllowedIps()
+                        ).orElseGet(Set::of)),
                 peerCreationRequestDTO.getPersistentKeepalive(),
                 countOfIpsToGenerate
         );

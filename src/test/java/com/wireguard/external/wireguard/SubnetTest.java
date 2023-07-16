@@ -3,7 +3,7 @@ package com.wireguard.external.wireguard;
 import com.wireguard.external.network.Subnet;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
+import java.math.BigInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -26,7 +26,7 @@ class SubnetTest {
         Subnet subnet = Subnet.valueOf("192.168.0.3/24");
         assertEquals("192.168.0.255", subnet.getLastIpString(), ".getLastIpString()");
         assertEquals("192.168.0.0", subnet.getFirstIpString(), ".getFirstIpString()");
-        assertEquals(256, subnet.getIpCount(), ".getIpCount()");
+        assertEquals(BigInteger.valueOf(256), subnet.getIpCount(), ".getIpCount()");
         assertEquals(24, subnet.getNumericMask(), ".getNumericMask()");
         assertEquals(3232235775L, subnet.getLastIpNumeric(), ".getLastIpNumeric()");
         assertEquals(3232235520L, subnet.getFirstIpNumeric(), ".getFirstIpNumeric()");
@@ -37,7 +37,7 @@ class SubnetTest {
         Subnet subnet = Subnet.valueOf("0.0.0.0/0");
         assertEquals("0.0.0.0", subnet.getFirstIpString(), ".getFirstIpString()");
         assertEquals("255.255.255.255", subnet.getLastIpString(), ".getLastIpString()");
-        assertEquals(4294967296L, subnet.getIpCount(), ".getIpCount()");
+        assertEquals(BigInteger.valueOf(4294967296L), subnet.getIpCount(), ".getIpCount()");
         assertEquals(0, subnet.getNumericMask(), ".getNumericMask()");
         assertEquals(0L, subnet.getFirstIpNumeric(), ".getFirstIpNumeric()");
         assertEquals(4294967295L, subnet.getLastIpNumeric(), ".getLastIpNumeric()");
@@ -74,24 +74,7 @@ class SubnetTest {
         assertEquals(32767L, subnet.getLastIpNumeric(), ".getLastIpNumeric()");
     }
 
-    @Test
-    public void getIpTest() {
-        Subnet subnet = Subnet.valueOf("192.168.0.2/17");
-        assertEquals(List.of(192,168,0,2), subnet.getIp(), ".getIp()");
-    }
 
-    @Test
-    public void getFirstIpTest() {
-        Subnet subnet = Subnet.valueOf("192.168.0.5/20");
-        assertEquals(List.of(192,168,0,0), subnet.getFirstIp(), ".getFirstIp()");
-    }
-
-    @Test
-    public void getLastIpTest() {
-        Subnet subnet = Subnet.valueOf("192.168.0.5/20");
-        assertEquals(List.of(192, 168, 15, 255), subnet.getLastIp(), ".getLastIp()");
-
-    }
 
 
 }

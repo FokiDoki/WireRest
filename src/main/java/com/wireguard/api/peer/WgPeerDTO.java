@@ -26,7 +26,7 @@ public class WgPeerDTO {
         wgPeerDTO.publicKey = wgPeer.getPublicKey();
         wgPeerDTO.presharedKey = wgPeer.getPresharedKey();
         wgPeerDTO.endpoint = wgPeer.getEndpoint();
-        wgPeerDTO.allowedSubnets = wgPeer.getAllowedSubnets().getAll();
+        wgPeerDTO.allowedSubnets = wgPeer.getAllowedSubnets().getAllStrings();
         wgPeerDTO.latestHandshake = wgPeer.getLatestHandshake();
         wgPeerDTO.transferRx = wgPeer.getTransferRx();
         wgPeerDTO.transferTx = wgPeer.getTransferTx();

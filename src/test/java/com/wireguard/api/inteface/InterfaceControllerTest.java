@@ -2,7 +2,6 @@ package com.wireguard.api.inteface;
 
 import com.wireguard.external.wireguard.iface.WgInterface;
 import com.wireguard.external.wireguard.iface.WgInterfaceService;
-import com.wireguard.external.wireguard.peer.WgPeerService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;

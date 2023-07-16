@@ -1,6 +1,5 @@
 package com.wireguard.external.wireguard;
 
-import com.wireguard.external.network.Subnet;
 import lombok.EqualsAndHashCode;
 
 import java.util.Set;

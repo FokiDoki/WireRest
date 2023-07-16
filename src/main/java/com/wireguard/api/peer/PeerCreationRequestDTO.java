@@ -7,7 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -26,10 +25,4 @@ public class PeerCreationRequestDTO {
     @Max(65535)
     private final Integer persistentKeepalive;
 
-    public Set<String> getAllowedIps() {
-        if (allowedIps == null) {
-            return new HashSet<>();
-        }
-        return allowedIps;
-    }
 }

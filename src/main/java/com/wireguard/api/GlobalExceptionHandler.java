@@ -2,6 +2,7 @@ package com.wireguard.api;
 
 
 import com.wireguard.external.network.AlreadyUsedException;
+import com.wireguard.external.shell.CommandExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -51,5 +52,13 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(
                 new AppError(HttpStatus.BAD_REQUEST.value(),
                         e.getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<AppError> commandExecutionException(CommandExecutionException e) {
+        logger.error(e.getMessage(), e);
+        return new ResponseEntity<>(
+                new AppError(HttpStatus.BAD_REQUEST.value(),
+                        "Wireguard error: %s".formatted(e.getStderr().strip())), HttpStatus.BAD_REQUEST);
     }
 }

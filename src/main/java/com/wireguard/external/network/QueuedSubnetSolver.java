@@ -8,14 +8,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-public class QueuedSubnetSolver implements ISubnetSolver{
+public class QueuedSubnetSolver implements IV4SubnetSolver {
 
-    private final ISubnetSolver subnetSolver;
+    private final IV4SubnetSolver subnetSolver;
 
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
-    public QueuedSubnetSolver(ISubnetSolver subnetSolver){
+    public QueuedSubnetSolver(IV4SubnetSolver subnetSolver){
         this.subnetSolver = subnetSolver;
     }
 
