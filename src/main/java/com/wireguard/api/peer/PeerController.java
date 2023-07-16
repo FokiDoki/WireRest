@@ -5,7 +5,6 @@ import com.wireguard.api.BadRequestException;
 import com.wireguard.api.ResourceNotFoundException;
 import com.wireguard.api.dto.PageDTO;
 import com.wireguard.external.network.ISubnet;
-import com.wireguard.external.network.Subnet;
 import com.wireguard.external.shell.CommandExecutionException;
 import com.wireguard.external.wireguard.ParsingException;
 import com.wireguard.external.wireguard.PeerCreationRequest;
@@ -63,7 +62,7 @@ public class PeerController {
     @Parameter(name = "page", description = "Page number")
     @Parameter(name = "limit", description = "Page size (In case of 0, all peers will be returned)")
     @Parameter(name = "sort", description = "Sort key and direction separated by a dot. The keys are the same as in the answer. " +
-            "Direction is optional and may have value DESC (High to low) and ASC (Low to high). Using with a large number of peers (3000 or more) affects performance. ", example = "allowedSubnets.desc")
+            "Direction is optional and may have value DESC (High to low) and ASC (Low to high). Using with a large number of the peers (3000 or more) affects performance. ", example = "allowedSubnets.desc")
     public PageDTO<WgPeerDTO> getPeers(
             @RequestParam(value = "page", required = false, defaultValue = "0") int page,
             @RequestParam(value = "limit", required = false, defaultValue = "1000") int limit,
@@ -85,12 +84,12 @@ public class PeerController {
 
     @Operation(summary = "Update peer by public key", description = "Update peer by public key. " +
             "Do not provide fields that you do not want to change.")
-    @Parameter(name = "currentPublicKey", description = "Public key of peer", required = true)
-    @Parameter(name = "newPublicKey", description = "New public key of peer. Warning: If you change the public key, latest handshake and transfer data will be lost. "
+    @Parameter(name = "publicKey", description = "Current public key of the peer", required = true)
+    @Parameter(name = "newPublicKey", description = "New public key of the peer. Warning: If you change the public key, latest handshake and transfer data will be lost. "
             , allowEmptyValue = true)
     @Parameter(name = "presharedKey", description = "Preshared key or empty if no psk required (Empty if not provided)",
             allowEmptyValue = true)
-    @Parameter(name = "allowedIps", description = "New ips of peer (Exists will be replaced)  Example: 10.0.0.11/32",
+    @Parameter(name = "allowedIps", description = "New ips of the peer (Exists will be replaced)  Example: 10.0.0.11/32",
             array = @ArraySchema(arraySchema = @Schema(implementation = String.class), uniqueItems=true), allowEmptyValue = true)
     @Parameter(name = "persistentKeepalive", description = "New persistent keepalive interval in seconds (0 if not provided)", schema = @Schema(implementation = Integer.class, defaultValue = "0", example = "0", minimum = "0", maximum = "65535"))
     @Parameter(name = "peerUpdateRequestDTO", hidden = true)
@@ -113,7 +112,7 @@ public class PeerController {
             allowedIps = Optional.of(IpUtils.stringToSubnetSet(peerUpdateRequestDTO.getAllowedIps()));
         }
         PeerUpdateRequest peerUpdateRequest = new PeerUpdateRequest(
-                peerUpdateRequestDTO.getCurrentPublicKey(),
+                peerUpdateRequestDTO.getPublicKey(),
                 peerUpdateRequestDTO.getNewPublicKey(),
                 peerUpdateRequestDTO.getPresharedKey(),
                 allowedIps.orElse(null),

@@ -8,7 +8,7 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 public class PeerUpdateRequestDTO {
-    private final String currentPublicKey;
+    private final String publicKey;
     private final String newPublicKey;
     private final String presharedKey;
     private final Set<String> allowedIps;
