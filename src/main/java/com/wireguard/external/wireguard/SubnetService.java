@@ -25,7 +25,7 @@ import java.util.stream.Stream;
 @Component
 public class SubnetService {
 
-    private static final Logger logger = LoggerFactory.getLogger(WgPeerService.class);
+    private static final Logger logger = LoggerFactory.getLogger(SubnetService.class);
     PeerCreationRules peerCreationRules;
     IV4SubnetSolver v4SubnetSolver;
 
@@ -42,6 +42,7 @@ public class SubnetService {
                 subnets.add(v4SubnetSolver.obtainFree(mask));
             }
         });
+        logger.debug("Generated subnets: {}", subnets);
         return Collections.unmodifiableSet(subnets);
     }
 
@@ -57,6 +58,7 @@ public class SubnetService {
         try{
             consumer.accept(subnets);
         } catch (Exception e){
+            logger.debug("Exception occurred during obtaining subnets, releasing subnets: {}", subnets);
             release(subnets);
             throw e;
         }
@@ -64,6 +66,7 @@ public class SubnetService {
 
     public void release(Set<? extends ISubnet> subnets) {
         subnets.forEach((subnet) -> {
+            logger.debug("Releasing subnet: {}", subnet);
             if (subnet instanceof Subnet) {
                 v4SubnetSolver.release((Subnet) subnet);
             } else if (subnet instanceof SubnetV6) {
@@ -75,6 +78,7 @@ public class SubnetService {
     public void obtain(Set<? extends ISubnet> subnets) {
         Set<ISubnet> obtainedSubnets = new HashSet<>();
         releaseIfException(obtainedSubnets, (s) -> {
+            logger.debug("Obtaining subnets: {}", subnets);
             subnets.forEach((subnet) -> {
                 if (subnet instanceof Subnet){
                     v4SubnetSolver.obtain((Subnet) subnet);
@@ -93,6 +97,7 @@ public class SubnetService {
         Set<ISubnet> subnetsToObtain = new HashSet<>(newState);
         subnetsToObtain.removeAll(oldState);
         obtain(subnetsToObtain);
+        logger.debug("Applied subnet state, old state: {}, new state: {}", oldState, newState);
     }
 
 
