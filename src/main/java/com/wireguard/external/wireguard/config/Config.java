@@ -29,7 +29,7 @@ public class Config {
 
 
     @Bean
-    public ISubnetSolver ipResolver(NetworkInterfaceDTO wgInterface) {
+    public IV4SubnetSolver ipResolver(NetworkInterfaceData wgInterface) {
 
         logger.info("Configuring SubnetSolver...");
         Subnet interfaceSubnet = wgInterface.getCidrV4Address().stream().findFirst().orElseThrow(
@@ -71,7 +71,7 @@ public class Config {
 
     @Profile("prod")
     @Bean
-    public NetworkInterfaceDTO wgInterface(
+    public NetworkInterfaceData wgInterface(
             @Value("${wg.interface.name}") String interfaceName
     ) throws SocketException {
         NetworkInterface networkInterface = NetworkInterface.getByName(interfaceName);
@@ -79,32 +79,32 @@ public class Config {
             logger.error("Network interface {} not found", interfaceName);
             throw new RuntimeException("Network interface not found");
         }
-        NetworkInterfaceDTO networkInterfaceDTO = new NetworkInterfaceDTO(interfaceName);
+        NetworkInterfaceData networkInterfaceData = new NetworkInterfaceData(interfaceName);
         networkInterface.getInterfaceAddresses().stream()
                         .filter(interfaceAddress -> interfaceAddress.getAddress() instanceof Inet4Address)
-                        .findFirst().ifPresentOrElse( networkInterfaceDTO::addInterfaceAddress,
+                        .findFirst().ifPresentOrElse( networkInterfaceData::addInterfaceAddress,
                             () -> {
                                 logger.error("Network interface {} has no IPv4 address", interfaceName);
                                 throw new RuntimeException("Network interface %s has no IPv4 address".formatted(interfaceName));
                             });
         networkInterface.getInetAddresses().asIterator().forEachRemaining(
                 inetAddress -> {
-                    if (inetAddress instanceof Inet4Address) networkInterfaceDTO.addAddress((Inet4Address) inetAddress);
+                    if (inetAddress instanceof Inet4Address) networkInterfaceData.addAddress((Inet4Address) inetAddress);
                 });
-        return networkInterfaceDTO;
+        return networkInterfaceData;
     }
 
     @Profile("test")
     @Bean
-    public NetworkInterfaceDTO wgInterfaceTest(
+    public NetworkInterfaceData wgInterfaceTest(
             @Value("${wg.interface.name}") String interfaceName,
             @Value("${wg.test.interface.cidr}") String cidr,
             @Value("${wg.test.interface.interfaceIp}") String interfaceIp
     ) throws UnknownHostException {
-        NetworkInterfaceDTO networkInterfaceDTO = new NetworkInterfaceDTO(interfaceName);
+        NetworkInterfaceData networkInterfaceData = new NetworkInterfaceData(interfaceName);
         Subnet subnet = Subnet.valueOf(cidr);
-        networkInterfaceDTO.addInterfaceAddress(subnet);
-        networkInterfaceDTO.addAddress((Inet4Address) Inet4Address.getByName(interfaceIp));
-        return networkInterfaceDTO;
+        networkInterfaceData.addInterfaceAddress(subnet);
+        networkInterfaceData.addAddress((Inet4Address) Inet4Address.getByName(interfaceIp));
+        return networkInterfaceData;
     }
 }

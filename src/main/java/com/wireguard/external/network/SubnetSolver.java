@@ -13,7 +13,7 @@ import java.util.Collections;
 import java.util.List;
 
 
-public class SubnetSolver implements ISubnetSolver {
+public class SubnetSolver implements IV4SubnetSolver {
 
     private static final Logger logger = LoggerFactory.getLogger(SubnetSolver.class);
 

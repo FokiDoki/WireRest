@@ -1,7 +1,7 @@
 package com.wireguard.external.wireguard.peer;
 
 
-import com.wireguard.external.network.NetworkInterfaceDTO;
+import com.wireguard.external.network.NetworkInterfaceData;
 import com.wireguard.external.wireguard.Paging;
 import com.wireguard.external.wireguard.RepositoryPageable;
 import com.wireguard.external.wireguard.Specification;
@@ -20,11 +20,11 @@ import java.util.stream.Collectors;
 public class WgPeerRepository implements RepositoryPageable<WgPeer> {
 
     private final WgTool wgTool;
-    private final NetworkInterfaceDTO wgInterface;
+    private final NetworkInterfaceData wgInterface;
     private final Paging<WgPeer> paging = new Paging<>(WgPeer.class);
 
     @Autowired
-    public WgPeerRepository(WgTool wgTool, NetworkInterfaceDTO wgInterface) {
+    public WgPeerRepository(WgTool wgTool, NetworkInterfaceData wgInterface) {
         this.wgTool = wgTool;
         this.wgInterface = wgInterface;
     }

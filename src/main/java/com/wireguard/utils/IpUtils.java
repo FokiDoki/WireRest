@@ -39,11 +39,15 @@ public class IpUtils {
         ipsStrings.forEach(allowedIp -> {
             if (IpUtils.isIpV4Cidr(allowedIp)){
                 ipsMap.get(IpType.IPV4).add(Subnet.valueOf(allowedIp));
-            } else if (IpUtils.isIpV6Cidr(allowedIp)){
-                ipsMap.get(IpType.IPV6).add(SubnetV6.valueOf(allowedIp));
             } else {
-                throw new IllegalArgumentException("WgPeerParser.parseAllowedIps: invalid IP address %s".formatted(allowedIp));
+                try{
+                    ipsMap.get(IpType.IPV6).add(SubnetV6.valueOf(allowedIp));
+                } catch (IllegalArgumentException e){
+                    throw new IllegalArgumentException("WgPeerParser.parseAllowedIps: Invalid IP address %s. %s".formatted(
+                            allowedIp, e.getMessage()));
+                }
             }
+
         });
         return ipsMap;
     }

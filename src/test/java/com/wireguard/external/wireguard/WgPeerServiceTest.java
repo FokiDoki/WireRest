@@ -21,16 +21,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class WgPeerServiceTest {
     private WgPeerService wgPeerService;
 
-    WgPeerGenerator wgPeerGenerator;
-    WgPeerRepository wgPeerRepository;
-    SubnetSolver subnetSolver;
+    WgPeerRepository wgPeerRepository = Mockito.mock(WgPeerRepository.class);
+    WgPeerGenerator wgPeerGenerator = Mockito.mock(WgPeerGenerator.class);
+    SubnetService subnetService = Mockito.mock(SubnetService.class);
 
     @BeforeEach
     public void setup() {
-        wgPeerRepository = Mockito.mock(WgPeerRepository.class);
-        wgPeerGenerator = Mockito.mock(WgPeerGenerator.class);
-        subnetSolver = Mockito.mock(SubnetSolver.class);
-        wgPeerService = new WgPeerService(wgPeerGenerator, wgPeerRepository, subnetSolver,new PeerCreationRules(32));
+        wgPeerService = new WgPeerService(wgPeerGenerator, wgPeerRepository, subnetService);
     }
 
     @Test
@@ -93,6 +90,7 @@ class WgPeerServiceTest {
         CreatedPeer createdPeer = wgPeerService.createPeerGenerateNulls(peerCreationRequest);
         Assertions.assertNotNull(createdPeer);
         Assertions.assertEquals(shouldBeReturned, createdPeer);
+        Mockito.verify(subnetService, Mockito.times(1)).generateV4(Mockito.anyInt());
         Mockito.verify(wgPeerGenerator, Mockito.times(1)).createPeerGenerateNulls(
                 new PeerCreationRequest(shouldBeReturned.getPublicKey(), shouldBeReturned.getPresharedKey(), shouldBeReturned.getPrivateKey(),
                 Mockito.any(), shouldBeReturned.getPersistentKeepalive(), 1));
@@ -106,6 +104,7 @@ class WgPeerServiceTest {
         wgPeerService.createPeer();
         Mockito.verify(wgPeerGenerator, Mockito.times(1)).createPeerGenerateNulls(
                 new EmptyPeerCreationRequest());
+        Mockito.verify(subnetService, Mockito.times(1)).generateV4(Mockito.anyInt());
         Mockito.verify(wgPeerRepository, Mockito.times(1)).add(Mockito.any(WgPeer.class));
     }
 
@@ -113,5 +112,6 @@ class WgPeerServiceTest {
     public void deletePeer(){
         wgPeerService.deletePeer("publicKey");
         Mockito.verify(wgPeerRepository, Mockito.times(1)).remove(Mockito.any());
+        Mockito.verify(subnetService, Mockito.times(1)).release(Mockito.any());
     }
 }

@@ -85,6 +85,10 @@ public class WgPeer implements Comparable<WgPeer> {
 
         @Override
         public int compareTo(AllowedSubnets o) {
+            if (IPv4Subnets.isEmpty() && o.IPv4Subnets.isEmpty()){
+                return IPv6Subnets.stream().findFirst().orElse(SubnetV6.valueOf("::/128"))
+                        .compareTo(o.IPv6Subnets.stream().findFirst().orElse(SubnetV6.valueOf("::/128")));
+            }
             return IPv4Subnets.stream().findFirst().orElse(Subnet.valueOf("0.0.0.0/32"))
                     .compareTo(o.IPv4Subnets.stream().findFirst().orElse(Subnet.valueOf("0.0.0.0/32")));
         }

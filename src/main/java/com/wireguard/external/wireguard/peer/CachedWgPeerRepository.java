@@ -2,8 +2,8 @@ package com.wireguard.external.wireguard.peer;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
-import com.wireguard.external.network.ISubnetSolver;
-import com.wireguard.external.network.NetworkInterfaceDTO;
+import com.wireguard.external.network.IV4SubnetSolver;
+import com.wireguard.external.network.NetworkInterfaceData;
 import com.wireguard.external.wireguard.RepositoryPageable;
 import com.wireguard.external.wireguard.WgTool;
 import com.wireguard.external.wireguard.peer.spec.FindByPublicKey;
@@ -26,7 +26,7 @@ public class CachedWgPeerRepository extends WgPeerRepository implements Reposito
     private final int UPDATE_INTERVAL_SECONDS;
 
     @Autowired
-    public CachedWgPeerRepository(WgTool wgTool, NetworkInterfaceDTO wgInterface, ISubnetSolver subnetSolver,
+    public CachedWgPeerRepository(WgTool wgTool, NetworkInterfaceData wgInterface, IV4SubnetSolver subnetSolver,
                                   @Value("${wg.cache.update-interval}") int cacheUpdateIntervalSeconds) {
         super(wgTool, wgInterface);
         UPDATE_INTERVAL_SECONDS = cacheUpdateIntervalSeconds;
@@ -57,7 +57,7 @@ public class CachedWgPeerRepository extends WgPeerRepository implements Reposito
         super.update(oldT, newT);
     }
 
-    private void updateCache(ISubnetSolver subnetSolver) {
+    private void updateCache(IV4SubnetSolver subnetSolver) {
         wgPeerCache.invalidateAll();
         for (WgPeer wgPeer : super.getAll()) {
             wgPeerCache.put(wgPeer.getPublicKey(), wgPeer);

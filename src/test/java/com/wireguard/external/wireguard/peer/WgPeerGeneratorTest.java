@@ -1,6 +1,6 @@
 package com.wireguard.external.wireguard.peer;
 
-import com.wireguard.external.network.ISubnetSolver;
+import com.wireguard.external.network.IV4SubnetSolver;
 import com.wireguard.external.network.Subnet;
 import com.wireguard.external.wireguard.EmptyPeerCreationRequest;
 import com.wireguard.external.wireguard.PeerCreationRequest;
@@ -14,13 +14,13 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class WgPeerGeneratorTest {
-    ISubnetSolver subnetSolver;
+    IV4SubnetSolver subnetSolver;
     WgTool wgTool;
     WgPeerGenerator wgPeerGenerator;
 
     @BeforeEach
     public void setup() {
-        subnetSolver = Mockito.mock(ISubnetSolver.class);
+        subnetSolver = Mockito.mock(IV4SubnetSolver.class);
         Mockito.when(subnetSolver.obtainFree(Mockito.anyInt())).thenReturn(Subnet.valueOf("0.0.0.0/32"));
 
         wgTool = Mockito.mock(WgTool.class);
