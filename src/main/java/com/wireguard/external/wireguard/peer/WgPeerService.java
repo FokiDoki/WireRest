@@ -23,7 +23,7 @@ import java.util.*;
 @Service
 public class WgPeerService {
 
-    private static final Logger logger = LoggerFactory.getLogger(ShellRunner.class);
+    private static final Logger logger = LoggerFactory.getLogger(WgPeerService.class);
     WgPeerGenerator peerGenerator;
     RepositoryPageable<WgPeer> wgPeerRepository;
     SubnetService subnetService;
@@ -78,11 +78,15 @@ public class WgPeerService {
     }
 
 
+    private boolean isUpdateRequestHasNewPublicKey(PeerUpdateRequest updateRequest) {
+        return updateRequest.getNewPublicKey() != null &&
+                updateRequest.getNewPublicKey().equals(updateRequest.getCurrentPublicKey());
+    }
 
 
     public WgPeer updatePeer(PeerUpdateRequest updateRequest) {
         WgPeer oldPeer = getPeerByPublicKeyOrThrow(updateRequest.getCurrentPublicKey());
-        throwIfPeerExists(updateRequest.getNewPublicKey());
+        if (isUpdateRequestHasNewPublicKey(updateRequest)) throwIfPeerExists(updateRequest.getNewPublicKey());
         WgPeer.Builder newPeerBuilder = WgPeer.from(oldPeer);
         newPeerBuilder.publicKey(
                 updateRequest.getNewPublicKey() != null ? updateRequest.getNewPublicKey() : oldPeer.getPublicKey());
@@ -110,7 +114,6 @@ public class WgPeerService {
     public <T> T defaultIfNull(T value, T defaultValue) {
         return value != null ? value : defaultValue;
     }
-
 
 
     public CreatedPeer createPeer() {

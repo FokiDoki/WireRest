@@ -99,8 +99,6 @@ public class PeerController {
         PeerUpdateRequestDTO peerUpdateRequestDTO
     ){
         try {
-            System.out.println(peerUpdateRequestDTO);
-            System.out.println(peerUpdateRequestDTOToPeerUpdateRequest(peerUpdateRequestDTO));
             WgPeer wgPeer = wgPeerService.updatePeer(
                     peerUpdateRequestDTOToPeerUpdateRequest(peerUpdateRequestDTO));
             return WgPeerDTO.from(wgPeer);
@@ -110,17 +108,15 @@ public class PeerController {
     }
 
     private PeerUpdateRequest peerUpdateRequestDTOToPeerUpdateRequest(PeerUpdateRequestDTO peerUpdateRequestDTO){
-        Set<ISubnet> allowedIps = new HashSet<>();
+        Optional<Set<ISubnet>> allowedIps = Optional.empty();
         if (peerUpdateRequestDTO.getAllowedIps()!=null){
-            Map<IpUtils.IpType, Set<ISubnet>> allowedIpsSorted = IpUtils.splitIpv4AndIpv6(peerUpdateRequestDTO.getAllowedIps());
-            allowedIps.addAll(allowedIpsSorted.get(IpUtils.IpType.IPV4));
-            allowedIps.addAll(allowedIpsSorted.get(IpUtils.IpType.IPV6));
+            allowedIps = Optional.of(IpUtils.stringToSubnetSet(peerUpdateRequestDTO.getAllowedIps()));
         }
         PeerUpdateRequest peerUpdateRequest = new PeerUpdateRequest(
                 peerUpdateRequestDTO.getCurrentPublicKey(),
                 peerUpdateRequestDTO.getNewPublicKey(),
                 peerUpdateRequestDTO.getPresharedKey(),
-                allowedIps,
+                allowedIps.orElse(null),
                 peerUpdateRequestDTO.getEndpoint(),
                 peerUpdateRequestDTO.getPersistentKeepalive()
         );
