@@ -1,42 +1,35 @@
 package com.wireguard.external.wireguard;
 
-import com.wireguard.api.inteface.WgInterfaceDTO;
-import com.wireguard.api.peer.WgPeerDTO;
-import com.wireguard.external.network.NetworkInterfaceDTO;
 import com.wireguard.external.network.Subnet;
 import com.wireguard.external.network.SubnetSolver;
 import com.wireguard.external.wireguard.peer.*;
 import com.wireguard.external.wireguard.peer.spec.FindByPublicKey;
-import com.wireguard.parser.WgShowDump;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class WgPeerServiceTest {
     private WgPeerService wgPeerService;
 
-    WgPeerCreator wgPeerCreator;
+    WgPeerGenerator wgPeerGenerator;
     WgPeerRepository wgPeerRepository;
+    SubnetSolver subnetSolver;
 
     @BeforeEach
     public void setup() {
         wgPeerRepository = Mockito.mock(WgPeerRepository.class);
-        wgPeerCreator = Mockito.mock(WgPeerCreator.class);
-        wgPeerService = new WgPeerService(wgPeerCreator, wgPeerRepository);
+        wgPeerGenerator = Mockito.mock(WgPeerGenerator.class);
+        subnetSolver = Mockito.mock(SubnetSolver.class);
+        wgPeerService = new WgPeerService(wgPeerGenerator, wgPeerRepository, subnetSolver,new PeerCreationRules(32));
     }
 
     @Test
@@ -91,25 +84,26 @@ class WgPeerServiceTest {
     @Test
     public void testCreatePeerGenerateNulls() {
         CreatedPeer shouldBeReturned = new CreatedPeer("publicKey", "Psk", "Ppk", Set.of(Subnet.valueOf("10.66.66.1/32")), 0);
-        Mockito.when(wgPeerCreator.createPeerGenerateNulls(
-                new PeerCreationRequest("publicKey", "Psk", "Ppk",
-                        null, 0, 1)))
+        PeerCreationRequest peerCreationRequest = new PeerCreationRequest("publicKey", "Psk", "Ppk",
+                Mockito.any(), 0, 1);
+        Mockito.when(wgPeerGenerator.createPeerGenerateNulls(
+                        peerCreationRequest))
                 .thenReturn(shouldBeReturned);
-        CreatedPeer createdPeer = wgPeerService.createPeerGenerateNulls(new PeerCreationRequest("publicKey", "Psk", "Ppk", null, 0, 1));
+        CreatedPeer createdPeer = wgPeerService.createPeerGenerateNulls(peerCreationRequest);
         Assertions.assertNotNull(createdPeer);
         Assertions.assertEquals(shouldBeReturned, createdPeer);
-        Mockito.verify(wgPeerCreator, Mockito.times(1)).createPeerGenerateNulls(
+        Mockito.verify(wgPeerGenerator, Mockito.times(1)).createPeerGenerateNulls(
                 new PeerCreationRequest(shouldBeReturned.getPublicKey(), shouldBeReturned.getPresharedKey(), shouldBeReturned.getPrivateKey(),
-                null, shouldBeReturned.getPersistentKeepalive(), 1));
+                Mockito.any(), shouldBeReturned.getPersistentKeepalive(), 1));
         Mockito.verify(wgPeerRepository, Mockito.times(1)).add(Mockito.any(WgPeer.class));
     }
 
     @Test
     public void testCreatePeer() {
-        Mockito.when(wgPeerCreator.createPeerGenerateNulls(new EmptyPeerCreationRequest()))
+        Mockito.when(wgPeerGenerator.createPeerGenerateNulls(new EmptyPeerCreationRequest()))
                 .thenReturn(new CreatedPeer("publicKey", "Psk", "Ppk", Set.of(Subnet.valueOf("0.0.0.0/32")), 0));
         wgPeerService.createPeer();
-        Mockito.verify(wgPeerCreator, Mockito.times(1)).createPeerGenerateNulls(
+        Mockito.verify(wgPeerGenerator, Mockito.times(1)).createPeerGenerateNulls(
                 new EmptyPeerCreationRequest());
         Mockito.verify(wgPeerRepository, Mockito.times(1)).add(Mockito.any(WgPeer.class));
     }

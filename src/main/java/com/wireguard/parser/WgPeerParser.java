@@ -1,13 +1,11 @@
 package com.wireguard.parser;
 
-import com.wireguard.external.network.Subnet;
+import com.wireguard.external.network.ISubnet;
 import com.wireguard.external.wireguard.peer.WgPeer;
 import com.wireguard.utils.IpUtils;
 import org.springframework.util.Assert;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -27,13 +25,12 @@ public class WgPeerParser {
         WgShowPeerDump = WgShowPeerDump.stream()
                 .map(s -> s.equals("(none)") ? null : s).collect(Collectors.toList());
 
-        Map<IpUtils.IpType, Set<String>> allowedIps = IpUtils.splitIpv4AndIpv6(splitToStringSet(WgShowPeerDump.get(3), ","));
+        Set<ISubnet> allowedIps = IpUtils.stringToSubnetSet(splitToStringSet(WgShowPeerDump.get(3), ","));
         return WgPeer.
                 publicKey( WgShowPeerDump.get(0))
                 .presharedKey(WgShowPeerDump.get(1))
                 .endpoint(WgShowPeerDump.get(2))
-                .allowedIPv4Subnets(allowedIps.get(IpUtils.IpType.IPV4).stream().map(Subnet::valueOf).collect(Collectors.toSet()))
-                .allowedIPv6Subnets(allowedIps.get(IpUtils.IpType.IPV6))
+                .allowedIps(allowedIps)
                 .latestHandshake(Long.parseLong(WgShowPeerDump.get(4)))
                 .transferRx(Long.parseLong(WgShowPeerDump.get(5)))
                 .transferTx(Long.parseLong(WgShowPeerDump.get(6)))

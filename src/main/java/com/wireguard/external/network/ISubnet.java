@@ -1,21 +1,16 @@
 package com.wireguard.external.network;
 
-import java.util.List;
+import java.math.BigInteger;
 
-public interface ISubnet extends Comparable<ISubnet> {
+public interface ISubnet {
 
 
-    long getIpCount();
+    BigInteger getIpCount();
     byte[] getFirstIpBytes();
     byte[] getLastIpBytes();
-    long getLastIpNumeric();
-    long getFirstIpNumeric();
-    List<Integer> getIp();
     String getIpString();
     String getFirstIpString();
     String getLastIpString();
-    List<Integer> getFirstIp();
-    List<Integer> getLastIp();
 
 
 }

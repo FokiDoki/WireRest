@@ -2,7 +2,6 @@ package com.wireguard.api.inteface;
 
 import com.wireguard.api.AppError;
 import com.wireguard.external.wireguard.ParsingException;
-import com.wireguard.external.wireguard.iface.WgInterface;
 import com.wireguard.external.wireguard.iface.WgInterfaceService;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;

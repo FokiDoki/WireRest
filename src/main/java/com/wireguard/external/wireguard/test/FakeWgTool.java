@@ -1,15 +1,18 @@
 package com.wireguard.external.wireguard.test;
 
 import com.wireguard.external.network.Subnet;
-import com.wireguard.parser.WgShowDump;
 import com.wireguard.external.wireguard.WgTool;
 import com.wireguard.external.wireguard.iface.WgInterface;
 import com.wireguard.external.wireguard.peer.WgPeer;
+import com.wireguard.parser.WgShowDump;
 import lombok.SneakyThrows;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Profile("test")
 @Component

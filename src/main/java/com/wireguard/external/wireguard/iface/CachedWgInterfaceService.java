@@ -1,6 +1,5 @@
 package com.wireguard.external.wireguard.iface;
 
-import com.github.benmanes.caffeine.cache.AsyncLoadingCache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.wireguard.external.network.NetworkInterfaceDTO;

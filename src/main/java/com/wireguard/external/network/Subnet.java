@@ -4,11 +4,12 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.springframework.util.Assert;
 
+import java.math.BigInteger;
 import java.net.InetAddress;
 import java.util.List;
 
 @EqualsAndHashCode
-public class Subnet implements ISubnet {
+public class Subnet implements ISubnet, Comparable<Subnet> {
     private final byte[] ip;
     private final byte[] mask;
     @Getter private final int numericMask;
@@ -32,8 +33,8 @@ public class Subnet implements ISubnet {
     }
 
     @Override
-    public long getIpCount(){
-        return (long) Math.pow(2, 32 - numericMask);
+    public BigInteger getIpCount(){
+        return  BigInteger.valueOf((long) Math.pow(2, 32 - numericMask));
     }
 
     @Override
@@ -60,12 +61,10 @@ public class Subnet implements ISubnet {
     }
 
 
-    @Override
     public long getLastIpNumeric(){
         return byteToNumericIp(getLastIpBytes());
     }
 
-    @Override
     public long getFirstIpNumeric(){
         return byteToNumericIp(getFirstIpBytes());
     }
@@ -77,11 +76,6 @@ public class Subnet implements ISubnet {
                 byteToUnsignedInt(ip[2]),
                 byteToUnsignedInt(ip[3])
         );
-    }
-
-    @Override
-    public List<Integer> getIp(){
-        return byteIpToIntList(ip);
     }
 
     private String bytesIpToString(byte[] ip){
@@ -108,15 +102,6 @@ public class Subnet implements ISubnet {
         return bytesIpToString(getLastIpBytes());
     }
 
-    @Override
-    public List<Integer> getFirstIp(){
-        return byteIpToIntList(getFirstIpBytes());
-    }
-
-    @Override
-    public List<Integer> getLastIp(){
-        return byteIpToIntList(getLastIpBytes());
-    }
 
     private long byteToNumericIp(byte[] ip){
         long count = 0;
@@ -168,7 +153,7 @@ public class Subnet implements ISubnet {
 
 
     @Override
-    public int compareTo(ISubnet o) {
+    public int compareTo(Subnet o) {
         return Long.compare(getFirstIpNumeric(), o.getFirstIpNumeric());
     }
 }
