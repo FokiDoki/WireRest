@@ -3,8 +3,6 @@ package com.wireguard.external.wireguard;
 import com.wireguard.external.network.Subnet;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -74,24 +72,7 @@ class SubnetTest {
         assertEquals(32767L, subnet.getLastIpNumeric(), ".getLastIpNumeric()");
     }
 
-    @Test
-    public void getIpTest() {
-        Subnet subnet = Subnet.valueOf("192.168.0.2/17");
-        assertEquals(List.of(192,168,0,2), subnet.getIp(), ".getIp()");
-    }
 
-    @Test
-    public void getFirstIpTest() {
-        Subnet subnet = Subnet.valueOf("192.168.0.5/20");
-        assertEquals(List.of(192,168,0,0), subnet.getFirstIp(), ".getFirstIp()");
-    }
-
-    @Test
-    public void getLastIpTest() {
-        Subnet subnet = Subnet.valueOf("192.168.0.5/20");
-        assertEquals(List.of(192, 168, 15, 255), subnet.getLastIp(), ".getLastIp()");
-
-    }
 
 
 }

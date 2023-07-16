@@ -1,6 +1,5 @@
 package com.wireguard.parser;
 
-import com.wireguard.utils.IpUtils;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

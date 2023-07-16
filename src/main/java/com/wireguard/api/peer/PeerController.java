@@ -4,6 +4,7 @@ import com.wireguard.api.AppError;
 import com.wireguard.api.BadRequestException;
 import com.wireguard.api.ResourceNotFoundException;
 import com.wireguard.api.dto.PageDTO;
+import com.wireguard.external.network.ISubnet;
 import com.wireguard.external.network.Subnet;
 import com.wireguard.external.shell.CommandExecutionException;
 import com.wireguard.external.wireguard.ParsingException;
@@ -20,7 +21,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,7 +29,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.Inet4Address;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -87,7 +86,8 @@ public class PeerController {
     @Operation(summary = "Update peer by public key", description = "Update peer by public key. " +
             "Do not provide fields that you do not want to change.")
     @Parameter(name = "currentPublicKey", description = "Public key of peer", required = true)
-    @Parameter(name = "newPublicKey", description = "New public key of peer")
+    @Parameter(name = "newPublicKey", description = "New public key of peer. Warning: If you change the public key, latest handshake and transfer data will be lost. "
+            , allowEmptyValue = true)
     @Parameter(name = "presharedKey", description = "Preshared key or empty if no psk required (Empty if not provided)",
             allowEmptyValue = true)
     @Parameter(name = "allowedIps", description = "New ips of peer (Exists will be replaced)  Example: 10.0.0.11/32",
@@ -110,20 +110,17 @@ public class PeerController {
     }
 
     private PeerUpdateRequest peerUpdateRequestDTOToPeerUpdateRequest(PeerUpdateRequestDTO peerUpdateRequestDTO){
-        Set<Subnet> allowedV4Ips = null;
-        Set<String> allowedV6Ips = null;
+        Set<ISubnet> allowedIps = new HashSet<>();
         if (peerUpdateRequestDTO.getAllowedIps()!=null){
-            Map<IpUtils.IpType, Set<String>> allowedIps = IpUtils.splitIpv4AndIpv6(peerUpdateRequestDTO.getAllowedIps());
-            allowedV4Ips = allowedIps.get(IpUtils.IpType.IPV4).stream().map(Subnet::valueOf).collect(Collectors.toSet());
-            allowedV6Ips = allowedIps.get(IpUtils.IpType.IPV6);
+            Map<IpUtils.IpType, Set<ISubnet>> allowedIpsSorted = IpUtils.splitIpv4AndIpv6(peerUpdateRequestDTO.getAllowedIps());
+            allowedIps.addAll(allowedIpsSorted.get(IpUtils.IpType.IPV4));
+            allowedIps.addAll(allowedIpsSorted.get(IpUtils.IpType.IPV6));
         }
-
         PeerUpdateRequest peerUpdateRequest = new PeerUpdateRequest(
                 peerUpdateRequestDTO.getCurrentPublicKey(),
                 peerUpdateRequestDTO.getNewPublicKey(),
                 peerUpdateRequestDTO.getPresharedKey(),
-                allowedV4Ips,
-                allowedV6Ips,
+                allowedIps,
                 peerUpdateRequestDTO.getEndpoint(),
                 peerUpdateRequestDTO.getPersistentKeepalive()
         );
