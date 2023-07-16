@@ -26,8 +26,8 @@ public class FakeWgTool extends WgTool {
         super(1);
         wgInterface = new WgInterface("privkey", "pubkey", 16666, 0);
         List.of(
-                WgPeer.publicKey("pubkey1").build(),
-                WgPeer.publicKey("pubkey2").presharedKey("presharedKey2").build(),
+                WgPeer.publicKey("PubKey1").build(),
+                WgPeer.publicKey("PubKey2").presharedKey("presharedKey2").build(),
                 WgPeer.publicKey("PubKey3").presharedKey("presharedKey3").endpoint("10.0.0.1").build(),
                 WgPeer.publicKey("PubKey4").presharedKey("presharedKey4").allowedIPv4Subnets(Set.of(Subnet.valueOf("10.0.0.2/32"))).build(),
                 WgPeer.publicKey("PubKey5").presharedKey("presharedKey5").allowedIPv4Subnets(Set.of(Subnet.valueOf("10.0.0.3/32"))).build(),
@@ -51,6 +51,7 @@ public class FakeWgTool extends WgTool {
         return "PrivateKey"+keyCounter++;
     }
 
+    @SneakyThrows
     @Override
     synchronized public void addPeer(String interfaceName, WgPeer newPeer) {
         WgPeer.Builder peerBuilder = WgPeer.from(peers.getOrDefault(newPeer.getPublicKey(), newPeer));

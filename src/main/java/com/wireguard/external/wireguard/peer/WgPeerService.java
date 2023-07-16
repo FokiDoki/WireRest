@@ -7,6 +7,7 @@ import com.wireguard.external.shell.ShellRunner;
 import com.wireguard.external.wireguard.*;
 import com.wireguard.external.wireguard.peer.spec.FindByPublicKey;
 import com.wireguard.utils.IpUtils;
+import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 
 @Component
 @Scope("singleton")
@@ -27,6 +30,7 @@ public class WgPeerService {
     WgPeerGenerator peerGenerator;
     RepositoryPageable<WgPeer> wgPeerRepository;
     SubnetService subnetService;
+    BlockingByHashAsyncExecutor<WgPeer> blockingByHashAsyncExecutor = new BlockingByHashAsyncExecutor<>();
 
 
     @Autowired
@@ -84,7 +88,14 @@ public class WgPeerService {
     }
 
 
+    @SneakyThrows
     public WgPeer updatePeer(PeerUpdateRequest updateRequest) {
+        Future<WgPeer> peer = blockingByHashAsyncExecutor.addTask(updateRequest.getCurrentPublicKey(),
+                () -> updatePeerTask(updateRequest));
+        return peer.get();
+    }
+
+    private WgPeer updatePeerTask(PeerUpdateRequest updateRequest){
         WgPeer oldPeer = getPeerByPublicKeyOrThrow(updateRequest.getCurrentPublicKey());
         if (isUpdateRequestHasNewPublicKey(updateRequest)) throwIfPeerExists(updateRequest.getNewPublicKey());
         WgPeer.Builder newPeerBuilder = WgPeer.from(oldPeer);
@@ -95,7 +106,6 @@ public class WgPeerService {
         newPeerBuilder.endpoint(defaultIfNull(updateRequest.getEndpoint(), oldPeer.getEndpoint()));
         newPeerBuilder.persistentKeepalive(defaultIfNull(updateRequest.getPersistentKeepalive(), oldPeer.getPersistentKeepalive()));
         WgPeer newPeer = newPeerBuilder.build();
-        subnetService.applyState(oldPeer.getAllowedSubnets().getAll(), newPeer.getAllowedSubnets().getAll());
         wgPeerRepository.update(oldPeer, newPeer);
         return newPeer;
     }
