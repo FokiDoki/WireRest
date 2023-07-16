@@ -44,6 +44,12 @@ public class WgPeerService {
                 .findFirst();
     }
 
+    public WgPeer getPeerByPublicKeyOrThrow(String publicKey) throws ParsingException {
+        return getPeerByPublicKey(publicKey).orElseThrow(
+                () -> new NoSuchElementException("Peer with public key %s not found".formatted(publicKey))
+        );
+    }
+
     public List<WgPeer> getPeers() {
         return wgPeerRepository.getAll();
     }
@@ -75,9 +81,7 @@ public class WgPeerService {
 
 
     public WgPeer updatePeer(PeerUpdateRequest updateRequest) {
-        WgPeer oldPeer = getPeerByPublicKey(updateRequest.getCurrentPublicKey()).orElseThrow(
-                        () -> new NoSuchElementException("Peer with public key %s not found".formatted(updateRequest.getCurrentPublicKey()))
-                );
+        WgPeer oldPeer = getPeerByPublicKeyOrThrow(updateRequest.getCurrentPublicKey());
         throwIfPeerExists(updateRequest.getNewPublicKey());
         WgPeer.Builder newPeerBuilder = WgPeer.from(oldPeer);
         newPeerBuilder.publicKey(
@@ -114,9 +118,11 @@ public class WgPeerService {
     }
 
     public void deletePeer(String publicKey) {
+        WgPeer peer = getPeerByPublicKeyOrThrow(publicKey);
         wgPeerRepository.remove(
                 WgPeer.publicKey(publicKey).build()
         );
+        subnetService.release(peer.getAllowedSubnets().getAll());
     }
 
 

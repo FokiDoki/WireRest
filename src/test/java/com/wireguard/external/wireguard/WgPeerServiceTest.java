@@ -110,6 +110,8 @@ class WgPeerServiceTest {
 
     @Test
     public void deletePeer(){
+        Mockito.when(wgPeerRepository.getBySpecification(new FindByPublicKey("publicKey")))
+                .thenReturn(List.of(WgPeer.publicKey("publicKey").build()));
         wgPeerService.deletePeer("publicKey");
         Mockito.verify(wgPeerRepository, Mockito.times(1)).remove(Mockito.any());
         Mockito.verify(subnetService, Mockito.times(1)).release(Mockito.any());
