@@ -1,6 +1,7 @@
 package com.wireguard.external.wireguard.test;
 
 import com.wireguard.external.network.Subnet;
+import com.wireguard.external.network.SubnetV6;
 import com.wireguard.external.wireguard.WgTool;
 import com.wireguard.external.wireguard.iface.WgInterface;
 import com.wireguard.external.wireguard.peer.WgPeer;
@@ -34,7 +35,7 @@ public class FakeWgTool extends WgTool {
                         Set.of(Subnet.valueOf("10.0.0.4/32"),Subnet.valueOf("10.0.0.5/32"))).build(),
                 WgPeer.publicKey("PubKey7").presharedKey("presharedKey7").allowedIPv4Subnets(Set.of(Subnet.valueOf("10.0.0.6/32")))
                         .latestHandshake(100000).transferRx(12345).transferTx(54321).build(),
-                WgPeer.publicKey("PubKey8").presharedKey("presharedKey8").allowedIPv4Subnets(Set.of(Subnet.valueOf("10.0.0.7/32")))
+                WgPeer.publicKey("PubKey8").presharedKey("presharedKey8").allowedIps(Set.of(Subnet.valueOf("10.0.0.7/32"), SubnetV6.valueOf("::1/128")))
                         .latestHandshake(200000).transferRx(12345).transferTx(54321).build()
         ).forEach(peer -> peers.put(peer.getPublicKey(), peer));
         keyCounter = peers.size()+1;

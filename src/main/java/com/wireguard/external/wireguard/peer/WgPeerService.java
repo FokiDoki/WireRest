@@ -1,10 +1,12 @@
 package com.wireguard.external.wireguard.peer;
 
+import com.wireguard.external.network.ISubnet;
 import com.wireguard.external.network.ISubnetSolver;
 import com.wireguard.external.network.Subnet;
 import com.wireguard.external.shell.ShellRunner;
 import com.wireguard.external.wireguard.*;
 import com.wireguard.external.wireguard.peer.spec.FindByPublicKey;
+import com.wireguard.utils.IpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,18 +53,19 @@ public class WgPeerService {
     }
 
     public CreatedPeer createPeerGenerateNulls(PeerCreationRequest peerCreationRequest) {
-        HashSet<Subnet> allowedIps = peerCreationRequest.getAllowedIps() == null ? new HashSet<>() : new HashSet<>(peerCreationRequest.getAllowedIps());
-        obtainSubnets(allowedIps);
+        HashSet<ISubnet> allowedIps = new HashSet<>(peerCreationRequest.getAllowedIps());
+        obtainSubnets(IpUtils.filterV4Ips(allowedIps));
         allowedIps.addAll(generateSubnets(peerCreationRequest.getCountOfIpsToGenerate(), peerCreationRules.getDefaultMask()));
         peerCreationRequest.setAllowedIps(allowedIps);
         CreatedPeer createdPeer = peerGenerator.createPeerGenerateNulls(peerCreationRequest);
         wgPeerRepository.add(WgPeer.publicKey(createdPeer.getPublicKey())
                 .presharedKey(createdPeer.getPresharedKey())
-                .allowedIPv4Subnets(createdPeer.getAllowedSubnets())
+                .allowedIps(createdPeer.getAllowedSubnets())
                 .persistentKeepalive(createdPeer.getPersistentKeepalive())
                 .build());
         return createdPeer;
     }
+
 
     private Set<Subnet> generateSubnets(int countOfIpsToGenerate, int mask) {
         Set<Subnet> subnets = new HashSet<>();

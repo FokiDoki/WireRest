@@ -1,5 +1,6 @@
 package com.wireguard.external.wireguard.peer;
 
+import com.wireguard.external.network.ISubnet;
 import com.wireguard.external.network.Subnet;
 import com.wireguard.external.wireguard.PeerCreationRequest;
 import com.wireguard.external.wireguard.WgTool;
@@ -33,7 +34,7 @@ public class WgPeerGenerator {
         String publicKey = peerCreationRequest.getPublicKey() == null ? wgTool.generatePublicKey(privateKey) : peerCreationRequest.getPublicKey();
         String presharedKey = peerCreationRequest.getPresharedKey() == null ? wgTool.generatePresharedKey() : peerCreationRequest.getPresharedKey();
         int persistentKeepalive = peerCreationRequest.getPersistentKeepalive() == null ? DEFAULT_PERSISTENT_KEEPALIVE : peerCreationRequest.getPersistentKeepalive();
-        Set<Subnet> allowedIps = peerCreationRequest.getAllowedIps();
+        Set<ISubnet> allowedIps = peerCreationRequest.getAllowedIps();
         logger.info("Created peer, public key: %s".formatted(publicKey.substring(0, Math.min(6, publicKey.length()))));
         return new CreatedPeer(publicKey, presharedKey, privateKey, allowedIps, persistentKeepalive);
     }

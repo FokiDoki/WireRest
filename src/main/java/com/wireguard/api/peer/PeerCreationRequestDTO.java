@@ -25,10 +25,4 @@ public class PeerCreationRequestDTO {
     @Max(65535)
     private final Integer persistentKeepalive;
 
-    public Set<String> getAllowedIps() {
-        if (allowedIps == null) {
-            return new HashSet<>();
-        }
-        return allowedIps;
-    }
 }

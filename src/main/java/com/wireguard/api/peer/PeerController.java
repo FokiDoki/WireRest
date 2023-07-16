@@ -222,7 +222,10 @@ public class PeerController {
                 peerCreationRequestDTO.getPublicKey(),
                 peerCreationRequestDTO.getPresharedKey(),
                 peerCreationRequestDTO.getPrivateKey(),
-                peerCreationRequestDTO.getAllowedIps().stream().map(Subnet::valueOf).collect(Collectors.toSet()),
+                IpUtils.stringToSubnetSet(
+                        Optional.ofNullable(
+                                peerCreationRequestDTO.getAllowedIps()
+                        ).orElseGet(Set::of)),
                 peerCreationRequestDTO.getPersistentKeepalive(),
                 countOfIpsToGenerate
         );

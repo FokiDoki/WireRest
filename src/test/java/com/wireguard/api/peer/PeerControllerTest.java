@@ -203,8 +203,8 @@ class PeerControllerTest {
                         .build())
                 .exchange()
                 .expectStatus().isCreated()
-                .expectBody(CreatedPeer.class)
-                .isEqualTo(newPeer);
+                .expectBody(CreatedPeerDTO.class)
+                .isEqualTo(CreatedPeerDTO.from(newPeer));
     }
 
     @Test

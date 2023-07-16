@@ -1,5 +1,6 @@
 package com.wireguard.external.wireguard;
 
+import com.wireguard.external.network.ISubnet;
 import com.wireguard.external.network.Subnet;
 import com.wireguard.external.network.SubnetSolver;
 import com.wireguard.external.wireguard.peer.*;
@@ -85,7 +86,7 @@ class WgPeerServiceTest {
     public void testCreatePeerGenerateNulls() {
         CreatedPeer shouldBeReturned = new CreatedPeer("publicKey", "Psk", "Ppk", Set.of(Subnet.valueOf("10.66.66.1/32")), 0);
         PeerCreationRequest peerCreationRequest = new PeerCreationRequest("publicKey", "Psk", "Ppk",
-                Mockito.any(), 0, 1);
+                Set.of(), 0, 1);
         Mockito.when(wgPeerGenerator.createPeerGenerateNulls(
                         peerCreationRequest))
                 .thenReturn(shouldBeReturned);
