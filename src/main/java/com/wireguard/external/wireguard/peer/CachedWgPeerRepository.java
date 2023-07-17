@@ -5,6 +5,7 @@ import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.wireguard.external.network.IV4SubnetSolver;
 import com.wireguard.external.network.NetworkInterfaceData;
 import com.wireguard.external.wireguard.RepositoryPageable;
+import com.wireguard.external.wireguard.Specification;
 import com.wireguard.external.wireguard.WgTool;
 import com.wireguard.external.wireguard.peer.spec.FindByPublicKey;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -55,6 +57,23 @@ public class CachedWgPeerRepository extends WgPeerRepository implements Reposito
             wgPeerCache.invalidate(oldT.getPublicKey());
         wgPeerCache.put(newT.getPublicKey(), newT);
         super.update(oldT, newT);
+    }
+
+    @Override
+    public List<WgPeer> getByAllSpecifications(List<Specification<WgPeer>> specifications) {
+        Optional<FindByPublicKey> findByPublicKeySpec = specifications.stream()
+                .filter(spec -> spec instanceof FindByPublicKey)
+                .map(spec -> (FindByPublicKey) spec)
+                .findFirst();
+        List<WgPeer> peers;
+        if (findByPublicKeySpec.isPresent()){
+            WgPeer peer = wgPeerCache.get(findByPublicKeySpec.get().getPublicKey());
+            specifications.remove(findByPublicKeySpec.get());
+            peers = List.of(peer);
+        } else {
+            peers = getAll();
+        }
+        return super.getByAllSpecifications(specifications, peers);
     }
 
     private void updateCache(IV4SubnetSolver subnetSolver) {

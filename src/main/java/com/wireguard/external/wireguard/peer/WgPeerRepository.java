@@ -54,13 +54,18 @@ public class WgPeerRepository implements RepositoryPageable<WgPeer> {
 
     @Override
     public List<WgPeer> getByAllSpecifications(List<Specification<WgPeer>> specifications) {
-        return getAll().stream()
+        return getByAllSpecifications(specifications, getAll());
+    }
+
+    protected List<WgPeer> getByAllSpecifications(List<Specification<WgPeer>> specifications, List<WgPeer> peers) {
+        return peers.stream()
                 .filter(wgPeer ->
                         specifications.stream().allMatch(
                                 specification -> specification.isExist(wgPeer)
                         )
-                        ).collect(Collectors.toList());
+                ).collect(Collectors.toList());
     }
+
 
     @Override
     public List<WgPeer> getAll() {
