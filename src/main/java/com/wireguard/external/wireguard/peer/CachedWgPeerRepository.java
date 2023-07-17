@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Executors;
@@ -65,15 +66,20 @@ public class CachedWgPeerRepository extends WgPeerRepository implements Reposito
                 .filter(spec -> spec instanceof FindByPublicKey)
                 .map(spec -> (FindByPublicKey) spec)
                 .findFirst();
-        List<WgPeer> peers;
+        List<WgPeer> peers = new ArrayList<>();
         if (findByPublicKeySpec.isPresent()){
-            WgPeer peer = wgPeerCache.get(findByPublicKeySpec.get().getPublicKey());
+            Optional<WgPeer> peer = getFromCacheByPublicKey(findByPublicKeySpec.get().getPublicKey());
+            specifications = new ArrayList<>(specifications);
             specifications.remove(findByPublicKeySpec.get());
-            peers = List.of(peer);
+            if (peer.isPresent()) peers.add(peer.get());
         } else {
             peers = getAll();
         }
         return super.getByAllSpecifications(specifications, peers);
+    }
+
+    private Optional<WgPeer> getFromCacheByPublicKey(String publicKey){
+        return Optional.ofNullable(wgPeerCache.getIfPresent(publicKey));
     }
 
     private void updateCache(IV4SubnetSolver subnetSolver) {
