@@ -6,9 +6,11 @@ import com.wireguard.external.shell.CommandExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.support.WebExchangeBindException;
 import org.springframework.web.server.ServerWebInputException;
 
 @ControllerAdvice
@@ -17,48 +19,49 @@ public class GlobalExceptionHandler {
     @ExceptionHandler
     public ResponseEntity<AppError> catchResourceNotFoundException(ResourceNotFoundException e) {
         logger.error(e.getMessage(), e);
-        return new ResponseEntity<>(new AppError(HttpStatus.NOT_FOUND.value(), e.getMessage()), HttpStatus.NOT_FOUND);
+        return getAppErrorResponseEntity(HttpStatus.NOT_FOUND, e);
     }
 
     @ExceptionHandler
     public ResponseEntity<AppError> catchException(Exception e) {
         logger.error(e.getMessage(), e);
-        return new ResponseEntity<>(
-                new AppError(HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                        e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        return getAppErrorResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, e);
     }
 
 
     @ExceptionHandler
-
     public ResponseEntity<AppError> badRequestException(BadRequestException e) {
         logger.error(e.getMessage(), e);
-        return new ResponseEntity<>(
-                new AppError(HttpStatus.BAD_REQUEST.value(),
-                        e.getMessage()), HttpStatus.BAD_REQUEST);
+        return getAppErrorResponseEntity(HttpStatus.BAD_REQUEST, e);
     }
 
     @ExceptionHandler
     public ResponseEntity<AppError> serverWebInputException(ServerWebInputException e) {
-        logger.warn("ServerWebInputException: ".formatted(e.getCause().getMessage()));
+        logger.warn("ServerWebInputException: %s".formatted(e.getCause().getMessage()));
+        return getAppErrorResponseEntity(e.getStatusCode(), e.getCause());
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<AppError> webExchangeBindException(WebExchangeBindException e) {
+        logger.warn("Input validation error: %s".formatted(e.getMessage()));
+        return getAppErrorResponseEntity(HttpStatus.BAD_REQUEST, e);
+    }
+
+    private ResponseEntity<AppError> getAppErrorResponseEntity(HttpStatusCode statusCode, Throwable cause) {
         return new ResponseEntity<>(
-                new AppError(e.getStatusCode().value(),
-                        e.getCause().getMessage()), e.getStatusCode());
+                new AppError(statusCode.value(),
+                        cause.getMessage()), statusCode);
     }
 
     @ExceptionHandler
     public ResponseEntity<AppError> alreadyUsed(AlreadyUsedException e) {
         logger.error(e.getMessage(), e);
-        return new ResponseEntity<>(
-                new AppError(HttpStatus.BAD_REQUEST.value(),
-                        e.getMessage()), HttpStatus.BAD_REQUEST);
+        return getAppErrorResponseEntity(HttpStatus.BAD_REQUEST, e);
     }
 
     @ExceptionHandler
     public ResponseEntity<AppError> commandExecutionException(CommandExecutionException e) {
         logger.error(e.getMessage(), e);
-        return new ResponseEntity<>(
-                new AppError(HttpStatus.BAD_REQUEST.value(),
-                        "Wireguard error: %s".formatted(e.getStderr().strip())), HttpStatus.BAD_REQUEST);
+        return getAppErrorResponseEntity(HttpStatus.BAD_REQUEST, e);
     }
 }

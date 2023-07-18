@@ -20,6 +20,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -93,9 +94,9 @@ public class PeerController {
             array = @ArraySchema(arraySchema = @Schema(implementation = String.class), uniqueItems=true), allowEmptyValue = true)
     @Parameter(name = "persistentKeepalive", description = "New persistent keepalive interval in seconds (0 if not provided)", schema = @Schema(implementation = Integer.class, defaultValue = "0", example = "0", minimum = "0", maximum = "65535"))
     @Parameter(name = "peerUpdateRequestDTO", hidden = true)
-    @RequestMapping(value = "/peer/update", method = RequestMethod.PATCH)
+    @RequestMapping(value = "/peer/update", method = RequestMethod.PATCH) 
     public WgPeerDTO updatePeer(
-        PeerUpdateRequestDTO peerUpdateRequestDTO
+        @Valid PeerUpdateRequestDTO peerUpdateRequestDTO
     ){
         try {
             WgPeer wgPeer = wgPeerService.updatePeer(
