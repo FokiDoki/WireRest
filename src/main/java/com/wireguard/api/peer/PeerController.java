@@ -90,11 +90,13 @@ public class PeerController {
             , allowEmptyValue = true)
     @Parameter(name = "presharedKey", description = "Preshared key or empty if no psk required (Empty if not provided)",
             allowEmptyValue = true)
+    @Parameter(name = "endpoint", description = "Endpoint IP:port ",
+            allowEmptyValue = true)
     @Parameter(name = "allowedIps", description = "New ips of the peer (Exists will be replaced)  Example: 10.0.0.11/32",
             array = @ArraySchema(arraySchema = @Schema(implementation = String.class), uniqueItems=true), allowEmptyValue = true)
     @Parameter(name = "persistentKeepalive", description = "New persistent keepalive interval in seconds (0 if not provided)", schema = @Schema(implementation = Integer.class, defaultValue = "0", example = "0", minimum = "0", maximum = "65535"))
     @Parameter(name = "peerUpdateRequestDTO", hidden = true)
-    @RequestMapping(value = "/peer/update", method = RequestMethod.PATCH) 
+    @RequestMapping(value = "/peer/update", method = RequestMethod.PATCH)
     public WgPeerDTO updatePeer(
         @Valid PeerUpdateRequestDTO peerUpdateRequestDTO
     ){
