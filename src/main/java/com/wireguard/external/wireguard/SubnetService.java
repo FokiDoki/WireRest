@@ -50,6 +50,8 @@ public class SubnetService {
         return generateV4(countOfIpsToGenerate, peerCreationRules.getDefaultMask());
     }
 
+
+
     public Set<SubnetV6> generateV6(int countOfIpsToGenerate, int mask) {
         throw new UnsupportedOperationException("It doesn't support yet");
     }
