@@ -100,13 +100,9 @@ public class PeerController {
     public WgPeerDTO updatePeer(
         @Valid PeerUpdateRequestDTO peerUpdateRequestDTO
     ){
-        try {
-            WgPeer wgPeer = wgPeerService.updatePeer(
-                    peerUpdateRequestDTOToPeerUpdateRequest(peerUpdateRequestDTO));
-            return WgPeerDTO.from(wgPeer);
-        } catch (IllegalArgumentException | NoSuchElementException e) {
-            throw new BadRequestException(e.getMessage());
-        }
+        WgPeer wgPeer = wgPeerService.updatePeer(
+                peerUpdateRequestDTOToPeerUpdateRequest(peerUpdateRequestDTO));
+        return WgPeerDTO.from(wgPeer);
     }
 
     private PeerUpdateRequest peerUpdateRequestDTOToPeerUpdateRequest(PeerUpdateRequestDTO peerUpdateRequestDTO){
@@ -114,7 +110,7 @@ public class PeerController {
         if (peerUpdateRequestDTO.getAllowedIps()!=null){
             allowedIps = Optional.of(IpUtils.stringToSubnetSet(peerUpdateRequestDTO.getAllowedIps()));
         }
-        PeerUpdateRequest peerUpdateRequest = new PeerUpdateRequest(
+        return new PeerUpdateRequest(
                 peerUpdateRequestDTO.getPublicKey(),
                 peerUpdateRequestDTO.getNewPublicKey(),
                 peerUpdateRequestDTO.getPresharedKey(),
@@ -122,7 +118,6 @@ public class PeerController {
                 peerUpdateRequestDTO.getEndpoint(),
                 peerUpdateRequestDTO.getPersistentKeepalive()
         );
-        return peerUpdateRequest;
     }
 
     private PageDTO<WgPeerDTO> pagePeerToPageDTOPeerDTO(Page<WgPeer> peers){

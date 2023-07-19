@@ -22,12 +22,8 @@ public class BlockingByHashAsyncExecutor<T> {
             T taskResult = null;
             synchronized (queue) {
                 Callable<T> tCallable = queue.poll();
-                try {
-                    assert tCallable != null;
-                    taskResult = tCallable.call();
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
+                assert tCallable != null;
+                taskResult = tCallable.call();
                 synchronized (tasks) {
                     if (queue.isEmpty()) {
                         tasks.remove(hash);

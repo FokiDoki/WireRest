@@ -5,13 +5,17 @@ import com.wireguard.external.network.AlreadyUsedException;
 import com.wireguard.external.shell.CommandExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.TypeMismatchException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.support.WebExchangeBindException;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.server.ServerWebInputException;
+
+import java.util.NoSuchElementException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -28,6 +32,24 @@ public class GlobalExceptionHandler {
         return getAppErrorResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, e);
     }
 
+    @ExceptionHandler
+    public ResponseEntity<AppError> catchNoSuchElementException(NoSuchElementException e) {
+        logger.error(e.getMessage(), e);
+        return getAppErrorResponseEntity(HttpStatus.NOT_FOUND, e);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<AppError> catchIllegalArgumentException(IllegalArgumentException e) {
+        logger.error(e.getMessage(), e);
+        return getAppErrorResponseEntity(HttpStatus.BAD_REQUEST, e);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<AppError> catchResponseStatusException(ResponseStatusException e) {
+        logger.info(e.getMessage());
+        return getAppErrorResponseEntity(e.getStatusCode(), e);
+    }
+
 
     @ExceptionHandler
     public ResponseEntity<AppError> badRequestException(BadRequestException e) {
@@ -42,8 +64,18 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler
+    public ResponseEntity<AppError> TypeMismatchException(TypeMismatchException e) {
+        return getAppErrorResponseEntity(HttpStatus.BAD_REQUEST, e);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<AppError> CommandExecutionException(CommandExecutionException e) {
+        return getAppErrorResponseEntity(HttpStatus.BAD_REQUEST, e);
+    }
+
+    @ExceptionHandler
     public ResponseEntity<AppError> webExchangeBindException(WebExchangeBindException e) {
-        logger.warn("Input validation error: %s".formatted(e.getMessage()));
+        logger.warn("Wireguard Error: %s".formatted(e.getMessage()));
         return getAppErrorResponseEntity(HttpStatus.BAD_REQUEST, e);
     }
 

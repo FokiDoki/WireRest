@@ -21,6 +21,8 @@ import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
+import static com.wireguard.utils.AsyncUtils.await;
+
 @Component
 @Scope("singleton")
 @Service
@@ -92,7 +94,7 @@ public class WgPeerService {
     public WgPeer updatePeer(PeerUpdateRequest updateRequest) {
         Future<WgPeer> peer = blockingByHashAsyncExecutor.addTask(updateRequest.getCurrentPublicKey(),
                 () -> updatePeerTask(updateRequest));
-        return peer.get();
+        return await(peer);
     }
 
     private WgPeer updatePeerTask(PeerUpdateRequest updateRequest){
@@ -106,6 +108,7 @@ public class WgPeerService {
         newPeerBuilder.endpoint(defaultIfNull(updateRequest.getEndpoint(), oldPeer.getEndpoint()));
         newPeerBuilder.persistentKeepalive(defaultIfNull(updateRequest.getPersistentKeepalive(), oldPeer.getPersistentKeepalive()));
         WgPeer newPeer = newPeerBuilder.build();
+        subnetService.applyState(oldPeer.getAllowedSubnets().getAll(), newPeer.getAllowedSubnets().getAll());
         wgPeerRepository.update(oldPeer, newPeer);
         return newPeer;
     }

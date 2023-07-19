@@ -24,6 +24,19 @@ public interface IV4SubnetSolver extends ISubnetSolver{
         public long getIpsCount(){
             return biggest - least + 1;
         }
+        private String toIpString(long ip){
+            return String.format("%d.%d.%d.%d",
+                    (ip >> 24) & 0xff,
+                    (ip >> 16) & 0xff,
+                    (ip >> 8) & 0xff,
+                    ip & 0xff);
+        }
+        public String getLeastString(){
+            return toIpString(least);
+        }
+        public String getBiggestString(){
+            return toIpString(biggest);
+        }
     }
 
 }
