@@ -20,6 +20,7 @@ import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 @Component
 @ConditionalOnProperty(value = "wg.cache.enabled", havingValue = "true")
@@ -36,6 +37,7 @@ public class CachedWgPeerRepository extends WgPeerRepository implements Reposito
         UPDATE_INTERVAL_SECONDS = cacheUpdateIntervalSeconds;
         wgPeerCache = Caffeine.newBuilder()
                 .refreshAfterWrite(UPDATE_INTERVAL_SECONDS, TimeUnit.SECONDS)
+                .expireAfterWrite(UPDATE_INTERVAL_SECONDS* 1000L + 100, TimeUnit.MILLISECONDS)
                 .build(key -> super.getBySpecification(new FindByPublicKey(key)).stream().findFirst().orElse(null));
         cacheUpdateScheduler.scheduleAtFixedRate(() -> updateCache(subnetSolver), 0, UPDATE_INTERVAL_SECONDS, TimeUnit.SECONDS);
 
@@ -84,16 +86,12 @@ public class CachedWgPeerRepository extends WgPeerRepository implements Reposito
     }
 
     synchronized private void updateCache(IV4SubnetSolver subnetSolver) {
-        LinkedList<WgPeer> cachedPeers = new LinkedList<>(wgPeerCache.asMap().values());
-        LinkedList<WgPeer> wgPeers = new LinkedList<>(super.getAll());
-        for (WgPeer wgPeer : wgPeers) {
+        for (WgPeer wgPeer : super.getAll()) {
             wgPeerCache.put(wgPeer.getPublicKey(), wgPeer);
             wgPeer.getAllowedSubnets().getIPv4Subnets().stream()
                     .filter(subnet -> !subnetSolver.isUsed(subnet))
                     .forEach(subnetSolver::obtain);
         }
-        cachedPeers.removeAll(wgPeers);
-        cachedPeers.forEach(wgPeer -> wgPeerCache.invalidate(wgPeer.getPublicKey()));
     }
 
     @Override
