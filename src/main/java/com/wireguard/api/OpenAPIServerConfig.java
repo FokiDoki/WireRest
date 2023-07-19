@@ -7,9 +7,9 @@ import io.swagger.v3.oas.annotations.info.Info;
 @OpenAPIDefinition(
 
         info = @Info(
-                title = "Wireguard API",
+                title = "WireRest",
                 description = "Docs for Wireguard API",
-                version = "0.3",
+                version = "1",
                 contact = @Contact(
                         name = "FokiDoki",
                         url = "https://github.com/FokiDoki/"

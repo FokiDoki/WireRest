@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -39,7 +39,7 @@ public class WgShowDumpParser {
 
 
     private static List<WgPeer> parsePeers(Scanner peersDump) {
-        List<WgPeer> peers = new ArrayList<>();
+        List<WgPeer> peers = new LinkedList<>();
         while (peersDump.hasNextLine()) {
             String line = peersDump.nextLine();
             logger.trace("Parsing peer "+line);

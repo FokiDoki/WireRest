@@ -1,12 +1,9 @@
 package com.wireguard.external.wireguard.peer;
 
 import com.wireguard.external.network.ISubnet;
-import com.wireguard.external.network.IV4SubnetSolver;
-import com.wireguard.external.network.Subnet;
-import com.wireguard.external.shell.ShellRunner;
 import com.wireguard.external.wireguard.*;
 import com.wireguard.external.wireguard.peer.spec.FindByPublicKey;
-import com.wireguard.utils.IpUtils;
+import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,17 +13,24 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.concurrent.Future;
+
+import static com.wireguard.utils.AsyncUtils.await;
 
 @Component
 @Scope("singleton")
 @Service
 public class WgPeerService {
 
-    private static final Logger logger = LoggerFactory.getLogger(ShellRunner.class);
+    private static final Logger logger = LoggerFactory.getLogger(WgPeerService.class);
     WgPeerGenerator peerGenerator;
     RepositoryPageable<WgPeer> wgPeerRepository;
     SubnetService subnetService;
+    BlockingByHashAsyncExecutor<WgPeer> blockingByHashAsyncExecutor = new BlockingByHashAsyncExecutor<>();
 
 
     @Autowired
@@ -78,11 +82,22 @@ public class WgPeerService {
     }
 
 
+    private boolean isUpdateRequestHasNewPublicKey(PeerUpdateRequest updateRequest) {
+        return updateRequest.getNewPublicKey() != null &&
+                updateRequest.getNewPublicKey().equals(updateRequest.getCurrentPublicKey());
+    }
 
 
+    @SneakyThrows
     public WgPeer updatePeer(PeerUpdateRequest updateRequest) {
+        Future<WgPeer> peer = blockingByHashAsyncExecutor.addTask(updateRequest.getCurrentPublicKey(),
+                () -> updatePeerTask(updateRequest));
+        return await(peer);
+    }
+
+    private WgPeer updatePeerTask(PeerUpdateRequest updateRequest){
         WgPeer oldPeer = getPeerByPublicKeyOrThrow(updateRequest.getCurrentPublicKey());
-        throwIfPeerExists(updateRequest.getNewPublicKey());
+        if (isUpdateRequestHasNewPublicKey(updateRequest)) throwIfPeerExists(updateRequest.getNewPublicKey());
         WgPeer.Builder newPeerBuilder = WgPeer.from(oldPeer);
         newPeerBuilder.publicKey(
                 updateRequest.getNewPublicKey() != null ? updateRequest.getNewPublicKey() : oldPeer.getPublicKey());
@@ -110,7 +125,6 @@ public class WgPeerService {
     public <T> T defaultIfNull(T value, T defaultValue) {
         return value != null ? value : defaultValue;
     }
-
 
 
     public CreatedPeer createPeer() {

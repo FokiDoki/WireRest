@@ -14,7 +14,7 @@ public class StreamToStringConverter implements Converter<InputStream, String> {
 
     private Charset charset = StandardCharsets.UTF_8;
 
-    private static final Logger logger = LoggerFactory.getLogger(ShellRunner.class);
+    private static final Logger logger = LoggerFactory.getLogger(StreamToStringConverter.class);
 
     public StreamToStringConverter(Charset charset) {
         this.charset = charset;

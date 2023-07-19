@@ -1,5 +1,6 @@
 package com.wireguard.api.peer;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -8,7 +9,8 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 public class PeerUpdateRequestDTO {
-    private final String currentPublicKey;
+    @NotNull
+    private final String publicKey;
     private final String newPublicKey;
     private final String presharedKey;
     private final Set<String> allowedIps;

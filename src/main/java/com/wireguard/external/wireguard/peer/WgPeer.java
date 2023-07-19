@@ -13,6 +13,7 @@ import java.util.Set;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@EqualsAndHashCode(of = "publicKey")
 public class WgPeer implements Comparable<WgPeer> {
     private final String publicKey;
     private String presharedKey;
@@ -42,7 +43,7 @@ public class WgPeer implements Comparable<WgPeer> {
                 ", persistentKeepalive=" + persistentKeepalive +
                 '}';
     }
-
+    
     @Override
     public int compareTo(WgPeer o) {
         return this.publicKey.compareTo(o.publicKey);
@@ -133,6 +134,7 @@ public class WgPeer implements Comparable<WgPeer> {
         }
 
         public Builder allowedIps(Set<ISubnet> allowedSubnets) {
+            this.allowedSubnets = new AllowedSubnets();
             allowedSubnets.forEach(
                     subnet -> {
                         if(subnet instanceof Subnet){

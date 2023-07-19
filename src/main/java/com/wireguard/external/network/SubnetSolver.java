@@ -75,7 +75,8 @@ public class SubnetSolver implements IV4SubnetSolver {
         long firstAddress = subnet.getFirstIpNumeric();
         long lastAddress = subnet.getLastIpNumeric();
         if (!isIpsInRange(firstAddress, lastAddress, totalAvailableRange)){
-            throw new IllegalArgumentException("Subnet " + subnet + " is not in allowed ips range +"+ totalAvailableRange);
+            throw new IllegalArgumentException("Subnet %s is not in allowed ips range %s - %s"
+                    .formatted(subnet, totalAvailableRange.getLeastString(), totalAvailableRange.getBiggestString()));
         }
         if (getAvailableIpsCount()==0L){
             throw new NoFreeIpException("No free ip left in "+ totalAvailableRange);

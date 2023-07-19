@@ -1,7 +1,6 @@
 package com.wireguard.external.wireguard.peer;
 
 import com.wireguard.external.network.ISubnet;
-import com.wireguard.external.network.Subnet;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

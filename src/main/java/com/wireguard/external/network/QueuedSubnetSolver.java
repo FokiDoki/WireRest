@@ -1,12 +1,13 @@
 package com.wireguard.external.network;
 
-
 import lombok.SneakyThrows;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+
+import static com.wireguard.utils.AsyncUtils.await;
 
 public class QueuedSubnetSolver implements IV4SubnetSolver {
 
@@ -52,14 +53,7 @@ public class QueuedSubnetSolver implements IV4SubnetSolver {
         return isUsedFuture.get();
     }
 
-    @SneakyThrows
-    private void await(Future<?> future){
-        try {
-            future.get();
-        } catch (ExecutionException e) {
-            throw e.getCause();
-        }
-    }
+
 
     @Override
     public long getAvailableIpsCount() {

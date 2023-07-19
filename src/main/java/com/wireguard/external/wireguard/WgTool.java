@@ -23,7 +23,7 @@ import java.util.function.Function;
 @Profile("prod")
 @Component
 public class WgTool {
-    private static final Logger logger = LoggerFactory.getLogger(ShellRunner.class);
+    private static final Logger logger = LoggerFactory.getLogger(WgTool.class);
 
     private static final String WG_SHOW_DUMP_COMMAND = "wg show %s dump";
     private static final String WG_GENKEY_COMMAND = "wg genkey";
