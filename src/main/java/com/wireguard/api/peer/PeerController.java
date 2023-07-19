@@ -4,6 +4,8 @@ import com.wireguard.api.AppError;
 import com.wireguard.api.BadRequestException;
 import com.wireguard.api.ResourceNotFoundException;
 import com.wireguard.api.dto.PageDTO;
+import com.wireguard.api.dto.PageRequestDTO;
+import com.wireguard.api.dto.PublicKey;
 import com.wireguard.external.network.ISubnet;
 import com.wireguard.external.shell.CommandExecutionException;
 import com.wireguard.external.wireguard.ParsingException;
@@ -21,12 +23,16 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Pattern;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,9 +41,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
+@Validated
 public class PeerController {
 
-    WgPeerService wgPeerService;
+    private final WgPeerService wgPeerService;
 
     public PeerController(WgPeerService wgPeerService) {
         this.wgPeerService = wgPeerService;
@@ -63,23 +70,20 @@ public class PeerController {
                             schema = @Schema(implementation = AppError.class)) }) })
     @GetMapping("/peers")
     @Parameter(name = "page", description = "Page number")
-    @Parameter(name = "limit", description = "Page size (In case of 0, all peers will be returned)")
+    @Parameter(name = "limit", description = "Page size (In case of 0, all peers will be returned)", schema = @Schema(defaultValue = "100"))
     @Parameter(name = "sort", description = "Sort key and direction separated by a dot. The keys are the same as in the answer. " +
-            "Direction is optional and may have value DESC (High to low) and ASC (Low to high). Using with a large number of the peers (3000 or more) affects performance. ", example = "allowedSubnets.desc")
+            "Direction is optional and may have value DESC (High to low) and ASC (Low to high). Using with a large number of the peers (3000 or more) affects performance. ",
+            example = "allowedSubnets.desc")
+    @Parameter(name = "pageRequestDTO", hidden = true)
     public PageDTO<WgPeerDTO> getPeers(
-            @RequestParam(value = "page", required = false, defaultValue = "0") int page,
-            @RequestParam(value = "limit", required = false, defaultValue = "100") int limit,
-            @RequestParam(value = "sort", required = false) String sortKey
+            @Valid PageRequestDTO pageRequestDTO
     ) throws ParsingException {
         Page<WgPeer> peers;
-        if (limit == 0){
-            limit = Integer.MAX_VALUE;
-        }
         try {
-            Pageable pageable = PageRequest.of(page, limit, getSort(sortKey));
+            Pageable pageable = pageRequestDTO.toPageRequest();
             peers = wgPeerService.getPeers(pageable);
 
-        } catch (IllegalArgumentException | ParsingException e){
+        } catch (ParsingException e){
             throw new BadRequestException(e.getMessage());
         }
         return pagePeerToPageDTOPeerDTO(peers);
@@ -99,7 +103,7 @@ public class PeerController {
     @Parameter(name = "peerUpdateRequestDTO", hidden = true)
     @RequestMapping(value = "/peer/update", method = RequestMethod.PATCH)
     public WgPeerDTO updatePeer(
-        @Valid PeerUpdateRequestDTO peerUpdateRequestDTO
+            @Valid PeerUpdateRequestDTO peerUpdateRequestDTO
     ){
         WgPeer wgPeer = wgPeerService.updatePeer(
                 peerUpdateRequestDTOToPeerUpdateRequest(peerUpdateRequestDTO));
@@ -127,18 +131,7 @@ public class PeerController {
     }
 
 
-    private Sort getSort(String sortKey){
-        if (sortKey == null){
-            return Sort.unsorted();
-        }
-        String[] keys = sortKey.split("\\.");
-        if (keys.length == 1){
-            return Sort.by(sortKey).descending();
-        } else {
-            Sort.Direction direction = Sort.Direction.fromString(keys[1]);
-            return Sort.by(direction, keys[0]);
-        }
-    }
+
 
 
     @ApiResponses(value = {
@@ -156,13 +149,16 @@ public class PeerController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error",
                     content = { @Content(mediaType = "application/json",
                             schema = @Schema(implementation = AppError.class)) }) })
+    @Parameter(name = "publicKey", description = "The public key of the peer to be found", required = true)
+    @Parameter(name = "publicKeyDTO", hidden = true)
     @GetMapping("/peer")
-    public WgPeerDTO getPeerByPublicKey(String publicKey) throws ParsingException {
-        Optional<WgPeer> peer =  wgPeerService.getPeerByPublicKey(publicKey);
+    public WgPeerDTO getPeerByPublicKey(
+            @Valid PublicKey publicKeyDTO) throws ParsingException {
+        Optional<WgPeer> peer =  wgPeerService.getPeerByPublicKey(publicKeyDTO.getPublicKey());
         if (peer.isPresent()){
             return WgPeerDTO.from(peer.get());
         } else {
-            throw new ResourceNotFoundException("Peer not found");
+            throw new ResourceNotFoundException("Peer with public key %s not found".formatted(publicKeyDTO.getPublicKey()));
         }
     }
 
@@ -192,38 +188,15 @@ public class PeerController {
     @Parameter(name = "persistentKeepalive", description = "Persistent keepalive interval in seconds (0 if not provided)", schema = @Schema(implementation = Integer.class, defaultValue = "0", example = "0", minimum = "0", maximum = "65535"))
     @Parameter(name = "peerCreationRequestDTO", hidden = true)
     public ResponseEntity<CreatedPeerDTO> createPeer(
-            PeerCreationRequestDTO peerCreationRequestDTO,
-            @RequestParam(value = "allowedIps", required = false) Set<String> allowedIps
+            @Valid PeerCreationRequestDTO peerCreationRequestDTO
     ) {
-        CreatedPeer createdPeer;
-        try {
-            int countOfIpsToGenerate = allowedIps == null ? 1 : 0;
-            createdPeer = wgPeerService.createPeerGenerateNulls(
-                    peerCreationRequestDTOToPeerCreationRequest(peerCreationRequestDTO,countOfIpsToGenerate)
-            );
-        } catch (IllegalArgumentException | ParsingException e){
-            throw new BadRequestException(e.getMessage());
-        } catch (CommandExecutionException e){
-            throw new BadRequestException("Wireguard error: %s".formatted(e.getStderr().strip()));
-        }
+        int countOfIpsToGenerate = peerCreationRequestDTO.getAllowedIps() == null ? 1 : 0;
+        CreatedPeer createdPeer = wgPeerService.createPeerGenerateNulls(
+                peerCreationRequestDTO.toPeerCreationRequest(countOfIpsToGenerate)
+        );
         return new ResponseEntity<>(CreatedPeerDTO.from(createdPeer), HttpStatus.CREATED);
     }
 
-    private PeerCreationRequest peerCreationRequestDTOToPeerCreationRequest(PeerCreationRequestDTO peerCreationRequestDTO,
-                                                                            int countOfIpsToGenerate) throws ParsingException {
-
-        return new PeerCreationRequest(
-                peerCreationRequestDTO.getPublicKey(),
-                peerCreationRequestDTO.getPresharedKey(),
-                peerCreationRequestDTO.getPrivateKey(),
-                IpUtils.stringToSubnetSet(
-                        Optional.ofNullable(
-                                peerCreationRequestDTO.getAllowedIps()
-                        ).orElseGet(Set::of)),
-                peerCreationRequestDTO.getPersistentKeepalive(),
-                countOfIpsToGenerate
-        );
-    }
 
 
     @ApiResponses(value = {
@@ -242,12 +215,12 @@ public class PeerController {
                     content = { @Content(mediaType = "application/json",
                             schema = @Schema(implementation = AppError.class)) }) })
     @DeleteMapping("/peer/delete")
-    public WgPeerDTO deletePeer(String publicKey) throws ParsingException {
-        Optional<WgPeer> peer = wgPeerService.getPeerByPublicKey(publicKey);
+    public WgPeerDTO deletePeer(@Valid PublicKey publicKeyDTO) throws ParsingException {
+        Optional<WgPeer> peer = wgPeerService.getPeerByPublicKey(publicKeyDTO.getPublicKey());
         if (peer.isEmpty()){
-            throw new ResourceNotFoundException("Peer with public key %s not found".formatted(publicKey));
+            throw new ResourceNotFoundException("Peer with public key %s not found".formatted(publicKeyDTO.getPublicKey()));
         }
-        wgPeerService.deletePeer(publicKey);
+        wgPeerService.deletePeer(publicKeyDTO.getPublicKey());
         return WgPeerDTO.from(peer.get());
     }
 

@@ -122,7 +122,7 @@ public class WgPeerService {
                 );
     }
 
-    public <T> T defaultIfNull(T value, T defaultValue) {
+    private <T> T defaultIfNull(T value, T defaultValue) {
         return value != null ? value : defaultValue;
     }
 

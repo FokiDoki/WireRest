@@ -3,6 +3,7 @@ package com.wireguard.api;
 
 import com.wireguard.external.network.AlreadyUsedException;
 import com.wireguard.external.shell.CommandExecutionException;
+import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.TypeMismatchException;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.support.WebExchangeBindException;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.server.ServerWebInputException;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @ControllerAdvice
@@ -70,14 +72,32 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler
     public ResponseEntity<AppError> webExchangeBindException(WebExchangeBindException e) {
-        logger.warn("Wireguard Error: %s".formatted(e.getMessage()));
+        logger.debug("Validation error: %s".formatted(e.getMessage()));
+        List<String> errors = getValidationErrorStrings(e);
+        return getAppErrorResponseEntity(e.getStatusCode(), String.join(", ", errors));
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<AppError> constraintViolationException(ConstraintViolationException e) {
+        logger.debug("Validation error: %s".formatted(e.getMessage()));
         return getAppErrorResponseEntity(HttpStatus.BAD_REQUEST, e);
+    }
+
+    private List<String> getValidationErrorStrings(WebExchangeBindException e){
+        return e.getFieldErrors().stream()
+                        .map(fieldError -> "%s: %s (%s provided)".formatted(fieldError.getField(), fieldError.getDefaultMessage(), fieldError.getRejectedValue()))
+                        .toList();
     }
 
     private ResponseEntity<AppError> getAppErrorResponseEntity(HttpStatusCode statusCode, Throwable cause) {
         return new ResponseEntity<>(
                 new AppError(statusCode.value(),
                         cause.getMessage()), statusCode);
+    }
+    private ResponseEntity<AppError> getAppErrorResponseEntity(HttpStatusCode statusCode, String causeMessage) {
+        return new ResponseEntity<>(
+                new AppError(statusCode.value(),
+                        causeMessage), statusCode);
     }
 
     @ExceptionHandler
