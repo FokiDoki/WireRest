@@ -8,11 +8,13 @@ import org.springframework.util.Assert;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@EqualsAndHashCode(of = "publicKey")
 public class WgPeer implements Comparable<WgPeer> {
     private final String publicKey;
     private String presharedKey;
@@ -42,7 +44,7 @@ public class WgPeer implements Comparable<WgPeer> {
                 ", persistentKeepalive=" + persistentKeepalive +
                 '}';
     }
-
+    
     @Override
     public int compareTo(WgPeer o) {
         return this.publicKey.compareTo(o.publicKey);
