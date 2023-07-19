@@ -35,18 +35,11 @@ public class FakeWgTool extends WgTool {
                 WgPeer.publicKey("PubKey8").presharedKey("presharedKey8").allowedIps(Set.of(Subnet.valueOf("10.0.0.7/32"), SubnetV6.valueOf("::1/128")))
                         .latestHandshake(200000).transferRx(12345).transferTx(54321).build()
         ).forEach(peer -> peers.put(peer.getPublicKey(), peer));
-        /*
-        for (keyCounter = 9; keyCounter < 25000; keyCounter++) {
-
-            peers.put("PubKey"+keyCounter, WgPeer.publicKey("PubKey"+keyCounter).presharedKey("presharedKey"+keyCounter).build());
-
-        }*/
         keyCounter = peers.size()+1;
     }
     @SneakyThrows
     @Override
     public WgShowDump showDump(String interfaceName) {
-        System.out.println(peers.remove("PubKey"+ new Random().nextInt(keyCounter)));
         return new WgShowDump(wgInterface, peers.values().stream().toList());
     }
 
