@@ -86,8 +86,7 @@ public class PeerController {
     @Operation(summary = "Update peer by public key", description = "Update peer by public key. " +
             "Do not provide fields that you do not want to change.")
     @Parameter(name = "publicKey", description = "Current public key of the peer", required = true)
-    @Parameter(name = "newPublicKey", description = "New public key of the peer. Warning: If you change the public key, latest handshake and transfer data will be lost. "
-            , allowEmptyValue = true)
+    @Parameter(name = "newPublicKey", description = "New public key of the peer. Warning: If you change the public key, latest handshake and transfer data will be lost. ")
     @Parameter(name = "presharedKey", description = "Preshared key or empty if no psk required (Empty if not provided)",
             allowEmptyValue = true)
     @Parameter(name = "endpoint", description = "Endpoint IP:port ",
