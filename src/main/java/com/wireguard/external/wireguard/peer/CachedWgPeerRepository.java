@@ -14,6 +14,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Executors;
@@ -82,14 +83,17 @@ public class CachedWgPeerRepository extends WgPeerRepository implements Reposito
         return Optional.ofNullable(wgPeerCache.getIfPresent(publicKey));
     }
 
-    private void updateCache(IV4SubnetSolver subnetSolver) {
-        wgPeerCache.invalidateAll();
-        for (WgPeer wgPeer : super.getAll()) {
+    synchronized private void updateCache(IV4SubnetSolver subnetSolver) {
+        LinkedList<WgPeer> cachedPeers = new LinkedList<>(wgPeerCache.asMap().values());
+        LinkedList<WgPeer> wgPeers = new LinkedList<>(super.getAll());
+        for (WgPeer wgPeer : wgPeers) {
             wgPeerCache.put(wgPeer.getPublicKey(), wgPeer);
             wgPeer.getAllowedSubnets().getIPv4Subnets().stream()
                     .filter(subnet -> !subnetSolver.isUsed(subnet))
                     .forEach(subnetSolver::obtain);
         }
+        wgPeers.removeAll(cachedPeers);
+        wgPeers.forEach(wgPeer -> wgPeerCache.invalidate(wgPeer.getPublicKey()));
     }
 
     @Override

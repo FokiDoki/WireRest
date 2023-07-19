@@ -28,12 +28,13 @@ public class BlockingByHashAsyncExecutor<T> {
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
-            }
-            synchronized (tasks) {
-                if (queue.isEmpty()) {
-                    tasks.remove(hash);
+                synchronized (tasks) {
+                    if (queue.isEmpty()) {
+                        tasks.remove(hash);
+                    }
                 }
             }
+
             return taskResult;
 
         });
