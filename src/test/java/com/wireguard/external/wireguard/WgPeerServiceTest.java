@@ -1,8 +1,6 @@
 package com.wireguard.external.wireguard;
 
-import com.wireguard.external.network.ISubnet;
 import com.wireguard.external.network.Subnet;
-import com.wireguard.external.network.SubnetSolver;
 import com.wireguard.external.wireguard.peer.*;
 import com.wireguard.external.wireguard.peer.spec.FindByPublicKey;
 import org.junit.jupiter.api.Assertions;

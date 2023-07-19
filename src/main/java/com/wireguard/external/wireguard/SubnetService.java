@@ -4,10 +4,7 @@ import com.wireguard.external.network.ISubnet;
 import com.wireguard.external.network.IV4SubnetSolver;
 import com.wireguard.external.network.Subnet;
 import com.wireguard.external.network.SubnetV6;
-import com.wireguard.external.shell.StreamToStringConverter;
 import com.wireguard.external.wireguard.peer.PeerCreationRules;
-import com.wireguard.external.wireguard.peer.WgPeer;
-import com.wireguard.external.wireguard.peer.WgPeerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +13,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.stream.Stream;
 
 @Service
 @Component

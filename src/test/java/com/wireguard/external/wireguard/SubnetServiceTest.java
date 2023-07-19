@@ -3,15 +3,11 @@ package com.wireguard.external.wireguard;
 import com.wireguard.external.network.ISubnet;
 import com.wireguard.external.network.IV4SubnetSolver;
 import com.wireguard.external.network.Subnet;
-import com.wireguard.external.network.SubnetSolver;
 import com.wireguard.external.wireguard.peer.PeerCreationRules;
-import com.wireguard.external.wireguard.peer.WgPeer;
-import lombok.ToString;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import java.util.HashSet;

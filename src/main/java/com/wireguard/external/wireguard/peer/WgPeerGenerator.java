@@ -1,7 +1,6 @@
 package com.wireguard.external.wireguard.peer;
 
 import com.wireguard.external.network.ISubnet;
-import com.wireguard.external.network.Subnet;
 import com.wireguard.external.wireguard.PeerCreationRequest;
 import com.wireguard.external.wireguard.WgTool;
 import org.slf4j.Logger;
