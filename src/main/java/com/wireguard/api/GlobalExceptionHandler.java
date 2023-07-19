@@ -69,11 +69,6 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler
-    public ResponseEntity<AppError> CommandExecutionException(CommandExecutionException e) {
-        return getAppErrorResponseEntity(HttpStatus.BAD_REQUEST, e);
-    }
-
-    @ExceptionHandler
     public ResponseEntity<AppError> webExchangeBindException(WebExchangeBindException e) {
         logger.warn("Wireguard Error: %s".formatted(e.getMessage()));
         return getAppErrorResponseEntity(HttpStatus.BAD_REQUEST, e);

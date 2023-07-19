@@ -66,7 +66,7 @@ public class PeerController {
             "Direction is optional and may have value DESC (High to low) and ASC (Low to high). Using with a large number of the peers (3000 or more) affects performance. ", example = "allowedSubnets.desc")
     public PageDTO<WgPeerDTO> getPeers(
             @RequestParam(value = "page", required = false, defaultValue = "0") int page,
-            @RequestParam(value = "limit", required = false, defaultValue = "1000") int limit,
+            @RequestParam(value = "limit", required = false, defaultValue = "100") int limit,
             @RequestParam(value = "sort", required = false) String sortKey
     ) throws ParsingException {
         Page<WgPeer> peers;
@@ -122,7 +122,7 @@ public class PeerController {
 
     private PageDTO<WgPeerDTO> pagePeerToPageDTOPeerDTO(Page<WgPeer> peers){
         List<WgPeerDTO> peerDTOs = peers.getContent().stream().map(WgPeerDTO::from).collect(Collectors.toList());
-        return new PageDTO<>(peers.getTotalPages()-1, peers.getNumber(), peerDTOs);
+        return new PageDTO<>(peers.getTotalPages(), peers.getNumber(), peerDTOs);
     }
 
 

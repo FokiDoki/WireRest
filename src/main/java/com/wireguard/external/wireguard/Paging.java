@@ -70,7 +70,7 @@ public class Paging<T> {
         PagedListHolder<T> page = new PagedListHolder<>(sorted);
         page.setPageSize(pageable.getPageSize());
         if (pageable.getPageNumber() >= page.getPageCount()) {
-            throw new PageOutOfRangeException(pageable.getPageNumber(), page.getPageCount()-1);
+            throw new PageOutOfRangeException(pageable.getPageNumber(), page.getPageCount());
         }
         page.setPage(pageable.getPageNumber());
         return new PageImpl<T>(new ArrayList<>(page.getPageList()), pageable, list.size());
