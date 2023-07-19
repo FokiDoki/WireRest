@@ -92,8 +92,8 @@ public class CachedWgPeerRepository extends WgPeerRepository implements Reposito
                     .filter(subnet -> !subnetSolver.isUsed(subnet))
                     .forEach(subnetSolver::obtain);
         }
-        wgPeers.removeAll(cachedPeers);
-        wgPeers.forEach(wgPeer -> wgPeerCache.invalidate(wgPeer.getPublicKey()));
+        cachedPeers.removeAll(wgPeers);
+        cachedPeers.forEach(wgPeer -> wgPeerCache.invalidate(wgPeer.getPublicKey()));
     }
 
     @Override
