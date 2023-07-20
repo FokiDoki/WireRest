@@ -4,9 +4,7 @@ import com.wireguard.api.AppError;
 import com.wireguard.api.BadRequestException;
 import com.wireguard.api.ResourceNotFoundException;
 import com.wireguard.api.converters.*;
-import com.wireguard.api.dto.PageDTO;
-import com.wireguard.api.dto.PageRequestDTO;
-import com.wireguard.api.dto.WgKey;
+import com.wireguard.api.dto.*;
 import com.wireguard.external.wireguard.ParsingException;
 import com.wireguard.external.wireguard.PeerUpdateRequest;
 import com.wireguard.external.wireguard.peer.CreatedPeer;
@@ -94,7 +92,7 @@ public class PeerController {
     @Parameter(name = "newPublicKey", description = "New public key of the peer. Warning: If you change the public key, latest handshake and transfer data will be lost. ")
     @Parameter(name = "presharedKey", description = "Preshared key or empty if no psk required (Empty if not provided)",
             allowEmptyValue = true)
-    @Parameter(name = "endpoint", description = "Endpoint IP:port ",
+    @Parameter(name = "endpoint", description = "Socket IP:port ",
             allowEmptyValue = true)
     @Parameter(name = "allowedIps", description = "New ips of the peer (Exists will be replaced)  Example: 10.0.0.11/32",
             array = @ArraySchema(arraySchema = @Schema(implementation = String.class), uniqueItems=true), allowEmptyValue = true)
@@ -131,15 +129,15 @@ public class PeerController {
                     content = { @Content(mediaType = "application/json",
                             schema = @Schema(implementation = AppError.class)) }) })
     @Parameter(name = "publicKey", description = "The public key of the peer to be found", required = true)
-    @Parameter(name = "wgKeyDTO", hidden = true)
+    @Parameter(name = "publicKeyDTO", hidden = true)
     @GetMapping("/peer")
     public WgPeerDTO getPeerByPublicKey(
-            @Valid WgKey publicKey) throws ParsingException {
-        Optional<WgPeer> peer =  wgPeerService.getPeerByPublicKey(publicKey.getValue());
+            @Valid PublicKeyDTO publicKeyDTO) throws ParsingException {
+        Optional<WgPeer> peer =  wgPeerService.getPeerByPublicKey(publicKeyDTO.getValue());
         if (peer.isPresent()){
             return peerDTOConverter.convert(peer.get());
         } else {
-            throw new ResourceNotFoundException("Peer with public key %s not found".formatted(publicKey.getValue()));
+            throw new ResourceNotFoundException("Peer with public key %s not found".formatted(publicKeyDTO.getValue()));
         }
     }
 
@@ -194,14 +192,13 @@ public class PeerController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error",
                     content = { @Content(mediaType = "application/json",
                             schema = @Schema(implementation = AppError.class)) }) })
+
+
+    @Parameter(name = "publicKey", description = "The public key of the peer to be deleted", required = true)
     @DeleteMapping("/peer/delete")
-    public WgPeerDTO deletePeer(@Valid WgKey publicKey) throws ParsingException {
-        Optional<WgPeer> peer = wgPeerService.getPeerByPublicKey(publicKey.getValue());
-        if (peer.isEmpty()){
-            throw new ResourceNotFoundException("Peer with public key %s not found".formatted(publicKey.getValue()));
-        }
-        wgPeerService.deletePeer(publicKey.getValue());
-        return peerDTOConverter.convert(peer.get());
+    public WgPeerDTO deletePeer(@Valid PublicKeyDTO publicKeyDTO) {
+        WgPeer deletedPeer = wgPeerService.deletePeer(publicKeyDTO.getValue());
+        return peerDTOConverter.convert(deletedPeer);
     }
 
 

@@ -133,12 +133,11 @@ public class WgPeerService {
         return createPeerGenerateNulls(new EmptyPeerCreationRequest());
     }
 
-    public void deletePeer(String publicKey) {
+    public WgPeer deletePeer(String publicKey) {
         WgPeer peer = getPeerByPublicKeyOrThrow(publicKey);
-        wgPeerRepository.remove(
-                WgPeer.publicKey(publicKey).build()
-        );
+        wgPeerRepository.remove(peer);
         subnetService.release(peer.getAllowedSubnets().getAll());
+        return peer;
     }
 
 

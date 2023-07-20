@@ -1,5 +1,6 @@
 package com.wireguard.api.peer;
 
+import com.wireguard.api.dto.RequiredWgKey;
 import com.wireguard.api.dto.WgKey;
 import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
@@ -16,7 +17,7 @@ import java.util.Set;
 @Data
 public class PeerCreationRequestDTO {
     @Valid
-    private final WgKey publicKey;
+    private final RequiredWgKey publicKey;
     @Valid
     @Nullable
     private final WgKey presharedKey;

@@ -23,7 +23,7 @@ public class PeerUpdateRequestFromDTOConverter implements Converter<PeerUpdateRe
                 Objects.requireNonNullElse(dto.getNewPublicKey(), new WgKey(null)).getValue(),
                 Objects.requireNonNullElse(dto.getPresharedKey(), new WgKey(null)).getValue(),
                 allowedIps.orElse(null),
-                dto.getEndpoint(),
+                "%s:%d".formatted(dto.getEndpoint().getHost(), dto.getEndpoint().getPort()),
                 dto.getPersistentKeepalive()
         );
     }
