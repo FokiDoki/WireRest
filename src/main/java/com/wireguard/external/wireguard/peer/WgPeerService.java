@@ -30,17 +30,15 @@ public class WgPeerService {
     WgPeerGenerator peerGenerator;
     RepositoryPageable<WgPeer> wgPeerRepository;
     SubnetService subnetService;
-    PeerCreationRules peerCreationRules;
     BlockingByHashAsyncExecutor<WgPeer> blockingByHashAsyncExecutor = new BlockingByHashAsyncExecutor<>();
 
 
     @Autowired
     public WgPeerService(WgPeerGenerator peerGenerator, RepositoryPageable<WgPeer> wgPeerRepository,
-                         SubnetService subnetService, PeerCreationRules peerCreationRules) {
+                         SubnetService subnetService) {
         this.peerGenerator = peerGenerator;
         this.wgPeerRepository = wgPeerRepository;
         this.subnetService = subnetService;
-        this.peerCreationRules = peerCreationRules;
     }
 
 
@@ -65,15 +63,17 @@ public class WgPeerService {
     }
 
     public CreatedPeer createPeerGenerateNulls(PeerCreationRequest peerCreationRequest) {
-        HashSet<ISubnet> allowedIps = new HashSet<>(peerCreationRequest.getAllowedIps());
+        IpAllocationRequest ipAllocationRequest = peerCreationRequest.getIpAllocationRequest();
+        HashSet<ISubnet> allowedIps = new HashSet<>(ipAllocationRequest.getSubnets());
         subnetService.obtain(allowedIps);
-        allowedIps.addAll(subnetService.generateV4(peerCreationRules.getDefaultIpsToGenerate()));
-        peerCreationRequest.setAllowedIps(allowedIps);
+        allowedIps.addAll(subnetService.generateV4(ipAllocationRequest.getCountOfIpsToGenerate()));
+        ipAllocationRequest.setSubnets(allowedIps);
 
         CreatedPeer createdPeer = peerGenerator.createPeerGenerateNulls(peerCreationRequest);
         wgPeerRepository.add(createdPeerToWgPeer(createdPeer));
         return createdPeer;
     }
+
 
     private WgPeer createdPeerToWgPeer(CreatedPeer createdPeer) {
         return WgPeer.publicKey(createdPeer.getPublicKey())

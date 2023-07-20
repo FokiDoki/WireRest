@@ -14,8 +14,6 @@ public class PeerCreationRequest {
     private final String publicKey;
     private final String presharedKey;
     private final String privateKey;
-    private Set<ISubnet> allowedIps;
+    private final IpAllocationRequest ipAllocationRequest;
     private final Integer persistentKeepalive;
-
-
 }

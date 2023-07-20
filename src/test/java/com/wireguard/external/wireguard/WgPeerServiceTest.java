@@ -22,12 +22,10 @@ class WgPeerServiceTest {
     WgPeerRepository wgPeerRepository = Mockito.mock(WgPeerRepository.class);
     WgPeerGenerator wgPeerGenerator = Mockito.mock(WgPeerGenerator.class);
     SubnetService subnetService = Mockito.mock(SubnetService.class);
-    PeerCreationRules peerCreationRules = Mockito.mock(PeerCreationRules.class);
 
     @BeforeEach
     public void setup() {
-        Mockito.when(peerCreationRules.getDefaultIpsToGenerate()).thenReturn(1);
-        wgPeerService = new WgPeerService(wgPeerGenerator, wgPeerRepository, subnetService, peerCreationRules);
+        wgPeerService = new WgPeerService(wgPeerGenerator, wgPeerRepository, subnetService);
     }
 
     @Test
@@ -83,7 +81,7 @@ class WgPeerServiceTest {
     public void testCreatePeerGenerateNulls() {
         CreatedPeer shouldBeReturned = new CreatedPeer("publicKey", "Psk", "Ppk", Set.of(Subnet.valueOf("10.66.66.1/32")), 0);
         PeerCreationRequest peerCreationRequest = new PeerCreationRequest("publicKey", "Psk", "Ppk",
-                Set.of(), 0);
+                new IpAllocationRequestOneIfNullSubnets(Set.of()), 0);
         Mockito.when(wgPeerGenerator.createPeerGenerateNulls(
                         peerCreationRequest))
                 .thenReturn(shouldBeReturned);

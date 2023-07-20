@@ -6,6 +6,7 @@ import com.wireguard.api.dto.PageDTO;
 import com.wireguard.external.network.NoFreeIpException;
 import com.wireguard.external.network.Subnet;
 import com.wireguard.external.network.SubnetV6;
+import com.wireguard.external.wireguard.IpAllocationRequestOneIfNullSubnets;
 import com.wireguard.external.wireguard.Paging;
 import com.wireguard.external.wireguard.ParsingException;
 import com.wireguard.external.wireguard.PeerCreationRequest;
@@ -197,7 +198,7 @@ class PeerControllerTest {
         Mockito.when(wgPeerService.createPeerGenerateNulls(new PeerCreationRequest(newPeer.getPublicKey(),
                 newPeer.getPresharedKey(),
                 newPeer.getPrivateKey(),
-                newPeer.getAllowedSubnets(),
+                new IpAllocationRequestOneIfNullSubnets(newPeer.getAllowedSubnets()),
                 25))).thenReturn(newPeer);
         webClient.post().uri(uriBuilder -> uriBuilder
                         .path("/peer/create")

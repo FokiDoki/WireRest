@@ -133,7 +133,7 @@ public class WgPeer implements Comparable<WgPeer> {
             return this;
         }
 
-        public Builder allowedIps(Set<ISubnet> allowedSubnets) {
+        public Builder allowedIps(Set<? extends ISubnet> allowedSubnets) {
             this.allowedSubnets = new AllowedSubnets();
             allowedSubnets.forEach(
                     subnet -> {

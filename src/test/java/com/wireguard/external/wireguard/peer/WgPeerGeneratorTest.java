@@ -3,6 +3,7 @@ package com.wireguard.external.wireguard.peer;
 import com.wireguard.external.network.IV4SubnetSolver;
 import com.wireguard.external.network.Subnet;
 import com.wireguard.external.wireguard.EmptyPeerCreationRequest;
+import com.wireguard.external.wireguard.IpAllocationRequestOneIfNullSubnets;
 import com.wireguard.external.wireguard.PeerCreationRequest;
 import com.wireguard.external.wireguard.WgTool;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,7 +42,7 @@ class WgPeerGeneratorTest {
     @Test
     public void testCreatePeerWithData(){
         CreatedPeer peer = wgPeerGenerator.createPeerGenerateNulls(new PeerCreationRequest("publicKey","presharedKey",
-                "privateKey", Set.of(Subnet.valueOf("0.0.0.1/32")),1));
+                "privateKey", new IpAllocationRequestOneIfNullSubnets(Set.of(Subnet.valueOf("0.0.0.1/32"))),1));
         assertEquals(1, peer.getPersistentKeepalive());
         assertEquals("publicKey", peer.getPublicKey());
         assertEquals("presharedKey", peer.getPresharedKey());
