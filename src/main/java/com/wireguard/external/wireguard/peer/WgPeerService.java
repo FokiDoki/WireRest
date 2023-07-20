@@ -63,6 +63,7 @@ public class WgPeerService {
     }
 
     public CreatedPeer createPeerGenerateNulls(PeerCreationRequest peerCreationRequest) {
+        if (peerCreationRequest.getPublicKey()  !=null) throwIfPeerExists(peerCreationRequest.getPublicKey());
         IpAllocationRequest ipAllocationRequest = peerCreationRequest.getIpAllocationRequest();
         HashSet<ISubnet> allowedIps = new HashSet<>(ipAllocationRequest.getSubnets());
         subnetService.obtain(allowedIps);
@@ -119,7 +120,7 @@ public class WgPeerService {
                 .stream()
                 .findFirst().ifPresent(
                         peer -> {
-                            throw new IllegalArgumentException("Peer with public key %s already exists".formatted(publicKey));
+                            throw new PeerAlreadyExistsException(peer.getPublicKey());
                         }
                 );
     }
