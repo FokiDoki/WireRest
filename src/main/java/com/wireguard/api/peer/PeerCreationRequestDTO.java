@@ -23,7 +23,7 @@ public class PeerCreationRequestDTO {
     private final WgKey presharedKey;
     @Valid
     @Nullable
-    private final WgKey privateKey;
+    private final RequiredWgKey privateKey;
     @Nullable
     private final Set<String> allowedIps;
     @Nullable
