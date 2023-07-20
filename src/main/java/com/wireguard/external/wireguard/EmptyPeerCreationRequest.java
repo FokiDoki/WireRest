@@ -7,6 +7,6 @@ import java.util.Set;
 @EqualsAndHashCode(callSuper = true)
 public class EmptyPeerCreationRequest extends PeerCreationRequest{
     public EmptyPeerCreationRequest() {
-        super(null, null, null, Set.of(), null, 0);
+        super(null, null, null, Set.of(), null);
     }
 }

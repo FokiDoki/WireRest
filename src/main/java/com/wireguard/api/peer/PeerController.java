@@ -3,18 +3,15 @@ package com.wireguard.api.peer;
 import com.wireguard.api.AppError;
 import com.wireguard.api.BadRequestException;
 import com.wireguard.api.ResourceNotFoundException;
+import com.wireguard.api.converters.*;
 import com.wireguard.api.dto.PageDTO;
 import com.wireguard.api.dto.PageRequestDTO;
-import com.wireguard.api.dto.PublicKey;
-import com.wireguard.external.network.ISubnet;
-import com.wireguard.external.shell.CommandExecutionException;
+import com.wireguard.api.dto.WgKey;
 import com.wireguard.external.wireguard.ParsingException;
-import com.wireguard.external.wireguard.PeerCreationRequest;
 import com.wireguard.external.wireguard.PeerUpdateRequest;
 import com.wireguard.external.wireguard.peer.CreatedPeer;
 import com.wireguard.external.wireguard.peer.WgPeer;
 import com.wireguard.external.wireguard.peer.WgPeerService;
-import com.wireguard.utils.IpUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -23,21 +20,16 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Pattern;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
@@ -45,6 +37,13 @@ import java.util.stream.Collectors;
 public class PeerController {
 
     private final WgPeerService wgPeerService;
+
+    private final PeerCreationRequestFromDTOConverter creationRequestConverter = new PeerCreationRequestFromDTOConverter();
+    private final PageRequestFromDTOConverter pageRequestConverter = new PageRequestFromDTOConverter();
+    private final PeerUpdateRequestFromDTOConverter updateRequestConverter = new PeerUpdateRequestFromDTOConverter();
+    private final WgPeerDTOFromWgPeerConverter peerDTOConverter = new WgPeerDTOFromWgPeerConverter();
+    private final PageDTOFromPageTypeChangeConverter<WgPeer, WgPeerDTO> pageDTOConverter = new PageDTOFromPageTypeChangeConverter<>(peerDTOConverter);
+
 
     public PeerController(WgPeerService wgPeerService) {
         this.wgPeerService = wgPeerService;
@@ -80,13 +79,13 @@ public class PeerController {
     ) throws ParsingException {
         Page<WgPeer> peers;
         try {
-            Pageable pageable = pageRequestDTO.toPageRequest();
+            Pageable pageable = pageRequestConverter.convert(pageRequestDTO);
             peers = wgPeerService.getPeers(pageable);
 
         } catch (ParsingException e){
             throw new BadRequestException(e.getMessage());
         }
-        return pagePeerToPageDTOPeerDTO(peers);
+        return pageDTOConverter.convert(peers);
     }
 
     @Operation(summary = "Update peer by public key", description = "Update peer by public key. " +
@@ -106,29 +105,11 @@ public class PeerController {
             @Valid PeerUpdateRequestDTO peerUpdateRequestDTO
     ){
         WgPeer wgPeer = wgPeerService.updatePeer(
-                peerUpdateRequestDTOToPeerUpdateRequest(peerUpdateRequestDTO));
-        return WgPeerDTO.from(wgPeer);
+                Objects.requireNonNull(updateRequestConverter.convert(peerUpdateRequestDTO)));
+        return peerDTOConverter.convert(wgPeer);
     }
 
-    private PeerUpdateRequest peerUpdateRequestDTOToPeerUpdateRequest(PeerUpdateRequestDTO peerUpdateRequestDTO){
-        Optional<Set<ISubnet>> allowedIps = Optional.empty();
-        if (peerUpdateRequestDTO.getAllowedIps()!=null){
-            allowedIps = Optional.of(IpUtils.stringToSubnetSet(peerUpdateRequestDTO.getAllowedIps()));
-        }
-        return new PeerUpdateRequest(
-                peerUpdateRequestDTO.getPublicKey(),
-                peerUpdateRequestDTO.getNewPublicKey(),
-                peerUpdateRequestDTO.getPresharedKey(),
-                allowedIps.orElse(null),
-                peerUpdateRequestDTO.getEndpoint(),
-                peerUpdateRequestDTO.getPersistentKeepalive()
-        );
-    }
 
-    private PageDTO<WgPeerDTO> pagePeerToPageDTOPeerDTO(Page<WgPeer> peers){
-        List<WgPeerDTO> peerDTOs = peers.getContent().stream().map(WgPeerDTO::from).collect(Collectors.toList());
-        return new PageDTO<>(peers.getTotalPages(), peers.getNumber(), peerDTOs);
-    }
 
 
 
@@ -150,15 +131,15 @@ public class PeerController {
                     content = { @Content(mediaType = "application/json",
                             schema = @Schema(implementation = AppError.class)) }) })
     @Parameter(name = "publicKey", description = "The public key of the peer to be found", required = true)
-    @Parameter(name = "publicKeyDTO", hidden = true)
+    @Parameter(name = "wgKeyDTO", hidden = true)
     @GetMapping("/peer")
     public WgPeerDTO getPeerByPublicKey(
-            @Valid PublicKey publicKeyDTO) throws ParsingException {
-        Optional<WgPeer> peer =  wgPeerService.getPeerByPublicKey(publicKeyDTO.getPublicKey());
+            @Valid WgKey publicKey) throws ParsingException {
+        Optional<WgPeer> peer =  wgPeerService.getPeerByPublicKey(publicKey.getValue());
         if (peer.isPresent()){
-            return WgPeerDTO.from(peer.get());
+            return peerDTOConverter.convert(peer.get());
         } else {
-            throw new ResourceNotFoundException("Peer with public key %s not found".formatted(publicKeyDTO.getPublicKey()));
+            throw new ResourceNotFoundException("Peer with public key %s not found".formatted(publicKey.getValue()));
         }
     }
 
@@ -190,9 +171,8 @@ public class PeerController {
     public ResponseEntity<CreatedPeerDTO> createPeer(
             @Valid PeerCreationRequestDTO peerCreationRequestDTO
     ) {
-        int countOfIpsToGenerate = peerCreationRequestDTO.getAllowedIps() == null ? 1 : 0;
         CreatedPeer createdPeer = wgPeerService.createPeerGenerateNulls(
-                peerCreationRequestDTO.toPeerCreationRequest(countOfIpsToGenerate)
+                Objects.requireNonNull(creationRequestConverter.convert(peerCreationRequestDTO))
         );
         return new ResponseEntity<>(CreatedPeerDTO.from(createdPeer), HttpStatus.CREATED);
     }
@@ -215,13 +195,13 @@ public class PeerController {
                     content = { @Content(mediaType = "application/json",
                             schema = @Schema(implementation = AppError.class)) }) })
     @DeleteMapping("/peer/delete")
-    public WgPeerDTO deletePeer(@Valid PublicKey publicKeyDTO) throws ParsingException {
-        Optional<WgPeer> peer = wgPeerService.getPeerByPublicKey(publicKeyDTO.getPublicKey());
+    public WgPeerDTO deletePeer(@Valid WgKey publicKey) throws ParsingException {
+        Optional<WgPeer> peer = wgPeerService.getPeerByPublicKey(publicKey.getValue());
         if (peer.isEmpty()){
-            throw new ResourceNotFoundException("Peer with public key %s not found".formatted(publicKeyDTO.getPublicKey()));
+            throw new ResourceNotFoundException("Peer with public key %s not found".formatted(publicKey.getValue()));
         }
-        wgPeerService.deletePeer(publicKeyDTO.getPublicKey());
-        return WgPeerDTO.from(peer.get());
+        wgPeerService.deletePeer(publicKey.getValue());
+        return peerDTOConverter.convert(peer.get());
     }
 
 

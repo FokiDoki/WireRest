@@ -1,6 +1,9 @@
 package com.wireguard.api.peer;
 
+import com.wireguard.api.dto.RequiredWgKey;
+import com.wireguard.api.dto.WgKey;
 import jakarta.annotation.Nullable;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,16 +16,18 @@ import java.util.Set;
 @AllArgsConstructor
 public class PeerUpdateRequestDTO {
     @NotNull
-    @Pattern(regexp = "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$", message = "Not a base64 encoded public key")
-    private final String publicKey;
+    @Valid
+    private final RequiredWgKey publicKey;
     @Nullable
-    @Pattern(regexp = "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$", message = "Not a base64 encoded public key")
-    private final String newPublicKey;
-    @Pattern(regexp = "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$", message = "Not a base64 encoded preshared key")
-    private final String presharedKey;
+    @Valid
+    private final RequiredWgKey newPublicKey;
+    @Nullable
+    @Valid
+    private final WgKey presharedKey;
     private final Set<String> allowedIps;
     private final String endpoint;
     @Min(0)
     @Max(65535)
     private final Integer persistentKeepalive;
 }
+

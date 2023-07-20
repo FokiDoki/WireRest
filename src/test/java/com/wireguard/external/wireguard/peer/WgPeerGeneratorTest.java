@@ -41,7 +41,7 @@ class WgPeerGeneratorTest {
     @Test
     public void testCreatePeerWithData(){
         CreatedPeer peer = wgPeerGenerator.createPeerGenerateNulls(new PeerCreationRequest("publicKey","presharedKey",
-                "privateKey", Set.of(Subnet.valueOf("0.0.0.1/32")),1, 0));
+                "privateKey", Set.of(Subnet.valueOf("0.0.0.1/32")),1));
         assertEquals(1, peer.getPersistentKeepalive());
         assertEquals("publicKey", peer.getPublicKey());
         assertEquals("presharedKey", peer.getPresharedKey());

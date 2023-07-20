@@ -16,7 +16,6 @@ public class PeerCreationRequest {
     private final String privateKey;
     private Set<ISubnet> allowedIps;
     private final Integer persistentKeepalive;
-    private final int countOfIpsToGenerate;
 
 
 }

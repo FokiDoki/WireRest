@@ -1,27 +1,19 @@
 package com.wireguard.api.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
 
 @Data
+@AllArgsConstructor
 public class PageDTO<T> {
     private final int totalPages;
     private final int currentPage;
     private final List<T> content;
 
-    public PageDTO(int totalPages, int currentPage, List<T> content) {
-        this.totalPages = totalPages;
-        this.currentPage = currentPage;
-        this.content = content;
-    }
 
-    public static <T> PageDTO<T> from(Page<T> page) {
-        return new PageDTO<>(
-                page.getTotalPages(),
-                page.getNumber(),
-                page.getContent()
-        );
-    }
+
 }

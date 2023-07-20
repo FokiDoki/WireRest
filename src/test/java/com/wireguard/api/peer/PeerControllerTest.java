@@ -1,6 +1,7 @@
 package com.wireguard.api.peer;
 
 import com.wireguard.api.AppError;
+import com.wireguard.api.converters.WgPeerDTOFromWgPeerConverter;
 import com.wireguard.api.dto.PageDTO;
 import com.wireguard.external.network.NoFreeIpException;
 import com.wireguard.external.network.Subnet;
@@ -34,6 +35,7 @@ class PeerControllerTest {
 
     @Autowired
     private WebTestClient webClient;
+    WgPeerDTOFromWgPeerConverter peerDTOC = new WgPeerDTOFromWgPeerConverter();
 
     @MockBean
     WgPeerService wgPeerService;
@@ -70,7 +72,11 @@ class PeerControllerTest {
         List<WgPeer> peers = peerList.stream().toList().subList(0,2);
         Mockito.when(wgPeerService.getPeers(PageRequest.of(1, 2, Sort.by(Sort.Direction.ASC, "PresharedKey"))))
                 .thenReturn(paging.apply(Pageable.ofSize(20),peerList));
-        PageDTO<WgPeerDTO> expected = PageDTO.from(paging.apply(Pageable.ofSize(20),peerList).map(WgPeerDTO::from));
+        PageDTO<WgPeerDTO> expected = new PageDTO<>(
+                1,
+                2,
+                peers.stream().map(peerDTOC::convert).toList()
+        );
         webClient.get().uri(uriBuilder -> uriBuilder
                         .path("/peers")
                         .queryParam("page", 1)
@@ -147,7 +153,7 @@ class PeerControllerTest {
                         .build())
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(WgPeerDTO.class).isEqualTo(WgPeerDTO.from(peer.get()));
+                .expectBody(WgPeerDTO.class).isEqualTo(peerDTOC.convert(peer.get()));
     }
 
     @Test
@@ -192,7 +198,7 @@ class PeerControllerTest {
                 newPeer.getPresharedKey(),
                 newPeer.getPrivateKey(),
                 newPeer.getAllowedSubnets(),
-                25, 0))).thenReturn(newPeer);
+                25))).thenReturn(newPeer);
         webClient.post().uri(uriBuilder -> uriBuilder
                         .path("/peer/create")
                         .queryParam("publicKey", newPeer.getPublicKey())
@@ -228,7 +234,7 @@ class PeerControllerTest {
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(WgPeerDTO.class)
-                .isEqualTo(WgPeerDTO.from(peerToDelete));
+                .isEqualTo(peerDTOC.convert(peerToDelete));
     }
 
     @Test
