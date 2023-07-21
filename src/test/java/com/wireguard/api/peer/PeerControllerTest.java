@@ -1,6 +1,7 @@
 package com.wireguard.api.peer;
 
 import com.wireguard.api.AppError;
+import com.wireguard.api.ResourceNotFoundException;
 import com.wireguard.api.converters.WgPeerDTOFromWgPeerConverter;
 import com.wireguard.api.dto.PageDTO;
 import com.wireguard.external.network.NoFreeIpException;
@@ -13,6 +14,7 @@ import com.wireguard.external.wireguard.PeerCreationRequest;
 import com.wireguard.external.wireguard.peer.CreatedPeer;
 import com.wireguard.external.wireguard.peer.WgPeer;
 import com.wireguard.external.wireguard.peer.WgPeerService;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,10 +26,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 import static org.hamcrest.Matchers.containsString;
 
@@ -41,7 +43,7 @@ class PeerControllerTest {
     @MockBean
     WgPeerService wgPeerService;
     List<WgPeer> peerList = List.of(
-            WgPeer.publicKey("PubKey1").build(),
+            WgPeer.publicKey(getFakePubKey()).build(),
             WgPeer.publicKey("PubKey2")
                     .presharedKey("PresharedKey2")
                     .allowedIPv4Subnets(Set.of(Subnet.valueOf("10.0.0.1/32"),Subnet.valueOf("10.1.1.1/30")))
@@ -103,7 +105,7 @@ class PeerControllerTest {
                 .expectStatus().isBadRequest()
                 .expectBody()
                 .jsonPath("$.code").isEqualTo(400)
-                .jsonPath("$.message").value(containsString("Page"));
+                .jsonPath("$.message").value(containsString("page"));
     }
 
     @Test
@@ -118,7 +120,7 @@ class PeerControllerTest {
                 .expectStatus().isBadRequest()
                 .expectBody()
                 .jsonPath("$.code").isEqualTo(400)
-                .jsonPath("$.message").value(containsString("size"));
+                .jsonPath("$.message").value(containsString("limit"));
     }
 
     @Test
@@ -143,14 +145,14 @@ class PeerControllerTest {
     @Test
     void getPeerByPublicKey() {
         Optional<WgPeer> peer = Optional.of(
-                peerList.stream().filter(p -> p.getPublicKey().equals("PubKey2"))
+                peerList.stream().filter(p -> p.getPublicKey().equals(getFakePubKey()))
                 .findFirst().get()
         );
-        Mockito.when(wgPeerService.getPeerByPublicKey("PubKey2"))
-                        .thenReturn(peer);
+        Mockito.when(wgPeerService.getPeerByPublicKeyOrThrow(getFakePubKey()))
+                        .thenReturn(peer.get());
         webClient.get().uri(uriBuilder -> uriBuilder
                         .path("/peer")
-                        .queryParam("publicKey", "PubKey2")
+                        .queryParam("publicKey", getFakePubKey())
                         .build())
                 .exchange()
                 .expectStatus().isOk()
@@ -159,10 +161,12 @@ class PeerControllerTest {
 
     @Test
     void getPeerByPublicKeyNotFound()  {
-        Mockito.when(wgPeerService.getPeerByPublicKey("NotExistedPubKey"))
-                .thenReturn(Optional.empty());
-        webClient.get().uri("/peer")
-                .attribute("publicKey", "NotExistedPubKey")
+        Mockito.when(wgPeerService.getPeerByPublicKeyOrThrow(getFakePubKey()))
+                .thenThrow(new ResourceNotFoundException("not found"));
+        webClient.get().uri(uriBuilder -> uriBuilder
+                        .path("/peer")
+                        .queryParam("publicKey", getFakePubKey())
+                        .build())
                 .exchange()
                 .expectStatus().isNotFound()
                 .expectBody()
@@ -190,9 +194,9 @@ class PeerControllerTest {
     @Test
     void createPeerWithParams() {
         CreatedPeer newPeer = new CreatedPeer(
-                "PubKeyParams",
-                "PresharedKeyParams",
-                "PrivateKeyParams",
+                getFakePubKey(),
+                getFakePubKey(),
+                getFakePubKey(),
                 Set.of(Subnet.valueOf("10.0.0.10/32")),
                 25);
         Mockito.when(wgPeerService.createPeerGenerateNulls(new PeerCreationRequest(newPeer.getPublicKey(),
@@ -227,10 +231,10 @@ class PeerControllerTest {
     @Test
     void deletePeer() {
         WgPeer peerToDelete = peerList.get(1);
-        Mockito.when(wgPeerService.getPeerByPublicKey("PubKey2")).thenReturn(Optional.of(peerToDelete));
+        Mockito.when(wgPeerService.deletePeer(Mockito.anyString())).thenReturn(peerToDelete);
         webClient.delete().uri(uriBuilder -> uriBuilder
                         .path("/peer/delete")
-                        .queryParam("publicKey", "PubKey2")
+                        .queryParam("publicKey", getFakePubKey())
                         .build())
                 .exchange()
                 .expectStatus().isOk()
@@ -238,17 +242,29 @@ class PeerControllerTest {
                 .isEqualTo(peerDTOC.convert(peerToDelete));
     }
 
+
     @Test
     void deletePeerNotExists(){
-        Mockito.when(wgPeerService.getPeerByPublicKey(Mockito.anyString())).thenReturn(Optional.empty());
+        Mockito.when(wgPeerService.deletePeer(Mockito.anyString())).thenThrow(new NoSuchElementException("not found"));
         webClient.delete().uri(uriBuilder -> uriBuilder
                         .path("/peer/delete")
-                        .queryParam("publicKey", "PubKey2")
+                        .queryParam("publicKey", getFakePubKey())
+
                         .build())
                 .exchange()
                 .expectStatus().isNotFound()
-                .expectBody(AppError.class)
-                .isEqualTo(new AppError(404, "Peer with public key PubKey2 not found"));
+                .expectBody()
+                .jsonPath("$.code").isEqualTo(404)
+                .jsonPath("$.message").value(containsString("not found"));
+
+    }
+
+    private String getFakePubKey() {
+        return "CkwTo0AKBXMyX9Mqf0SRrq31hZAb6s5C7k1UU94m024=";
+    }
+    @SneakyThrows
+    private String urlEncodeValue(String value) {
+        return URLEncoder.encode(value, StandardCharsets.UTF_8.toString());
     }
 
 

@@ -132,13 +132,9 @@ public class PeerController {
     @Parameter(name = "publicKeyDTO", hidden = true)
     @GetMapping("/peer")
     public WgPeerDTO getPeerByPublicKey(
-            @Valid PublicKeyDTO publicKeyDTO) throws ParsingException {
-        Optional<WgPeer> peer =  wgPeerService.getPeerByPublicKey(publicKeyDTO.getValue());
-        if (peer.isPresent()){
-            return peerDTOConverter.convert(peer.get());
-        } else {
-            throw new ResourceNotFoundException("Peer with public key %s not found".formatted(publicKeyDTO.getValue()));
-        }
+            @Valid PublicKeyDTO publicKeyDTO) {
+        WgPeer peer = wgPeerService.getPeerByPublicKeyOrThrow(publicKeyDTO.getValue());
+        return peerDTOConverter.convert(peer);
     }
 
     @ApiResponses(value = {

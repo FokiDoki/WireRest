@@ -22,7 +22,7 @@ public class FakeWgTool extends WgTool {
 
     public FakeWgTool() {
         super(1);
-        wgInterface = new WgInterface("privkey", "pubkey", 16666, 0);
+        wgInterface = new WgInterface(generatePrivateKey(), genPubKey(), 16666, 0);
         List.of(
                 WgPeer.publicKey(genPubKey()).build(),
                 WgPeer.publicKey(genPubKey()).presharedKey(generatePresharedKey()).build(),
@@ -75,7 +75,6 @@ public class FakeWgTool extends WgTool {
     @Override
     public String generatePublicKey(String privateKey) {
         String key = "pub"+privateKey.substring(44-7)+"FakePubKey"+String.format("%11d", keyCounter++);
-        System.out.println("keypub: "+key);
         return base64Encoder.encodeToString(key.getBytes());
     }
 
