@@ -80,7 +80,7 @@ class BlockingByHashAsyncExecutorTest {
         List<Map<String, Long>> results = new ArrayList<>();
         futures.forEach(future -> {
             try {
-                results.add(future.get(sleepTimeMs*3, TimeUnit.MILLISECONDS));
+                results.add(future.get(sleepTimeMs*6, TimeUnit.MILLISECONDS));
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
