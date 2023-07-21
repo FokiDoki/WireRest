@@ -16,6 +16,6 @@ public class CreatedPeer {
     private String publicKey;
     private String presharedKey;
     private String privateKey;
-    private Set<ISubnet> allowedSubnets;
+    private Set<? extends ISubnet> allowedSubnets;
     private int persistentKeepalive;
 }

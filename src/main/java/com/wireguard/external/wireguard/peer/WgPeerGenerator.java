@@ -33,7 +33,7 @@ public class WgPeerGenerator {
         String publicKey = peerCreationRequest.getPublicKey() == null ? wgTool.generatePublicKey(privateKey) : peerCreationRequest.getPublicKey();
         String presharedKey = peerCreationRequest.getPresharedKey() == null ? wgTool.generatePresharedKey() : peerCreationRequest.getPresharedKey();
         int persistentKeepalive = peerCreationRequest.getPersistentKeepalive() == null ? DEFAULT_PERSISTENT_KEEPALIVE : peerCreationRequest.getPersistentKeepalive();
-        Set<ISubnet> allowedIps = peerCreationRequest.getAllowedIps();
+        Set<? extends ISubnet> allowedIps = peerCreationRequest.getIpAllocationRequest().getSubnets();
         logger.info("Created peer, public key: %s".formatted(publicKey.substring(0, Math.min(6, publicKey.length()))));
         return new CreatedPeer(publicKey, presharedKey, privateKey, allowedIps, persistentKeepalive);
     }

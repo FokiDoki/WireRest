@@ -63,15 +63,18 @@ public class WgPeerService {
     }
 
     public CreatedPeer createPeerGenerateNulls(PeerCreationRequest peerCreationRequest) {
-        HashSet<ISubnet> allowedIps = new HashSet<>(peerCreationRequest.getAllowedIps());
+        if (peerCreationRequest.getPublicKey()  !=null) throwIfPeerExists(peerCreationRequest.getPublicKey());
+        IpAllocationRequest ipAllocationRequest = peerCreationRequest.getIpAllocationRequest();
+        HashSet<ISubnet> allowedIps = new HashSet<>(ipAllocationRequest.getSubnets());
         subnetService.obtain(allowedIps);
-        allowedIps.addAll(subnetService.generateV4(peerCreationRequest.getCountOfIpsToGenerate()));
-        peerCreationRequest.setAllowedIps(allowedIps);
+        allowedIps.addAll(subnetService.generateV4(ipAllocationRequest.getCountOfIpsToGenerate()));
+        ipAllocationRequest.setSubnets(allowedIps);
 
         CreatedPeer createdPeer = peerGenerator.createPeerGenerateNulls(peerCreationRequest);
         wgPeerRepository.add(createdPeerToWgPeer(createdPeer));
         return createdPeer;
     }
+
 
     private WgPeer createdPeerToWgPeer(CreatedPeer createdPeer) {
         return WgPeer.publicKey(createdPeer.getPublicKey())
@@ -117,12 +120,12 @@ public class WgPeerService {
                 .stream()
                 .findFirst().ifPresent(
                         peer -> {
-                            throw new IllegalArgumentException("Peer with public key %s already exists".formatted(publicKey));
+                            throw new PeerAlreadyExistsException(peer.getPublicKey());
                         }
                 );
     }
 
-    public <T> T defaultIfNull(T value, T defaultValue) {
+    private <T> T defaultIfNull(T value, T defaultValue) {
         return value != null ? value : defaultValue;
     }
 
@@ -131,12 +134,11 @@ public class WgPeerService {
         return createPeerGenerateNulls(new EmptyPeerCreationRequest());
     }
 
-    public void deletePeer(String publicKey) {
+    public WgPeer deletePeer(String publicKey) {
         WgPeer peer = getPeerByPublicKeyOrThrow(publicKey);
-        wgPeerRepository.remove(
-                WgPeer.publicKey(publicKey).build()
-        );
+        wgPeerRepository.remove(peer);
         subnetService.release(peer.getAllowedSubnets().getAll());
+        return peer;
     }
 
 

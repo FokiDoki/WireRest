@@ -27,7 +27,7 @@ public class Paging<T> {
         try{
             return sortList(sort.iterator(), list);
         } catch (NoSuchFieldException e){
-            throw new ParsingException("Filed %s not exist".formatted(e.getMessage()), e);
+            throw new ParsingException("Field %s not exist".formatted(e.getMessage()), e);
         }
     }
 

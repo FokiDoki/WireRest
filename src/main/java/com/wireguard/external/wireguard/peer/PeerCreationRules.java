@@ -11,9 +11,11 @@ public class PeerCreationRules {
 
 
     private final int defaultMask;
+    private final int defaultIpsToGenerate = 1;
 
     @Autowired
     public PeerCreationRules(@Value("${wg.interface.default.mask}") int defaultMask) {
         this.defaultMask = defaultMask;
     }
+
 }

@@ -81,7 +81,7 @@ class WgPeerServiceTest {
     public void testCreatePeerGenerateNulls() {
         CreatedPeer shouldBeReturned = new CreatedPeer("publicKey", "Psk", "Ppk", Set.of(Subnet.valueOf("10.66.66.1/32")), 0);
         PeerCreationRequest peerCreationRequest = new PeerCreationRequest("publicKey", "Psk", "Ppk",
-                Set.of(), 0, 1);
+                new IpAllocationRequestOneIfNullSubnets(Set.of()), 0);
         Mockito.when(wgPeerGenerator.createPeerGenerateNulls(
                         peerCreationRequest))
                 .thenReturn(shouldBeReturned);
@@ -91,7 +91,7 @@ class WgPeerServiceTest {
         Mockito.verify(subnetService, Mockito.times(1)).generateV4(Mockito.anyInt());
         Mockito.verify(wgPeerGenerator, Mockito.times(1)).createPeerGenerateNulls(
                 new PeerCreationRequest(shouldBeReturned.getPublicKey(), shouldBeReturned.getPresharedKey(), shouldBeReturned.getPrivateKey(),
-                Mockito.any(), shouldBeReturned.getPersistentKeepalive(), 1));
+                Mockito.any(), shouldBeReturned.getPersistentKeepalive()));
         Mockito.verify(wgPeerRepository, Mockito.times(1)).add(Mockito.any(WgPeer.class));
     }
 

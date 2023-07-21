@@ -1,5 +1,12 @@
 package com.wireguard.api.peer;
 
+import com.wireguard.api.dto.RequiredWgKey;
+import com.wireguard.api.dto.Socket;
+import com.wireguard.api.dto.WgKey;
+import jakarta.annotation.Nullable;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,10 +17,19 @@ import java.util.Set;
 @AllArgsConstructor
 public class PeerUpdateRequestDTO {
     @NotNull
-    private final String publicKey;
-    private final String newPublicKey;
-    private final String presharedKey;
+    @Valid
+    private final RequiredWgKey publicKey;
+    @Nullable
+    @Valid
+    private final RequiredWgKey newPublicKey;
+    @Nullable
+    @Valid
+    private final WgKey presharedKey;
     private final Set<String> allowedIps;
-    private final String endpoint;
+    @Valid
+    private final Socket endpoint;
+    @Min(0)
+    @Max(65535)
     private final Integer persistentKeepalive;
 }
+
