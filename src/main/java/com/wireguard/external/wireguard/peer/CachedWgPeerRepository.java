@@ -1,6 +1,8 @@
 package com.wireguard.external.wireguard.peer;
 
+import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.Expiry;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.wireguard.external.network.IV4SubnetSolver;
 import com.wireguard.external.network.NetworkInterfaceData;
@@ -8,6 +10,7 @@ import com.wireguard.external.wireguard.RepositoryPageable;
 import com.wireguard.external.wireguard.Specification;
 import com.wireguard.external.wireguard.WgTool;
 import com.wireguard.external.wireguard.peer.spec.FindByPublicKey;
+import org.checkerframework.checker.index.qual.NonNegative;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -24,20 +27,16 @@ import java.util.concurrent.TimeUnit;
 @ConditionalOnProperty(value = "wg.cache.enabled", havingValue = "true")
 public class CachedWgPeerRepository extends WgPeerRepository implements RepositoryPageable<WgPeer> {
 
-    private final LoadingCache<String, WgPeer> wgPeerCache;
+    private final Cache<String, WgPeer> wgPeerCache;
     private final ScheduledExecutorService cacheUpdateScheduler = Executors.newSingleThreadScheduledExecutor();
-    private final int UPDATE_INTERVAL_SECONDS;
 
     @Autowired
     public CachedWgPeerRepository(WgTool wgTool, NetworkInterfaceData wgInterface, IV4SubnetSolver subnetSolver,
                                   @Value("${wg.cache.update-interval}") int cacheUpdateIntervalSeconds) {
         super(wgTool, wgInterface);
-        UPDATE_INTERVAL_SECONDS = cacheUpdateIntervalSeconds;
-        wgPeerCache = Caffeine.newBuilder()
-                .refreshAfterWrite(UPDATE_INTERVAL_SECONDS, TimeUnit.SECONDS)
-                .expireAfterWrite(UPDATE_INTERVAL_SECONDS* 1000L + 100, TimeUnit.MILLISECONDS)
-                .build(key -> super.getBySpecification(new FindByPublicKey(key)).stream().findFirst().orElse(null));
-        cacheUpdateScheduler.scheduleAtFixedRate(() -> updateCache(subnetSolver), 0, UPDATE_INTERVAL_SECONDS, TimeUnit.SECONDS);
+        wgPeerCache = Caffeine.newBuilder().build();
+        cacheUpdateScheduler.scheduleAtFixedRate(() -> updateCache(subnetSolver), 0, cacheUpdateIntervalSeconds, TimeUnit.SECONDS);
+
 
     }
 
@@ -84,11 +83,14 @@ public class CachedWgPeerRepository extends WgPeerRepository implements Reposito
     }
 
     synchronized private void updateCache(IV4SubnetSolver subnetSolver) {
-        for (WgPeer wgPeer : super.getAll()) {
-            wgPeerCache.put(wgPeer.getPublicKey(), wgPeer);
-            wgPeer.getAllowedSubnets().getIPv4Subnets().stream()
-                    .filter(subnet -> !subnetSolver.isUsed(subnet))
-                    .forEach(subnetSolver::obtain);
+        List<WgPeer> newPeers = super.getAll();
+        synchronized (wgPeerCache) {
+            newPeers.forEach(wgPeer -> {
+                wgPeerCache.put(wgPeer.getPublicKey(), wgPeer);
+                wgPeer.getAllowedSubnets().getIPv4Subnets().stream()
+                        .filter(subnet -> !subnetSolver.isUsed(subnet))
+                        .forEach(subnetSolver::obtain);
+            });
         }
     }
 

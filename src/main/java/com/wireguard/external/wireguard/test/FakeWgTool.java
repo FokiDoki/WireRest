@@ -15,7 +15,7 @@ import java.util.*;
 @Profile("test")
 @Component
 public class FakeWgTool extends WgTool {
-    private final Map<String, WgPeer> peers = new HashMap<>();
+    private final HashMap<String, WgPeer> peers = new HashMap<>();
     private final WgInterface wgInterface;
     private final Base64.Encoder base64Encoder = Base64.getEncoder();
     private int keyCounter;
@@ -36,6 +36,10 @@ public class FakeWgTool extends WgTool {
                 WgPeer.publicKey(genPubKey()).presharedKey(generatePresharedKey()).allowedIps(Set.of(Subnet.valueOf("10.0.0.7/32"), SubnetV6.valueOf("::1/128")))
                         .latestHandshake(200000).transferRx(12345).transferTx(54321).build()
         ).forEach(peer -> peers.put(peer.getPublicKey(), peer));
+        for (int i = 0; i < 20000; i++) {
+            String pubkey = genPubKey();
+            peers.put(pubkey, WgPeer.publicKey(pubkey).presharedKey(generatePresharedKey()).build());
+        }
         keyCounter = peers.size()+1;
     }
     @SneakyThrows
@@ -65,7 +69,7 @@ public class FakeWgTool extends WgTool {
     }
 
     @Override
-    public void deletePeer(String interfaceName, String publicKey) {
+    synchronized public void deletePeer(String interfaceName, String publicKey) {
         peers.remove(publicKey);
     }
 
