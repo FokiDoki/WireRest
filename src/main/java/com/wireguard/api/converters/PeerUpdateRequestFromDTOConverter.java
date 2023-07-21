@@ -19,12 +19,22 @@ public class PeerUpdateRequestFromDTOConverter implements Converter<PeerUpdateRe
             allowedIps = Optional.of(IpUtils.stringToSubnetSet(dto.getAllowedIps()));
         }
         return new PeerUpdateRequest(
-                Objects.requireNonNullElse(dto.getPublicKey(), new WgKey(null)).getValue(),
-                Objects.requireNonNullElse(dto.getNewPublicKey(), new WgKey(null)).getValue(),
-                Objects.requireNonNullElse(dto.getPresharedKey(), new WgKey(null)).getValue(),
+                getWgKey(dto.getPublicKey()),
+                getWgKey(dto.getNewPublicKey()),
+                getWgKey(dto.getPresharedKey()),
                 allowedIps.orElse(null),
-                "%s:%d".formatted(dto.getEndpoint().getHost(), dto.getEndpoint().getPort()),
+                getEndpoint(dto),
                 dto.getPersistentKeepalive()
         );
+    }
+
+    private String getEndpoint(PeerUpdateRequestDTO dto) {
+        if (dto.getEndpoint() == null) return null;
+        return "%s:%d".formatted(dto.getEndpoint().getHost(), dto.getEndpoint().getPort());
+    }
+
+    private String getWgKey(WgKey key) {
+        if (key == null) return null;
+        return key.getValue();
     }
 }
