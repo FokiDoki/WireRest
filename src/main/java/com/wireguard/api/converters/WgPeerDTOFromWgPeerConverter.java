@@ -2,7 +2,6 @@ package com.wireguard.api.converters;
 
 import com.wireguard.api.peer.WgPeerDTO;
 import com.wireguard.external.wireguard.peer.WgPeer;
-import com.wireguard.utils.IpUtils;
 import org.springframework.core.convert.converter.Converter;
 
 public class WgPeerDTOFromWgPeerConverter implements Converter<WgPeer, WgPeerDTO> {

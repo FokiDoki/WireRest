@@ -1,11 +1,8 @@
 package com.wireguard.external.wireguard;
 
-import com.wireguard.external.network.ISubnet;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
-import java.util.Set;
 
 @AllArgsConstructor
 @Data

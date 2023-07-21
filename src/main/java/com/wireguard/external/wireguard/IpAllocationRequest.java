@@ -1,10 +1,8 @@
 package com.wireguard.external.wireguard;
 
 import com.wireguard.external.network.ISubnet;
-import com.wireguard.external.network.Subnet;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.checkerframework.checker.units.qual.A;
 
 import java.util.Set;
 

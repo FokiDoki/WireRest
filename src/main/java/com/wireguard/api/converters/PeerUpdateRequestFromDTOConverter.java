@@ -7,7 +7,6 @@ import com.wireguard.external.wireguard.PeerUpdateRequest;
 import com.wireguard.utils.IpUtils;
 import org.springframework.core.convert.converter.Converter;
 
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 

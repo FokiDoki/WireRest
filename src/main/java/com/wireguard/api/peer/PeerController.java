@@ -2,11 +2,11 @@ package com.wireguard.api.peer;
 
 import com.wireguard.api.AppError;
 import com.wireguard.api.BadRequestException;
-import com.wireguard.api.ResourceNotFoundException;
 import com.wireguard.api.converters.*;
-import com.wireguard.api.dto.*;
+import com.wireguard.api.dto.PageDTO;
+import com.wireguard.api.dto.PageRequestDTO;
+import com.wireguard.api.dto.PublicKeyDTO;
 import com.wireguard.external.wireguard.ParsingException;
-import com.wireguard.external.wireguard.PeerUpdateRequest;
 import com.wireguard.external.wireguard.peer.CreatedPeer;
 import com.wireguard.external.wireguard.peer.WgPeer;
 import com.wireguard.external.wireguard.peer.WgPeerService;
@@ -25,10 +25,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 @Validated

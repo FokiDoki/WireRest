@@ -5,11 +5,11 @@ import com.wireguard.api.dto.Socket;
 import com.wireguard.api.dto.WgKey;
 import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.checkerframework.checker.regex.qual.Regex;
-import org.checkerframework.common.value.qual.MatchesRegex;
 
 import java.util.Set;
 
