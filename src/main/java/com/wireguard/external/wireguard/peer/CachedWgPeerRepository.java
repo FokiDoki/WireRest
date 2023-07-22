@@ -25,7 +25,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 
 @Component
@@ -34,17 +36,14 @@ public class CachedWgPeerRepository extends WgPeerRepository implements Reposito
 
     private final Cache<String, WgPeer> wgPeerCache;
     private final ScheduledExecutorService cacheUpdateScheduler = Executors.newSingleThreadScheduledExecutor();
-    private final AtomicBoolean cacheUpdateInProgress = new AtomicBoolean(false);
-    private final ReentrantLock cacheReplacing = new ReentrantLock();
-    private ReentrantLock mutex = new ReentrantLock();
-    private final List<String> peersToDeleteAfterCacheUpdate = new LinkedList<>();
+    private static final ReentrantReadWriteLock lock =
+            new ReentrantReadWriteLock(true);
 
     @Autowired
     public CachedWgPeerRepository(WgTool wgTool, NetworkInterfaceData wgInterface, IV4SubnetSolver subnetSolver,
                                   @Value("${wg.cache.update-interval}") int cacheUpdateIntervalSeconds) {
         super(wgTool, wgInterface);
-        wgPeerCache = Caffeine.newBuilder()
-                .build();
+        wgPeerCache = Caffeine.newBuilder().build();
         cacheUpdateScheduler.scheduleAtFixedRate(() -> updateCache(subnetSolver),
                 0, cacheUpdateIntervalSeconds, TimeUnit.SECONDS);
 
@@ -60,17 +59,14 @@ public class CachedWgPeerRepository extends WgPeerRepository implements Reposito
     @SneakyThrows
     @Override
     public void remove(WgPeer wgPeer) {
-        cacheReplacing.lock();
-        mutex.lock();
-        wgPeerCache.invalidate(wgPeer.getPublicKey());
-        mutex.unlock();
-        System.out.println("Removing peer from cache "+wgPeer.getPublicKey());
-        super.remove(wgPeer);
-        if (cacheUpdateInProgress.get()){
-            peersToDeleteAfterCacheUpdate.add(wgPeer.getPublicKey());
-            System.out.println("added to delete list "+wgPeer.getPublicKey());
+        Lock readLock = lock.readLock();
+        readLock.lock();
+        try {
+            wgPeerCache.invalidate(wgPeer.getPublicKey());
+            super.remove(wgPeer);
+        } finally {
+            readLock.unlock();
         }
-        cacheReplacing.unlock();
     }
 
     @Override
@@ -100,58 +96,31 @@ public class CachedWgPeerRepository extends WgPeerRepository implements Reposito
     }
 
     private Optional<WgPeer> getFromCacheByPublicKey(String publicKey){
-        mutex.lock();
-        System.out.println("Getting peer from cache "+publicKey);
-        System.out.println("Cache size "+wgPeerCache.estimatedSize());
-        System.out.println("Cache state "+wgPeerCache.asMap().keySet().size());
-       // System.out.println("cache state "+wgPeerCache.asMap().keySet().stream().reduce("", (s, s2) -> s+" "+s2));
         Optional<WgPeer> peer = Optional.ofNullable(wgPeerCache.getIfPresent(publicKey));
-        mutex.unlock();
         return peer;
     }
 
     @SneakyThrows
     synchronized private void updateCache(IV4SubnetSolver subnetSolver) {
-        System.out.println("Getting all peers");
-        cacheUpdateInProgress.set(true);
-        List<WgPeer> newPeers = super.getAll();
-        System.out.println("Got all peers "+newPeers.stream().map(WgPeer::getPublicKey).reduce("", (s, s2) -> s+" "+s2));
-
-        Thread.sleep(1000);
-        System.out.println("Updating cache");
-        System.out.println(peersToDeleteAfterCacheUpdate.size() + " peers to no add");
-        cacheReplacing.lock();
-        newPeers.forEach(wgPeer -> {
-            //System.out.println(peersToDeleteAfterCacheUpdate);
-            if (peersToDeleteAfterCacheUpdate.contains(wgPeer.getPublicKey())){
-                peersToDeleteAfterCacheUpdate.remove(wgPeer.getPublicKey());
-                System.out.println("Peer "+wgPeer.getPublicKey()+" not added");
-                return;
-            }
-
-            wgPeerCache.put(wgPeer.getPublicKey(), wgPeer);
-            //System.out.println("a "+wgPeer.getPublicKey());
-            wgPeer.getAllowedSubnets().getIPv4Subnets().stream()
-                    .filter(subnet -> !subnetSolver.isUsed(subnet))
-                    .forEach(subnetSolver::obtain);
-        });
-        cacheReplacing.unlock();
-        System.out.println(peersToDeleteAfterCacheUpdate.size()+ " peers to no add");
-        cacheUpdateInProgress.set(false);
-        System.out.println("Cache updated");
-        peersToDeleteAfterCacheUpdate.clear();
+        Lock writeLock = lock.writeLock();
+        writeLock.lock();
+        try {
+            List<WgPeer> newPeers = super.getAll();
+            newPeers.forEach(wgPeer -> {
+                wgPeerCache.put(wgPeer.getPublicKey(), wgPeer);
+                wgPeer.getAllowedSubnets().getIPv4Subnets().stream()
+                        .filter(subnet -> !subnetSolver.isUsed(subnet))
+                        .forEach(subnetSolver::obtain);
+            });
+        } finally {
+            writeLock.unlock();
+        }
     }
 
     @SneakyThrows
     @Override
     public List<WgPeer> getAll() {
-        cacheReplacing.lock();
-        mutex.lock();
-        List<WgPeer> peers = wgPeerCache.asMap().values().stream().toList();
-       // System.out.println("getall: "+peers.stream().map(WgPeer::getPublicKey).collect(Collectors.toList()));
-        mutex.unlock();
-        cacheReplacing.unlock();
-        return peers;
+        return wgPeerCache.asMap().values().stream().toList();
 
     }
 
