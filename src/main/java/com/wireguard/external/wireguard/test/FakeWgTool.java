@@ -45,6 +45,7 @@ public class FakeWgTool extends WgTool {
     @SneakyThrows
     @Override
     public WgShowDump showDump(String interfaceName) {
+        System.out.println("fwt: showdump ");
         return new WgShowDump(wgInterface, peers.values().stream().toList());
     }
     private String genPubKey(){
@@ -70,6 +71,7 @@ public class FakeWgTool extends WgTool {
 
     @Override
     synchronized public void deletePeer(String interfaceName, String publicKey) {
+        System.out.println("fwt: deletePeer: "+publicKey);
         peers.remove(publicKey);
     }
 
