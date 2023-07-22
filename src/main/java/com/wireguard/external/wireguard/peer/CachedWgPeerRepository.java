@@ -56,7 +56,7 @@ public class CachedWgPeerRepository extends WgPeerRepository implements Reposito
         super.add(wgPeer);
     }
 
-    @SneakyThrows
+    
     @Override
     public void remove(WgPeer wgPeer) {
         Lock readLock = lock.readLock();
@@ -100,7 +100,7 @@ public class CachedWgPeerRepository extends WgPeerRepository implements Reposito
         return peer;
     }
 
-    @SneakyThrows
+    
     synchronized private void updateCache(IV4SubnetSolver subnetSolver) {
         Lock writeLock = lock.writeLock();
         writeLock.lock();
@@ -117,7 +117,7 @@ public class CachedWgPeerRepository extends WgPeerRepository implements Reposito
         }
     }
 
-    @SneakyThrows
+    
     @Override
     public List<WgPeer> getAll() {
         return wgPeerCache.asMap().values().stream().toList();
