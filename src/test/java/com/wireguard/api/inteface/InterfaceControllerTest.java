@@ -23,7 +23,7 @@ class InterfaceControllerTest {
     void getInterface() {
         WgInterface wgInterface = new WgInterface("PrivateKey", "PublicKey", 1234, 5678);
         Mockito.when(wgInterfaceService.getInterface()).thenReturn(wgInterface);
-        webClient.get().uri("/interface").accept(MediaType.APPLICATION_JSON).exchange()
+        webClient.get().uri("/v1/interface").accept(MediaType.APPLICATION_JSON).exchange()
                 .expectStatus().isOk()
                 .expectBody(WgInterfaceDTO.class).isEqualTo(WgInterfaceDTO.from(wgInterface));
 

@@ -3,6 +3,7 @@ package com.wireguard.api;
 
 import com.wireguard.external.network.AlreadyUsedException;
 import com.wireguard.external.shell.CommandExecutionException;
+import com.wireguard.external.wireguard.ParsingException;
 import com.wireguard.external.wireguard.peer.PeerAlreadyExistsException;
 import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
@@ -117,6 +118,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler
     public ResponseEntity<AppError> commandExecutionException(CommandExecutionException e) {
+        logger.error(e.getMessage(), e);
+        return getAppErrorResponseEntity(HttpStatus.BAD_REQUEST, e);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<AppError> parsingException(ParsingException e){
         logger.error(e.getMessage(), e);
         return getAppErrorResponseEntity(HttpStatus.BAD_REQUEST, e);
     }
