@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Objects;
 
 @RestController
+@RequestMapping(value = "v1/peers")
 @Validated
 public class PeerController {
 
@@ -60,7 +61,7 @@ public class PeerController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = AppError.class))})})
-    @GetMapping("/peers")
+    @GetMapping()
     @Parameter(name = "page", description = "Page number")
     @Parameter(name = "limit", description = "Page size (In case of 0, all peers will be returned)", schema = @Schema(defaultValue = "100"))
     @Parameter(name = "sort", description = "Sort key and direction separated by a dot. The keys are the same as in the answer. " +
@@ -71,13 +72,8 @@ public class PeerController {
             @Valid PageRequestDTO pageRequestDTO
     ) throws ParsingException {
         Page<WgPeer> peers;
-        try {
-            Pageable pageable = pageRequestConverter.convert(pageRequestDTO);
-            peers = wgPeerService.getPeers(pageable);
-
-        } catch (ParsingException e) {
-            throw new BadRequestException(e.getMessage());
-        }
+        Pageable pageable = pageRequestConverter.convert(pageRequestDTO);
+        peers = wgPeerService.getPeers(pageable);
         return pageDTOConverter.convert(peers);
     }
 
@@ -93,7 +89,7 @@ public class PeerController {
             array = @ArraySchema(arraySchema = @Schema(implementation = String.class), uniqueItems = true), allowEmptyValue = true)
     @Parameter(name = "persistentKeepalive", description = "New persistent keepalive interval in seconds (0 if not provided)", schema = @Schema(implementation = Integer.class, defaultValue = "0", example = "0", minimum = "0", maximum = "65535"))
     @Parameter(name = "peerUpdateRequestDTO", hidden = true)
-    @RequestMapping(value = "/peer/update", method = RequestMethod.PATCH)
+    @RequestMapping(method = RequestMethod.PATCH)
     public WgPeerDTO updatePeer(
             @Valid PeerUpdateRequestDTO peerUpdateRequestDTO
     ) {
@@ -120,7 +116,7 @@ public class PeerController {
                             schema = @Schema(implementation = AppError.class))})})
     @Parameter(name = "publicKey", description = "The public key of the peer to be found", required = true)
     @Parameter(name = "publicKeyDTO", hidden = true)
-    @GetMapping("/peer")
+    @GetMapping("/find")
     public WgPeerDTO getPeerByPublicKey(
             @Valid PublicKeyDTO publicKeyDTO) {
         WgPeer peer = wgPeerService.getPeerByPublicKeyOrThrow(publicKeyDTO.getValue());
@@ -142,7 +138,7 @@ public class PeerController {
             @ApiResponse(responseCode = "400", description = "Bad request (Invalid parameters values)",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = AppError.class))})})
-    @PostMapping("/peer/create")
+    @PostMapping()
     @Parameter(name = "publicKey", description = "Public key of the peer (Will be generated if not provided)")
     @Parameter(name = "presharedKey", description = "Preshared key or empty if no psk required (Will be generated if not provided)", allowEmptyValue = true)
     @Parameter(name = "privateKey", description = "Private key of the peer " +
@@ -180,7 +176,7 @@ public class PeerController {
 
 
     @Parameter(name = "publicKey", description = "The public key of the peer to be deleted", required = true)
-    @DeleteMapping("/peer/delete")
+    @DeleteMapping()
     public WgPeerDTO deletePeer(@Valid PublicKeyDTO publicKeyDTO) {
         WgPeer deletedPeer = wgPeerService.deletePeer(publicKeyDTO.getValue());
         return peerDTOConverter.convert(deletedPeer);
