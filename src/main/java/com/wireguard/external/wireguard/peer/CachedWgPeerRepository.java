@@ -2,42 +2,34 @@ package com.wireguard.external.wireguard.peer;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.Expiry;
-import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.wireguard.external.network.IV4SubnetSolver;
 import com.wireguard.external.network.NetworkInterfaceData;
 import com.wireguard.external.wireguard.RepositoryPageable;
 import com.wireguard.external.wireguard.Specification;
 import com.wireguard.external.wireguard.WgTool;
 import com.wireguard.external.wireguard.peer.spec.FindByPublicKey;
-import lombok.SneakyThrows;
-import org.checkerframework.checker.index.qual.NonNegative;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.stream.Collectors;
 
 @Component
 @ConditionalOnProperty(value = "wg.cache.enabled", havingValue = "true")
 public class CachedWgPeerRepository extends WgPeerRepository implements RepositoryPageable<WgPeer> {
 
-    private final Cache<String, WgPeer> wgPeerCache;
-    private final ScheduledExecutorService cacheUpdateScheduler = Executors.newSingleThreadScheduledExecutor();
     private static final ReentrantReadWriteLock lock =
             new ReentrantReadWriteLock(true);
+    private final Cache<String, WgPeer> wgPeerCache;
+    private final ScheduledExecutorService cacheUpdateScheduler = Executors.newSingleThreadScheduledExecutor();
 
     @Autowired
     public CachedWgPeerRepository(WgTool wgTool, NetworkInterfaceData wgInterface, IV4SubnetSolver subnetSolver,
@@ -56,7 +48,7 @@ public class CachedWgPeerRepository extends WgPeerRepository implements Reposito
         super.add(wgPeer);
     }
 
-    
+
     @Override
     public void remove(WgPeer wgPeer) {
         Lock readLock = lock.readLock();
@@ -84,7 +76,7 @@ public class CachedWgPeerRepository extends WgPeerRepository implements Reposito
                 .map(spec -> (FindByPublicKey) spec)
                 .findFirst();
         List<WgPeer> peers = new ArrayList<>();
-        if (findByPublicKeySpec.isPresent()){
+        if (findByPublicKeySpec.isPresent()) {
             Optional<WgPeer> peer = getFromCacheByPublicKey(findByPublicKeySpec.get().getPublicKey());
             specifications = new ArrayList<>(specifications);
             specifications.remove(findByPublicKeySpec.get());
@@ -95,12 +87,12 @@ public class CachedWgPeerRepository extends WgPeerRepository implements Reposito
         return super.getByAllSpecifications(specifications, peers);
     }
 
-    private Optional<WgPeer> getFromCacheByPublicKey(String publicKey){
+    private Optional<WgPeer> getFromCacheByPublicKey(String publicKey) {
         Optional<WgPeer> peer = Optional.ofNullable(wgPeerCache.getIfPresent(publicKey));
         return peer;
     }
 
-    
+
     synchronized private void updateCache(IV4SubnetSolver subnetSolver) {
         Lock writeLock = lock.writeLock();
         writeLock.lock();
@@ -117,7 +109,7 @@ public class CachedWgPeerRepository extends WgPeerRepository implements Reposito
         }
     }
 
-    
+
     @Override
     public List<WgPeer> getAll() {
         return wgPeerCache.asMap().values().stream().toList();
