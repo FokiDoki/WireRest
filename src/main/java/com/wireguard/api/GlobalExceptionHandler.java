@@ -3,6 +3,7 @@ package com.wireguard.api;
 
 import com.wireguard.external.network.AlreadyUsedException;
 import com.wireguard.external.shell.CommandExecutionException;
+import com.wireguard.external.wireguard.ParsingException;
 import com.wireguard.external.wireguard.peer.PeerAlreadyExistsException;
 import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
@@ -23,6 +24,7 @@ import java.util.NoSuchElementException;
 @ControllerAdvice
 public class GlobalExceptionHandler {
     Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
     @ExceptionHandler
     public ResponseEntity<AppError> catchResourceNotFoundException(ResourceNotFoundException e) {
         logger.error(e.getMessage(), e);
@@ -90,10 +92,10 @@ public class GlobalExceptionHandler {
         return getAppErrorResponseEntity(HttpStatus.BAD_REQUEST, e);
     }
 
-    private List<String> getValidationErrorStrings(WebExchangeBindException e){
+    private List<String> getValidationErrorStrings(WebExchangeBindException e) {
         return e.getFieldErrors().stream()
-                        .map(fieldError -> "%s: %s (%s provided)".formatted(fieldError.getField(), fieldError.getDefaultMessage(), fieldError.getRejectedValue()))
-                        .toList();
+                .map(fieldError -> "%s: %s (%s provided)".formatted(fieldError.getField(), fieldError.getDefaultMessage(), fieldError.getRejectedValue()))
+                .toList();
     }
 
     private ResponseEntity<AppError> getAppErrorResponseEntity(HttpStatusCode statusCode, Throwable cause) {
@@ -101,6 +103,7 @@ public class GlobalExceptionHandler {
                 new AppError(statusCode.value(),
                         cause.getMessage()), statusCode);
     }
+
     private ResponseEntity<AppError> getAppErrorResponseEntity(HttpStatusCode statusCode, String causeMessage) {
         return new ResponseEntity<>(
                 new AppError(statusCode.value(),
@@ -115,6 +118,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler
     public ResponseEntity<AppError> commandExecutionException(CommandExecutionException e) {
+        logger.error(e.getMessage(), e);
+        return getAppErrorResponseEntity(HttpStatus.BAD_REQUEST, e);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<AppError> parsingException(ParsingException e){
         logger.error(e.getMessage(), e);
         return getAppErrorResponseEntity(HttpStatus.BAD_REQUEST, e);
     }

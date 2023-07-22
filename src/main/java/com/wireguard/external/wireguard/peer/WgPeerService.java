@@ -63,7 +63,7 @@ public class WgPeerService {
     }
 
     public CreatedPeer createPeerGenerateNulls(PeerCreationRequest peerCreationRequest) {
-        if (peerCreationRequest.getPublicKey()  !=null) throwIfPeerExists(peerCreationRequest.getPublicKey());
+        if (peerCreationRequest.getPublicKey() != null) throwIfPeerExists(peerCreationRequest.getPublicKey());
         IpAllocationRequest ipAllocationRequest = peerCreationRequest.getIpAllocationRequest();
         HashSet<ISubnet> allowedIps = new HashSet<>(ipAllocationRequest.getSubnets());
         subnetService.obtain(allowedIps);
@@ -98,7 +98,7 @@ public class WgPeerService {
         return await(peer);
     }
 
-    private WgPeer updatePeerTask(PeerUpdateRequest updateRequest){
+    private WgPeer updatePeerTask(PeerUpdateRequest updateRequest) {
         WgPeer oldPeer = getPeerByPublicKeyOrThrow(updateRequest.getCurrentPublicKey());
         if (isUpdateRequestHasNewPublicKey(updateRequest)) throwIfPeerExists(updateRequest.getNewPublicKey());
         WgPeer.Builder newPeerBuilder = WgPeer.from(oldPeer);

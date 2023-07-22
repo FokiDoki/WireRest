@@ -36,17 +36,18 @@ class WgToolIntegrationTests {
         wgConfigFileSourceStream.close();
 
 
-        String resultOfCommand = shellRunner.execute(new String[]{"sudo","wg-quick", "up", wgConfigFile.getAbsolutePath()}, List.of(0,1));
+        String resultOfCommand = shellRunner.execute(new String[]{"sudo", "wg-quick", "up", wgConfigFile.getAbsolutePath()}, List.of(0, 1));
         Assertions.assertFalse(resultOfCommand.contains("wg-quick:"));
     }
 
     @AfterAll
     static void tearDownEnvironment() {
-        String resultOfCommand = shellRunner.execute(new String[]{"sudo","wg-quick", "down", wgConfigFile.getAbsolutePath()}, List.of(0,1));
+        String resultOfCommand = shellRunner.execute(new String[]{"sudo", "wg-quick", "down", wgConfigFile.getAbsolutePath()}, List.of(0, 1));
         boolean isDeleted = wgConfigFile.delete();
         Assertions.assertFalse(resultOfCommand.contains("wg-quick:"));
         Assertions.assertTrue(isDeleted);
     }
+
     @Test
     @Order(5)
     void showDump() throws IOException {
@@ -100,7 +101,7 @@ class WgToolIntegrationTests {
 
     @Test
     @Order(15)
-    void saveConfig()  {
+    void saveConfig() {
         String config = wgTool.showConf(interfaceName);
         Assertions.assertNotNull(config);
         Assertions.assertTrue(config.contains("10.112.112.10/32"));

@@ -37,6 +37,7 @@ class PeerControllerTest {
     @Autowired
     private WebTestClient webClient;
     WgPeerDTOFromWgPeerConverter peerDTOC = new WgPeerDTOFromWgPeerConverter();
+    private final static String BASE_URL = "/v1/peers";
 
     @MockBean
     WgPeerService wgPeerService;
@@ -44,7 +45,7 @@ class PeerControllerTest {
             WgPeer.publicKey(getFakePubKey()).build(),
             WgPeer.publicKey("PubKey2")
                     .presharedKey("PresharedKey2")
-                    .allowedIPv4Subnets(Set.of(Subnet.valueOf("10.0.0.1/32"),Subnet.valueOf("10.1.1.1/30")))
+                    .allowedIPv4Subnets(Set.of(Subnet.valueOf("10.0.0.1/32"), Subnet.valueOf("10.1.1.1/30")))
                     .allowedIPv6Subnets(Set.of(SubnetV6.valueOf("2001:db8::/32")))
                     .transferTx(100)
                     .transferRx(200)
@@ -57,11 +58,11 @@ class PeerControllerTest {
 
     @Test
     void getPeers() {
-        Page<WgPeer> expected = paging.apply(Pageable.ofSize(2),peerList);
+        Page<WgPeer> expected = paging.apply(Pageable.ofSize(2), peerList);
         Mockito.when(wgPeerService.getPeers(Mockito.any())).thenReturn(expected);
 
         Iterator<WgPeer> peersIter = peerList.iterator();
-        webClient.get().uri("/peers").exchange()
+        webClient.get().uri(BASE_URL).exchange()
                 .expectStatus().isOk()
                 .expectBody()
                 .jsonPath("$.content[0].publicKey").isEqualTo(peersIter.next().getPublicKey())
@@ -70,16 +71,16 @@ class PeerControllerTest {
 
     @Test
     void getPeersWithPageable() {
-        List<WgPeer> peers = peerList.stream().toList().subList(0,2);
+        List<WgPeer> peers = peerList.stream().toList().subList(0, 2);
         Mockito.when(wgPeerService.getPeers(PageRequest.of(1, 2, Sort.by(Sort.Direction.ASC, "PresharedKey"))))
-                .thenReturn(paging.apply(Pageable.ofSize(20),peerList));
+                .thenReturn(paging.apply(Pageable.ofSize(20), peerList));
         PageDTO<WgPeerDTO> expected = new PageDTO<>(
                 1,
                 2,
                 peers.stream().map(peerDTOC::convert).toList()
         );
         webClient.get().uri(uriBuilder -> uriBuilder
-                        .path("/peers")
+                        .path(BASE_URL)
                         .queryParam("page", 1)
                         .queryParam("limit", 2)
                         .queryParam("sort", "PresharedKey.asc")
@@ -90,11 +91,11 @@ class PeerControllerTest {
     }
 
     @Test
-    void getPeersWithWrongPage(){
+    void getPeersWithWrongPage() {
         Mockito.when(wgPeerService.getPeers(PageRequest.of(1, 2, Sort.by(Sort.Direction.ASC, "WrongField"))))
                 .thenThrow(new ParsingException("WrongField", new RuntimeException()));
         webClient.get().uri(uriBuilder -> uriBuilder
-                        .path("/peers")
+                        .path(BASE_URL)
                         .queryParam("page", -1)
                         .queryParam("limit", 2)
                         .queryParam("sort", "PresharedKey.asc")
@@ -107,9 +108,9 @@ class PeerControllerTest {
     }
 
     @Test
-    void getPeersWithWrongLimit(){
+    void getPeersWithWrongLimit() {
         webClient.get().uri(uriBuilder -> uriBuilder
-                        .path("/peers")
+                        .path(BASE_URL)
                         .queryParam("page", 0)
                         .queryParam("limit", -1)
                         .queryParam("sort", "PresharedKey.asc")
@@ -122,11 +123,11 @@ class PeerControllerTest {
     }
 
     @Test
-    void getPeersWithWrongSortKey(){
+    void getPeersWithWrongSortKey() {
         Mockito.when(wgPeerService.getPeers(PageRequest.of(0, 1, Sort.by(Sort.Direction.ASC, "WrongKey"))))
                 .thenThrow(new ParsingException("WrongField", new RuntimeException()));
         webClient.get().uri(uriBuilder -> uriBuilder
-                        .path("/peers")
+                        .path(BASE_URL)
                         .queryParam("page", 0)
                         .queryParam("limit", 1)
                         .queryParam("sort", "WrongKey.asc")
@@ -139,17 +140,16 @@ class PeerControllerTest {
     }
 
 
-
     @Test
     void getPeerByPublicKey() {
         Optional<WgPeer> peer = Optional.of(
                 peerList.stream().filter(p -> p.getPublicKey().equals(getFakePubKey()))
-                .findFirst().get()
+                        .findFirst().get()
         );
         Mockito.when(wgPeerService.getPeerByPublicKeyOrThrow(getFakePubKey()))
-                        .thenReturn(peer.get());
+                .thenReturn(peer.get());
         webClient.get().uri(uriBuilder -> uriBuilder
-                        .path("/peer")
+                        .path(BASE_URL+"/find")
                         .queryParam("publicKey", getFakePubKey())
                         .build())
                 .exchange()
@@ -158,11 +158,11 @@ class PeerControllerTest {
     }
 
     @Test
-    void getPeerByPublicKeyNotFound()  {
+    void getPeerByPublicKeyNotFound() {
         Mockito.when(wgPeerService.getPeerByPublicKeyOrThrow(getFakePubKey()))
                 .thenThrow(new ResourceNotFoundException("not found"));
         webClient.get().uri(uriBuilder -> uriBuilder
-                        .path("/peer")
+                        .path(BASE_URL+"/find")
                         .queryParam("publicKey", getFakePubKey())
                         .build())
                 .exchange()
@@ -183,7 +183,7 @@ class PeerControllerTest {
                 0
         );
         Mockito.when(wgPeerService.createPeerGenerateNulls(Mockito.any())).thenReturn(newPeer);
-        webClient.post().uri("/peer/create").exchange()
+        webClient.post().uri(BASE_URL).exchange()
                 .expectStatus().isCreated()
                 .expectBody(CreatedPeerDTO.class)
                 .isEqualTo(CreatedPeerDTO.from(newPeer));
@@ -203,7 +203,7 @@ class PeerControllerTest {
                 new IpAllocationRequestOneIfNullSubnets(newPeer.getAllowedSubnets()),
                 25))).thenReturn(newPeer);
         webClient.post().uri(uriBuilder -> uriBuilder
-                        .path("/peer/create")
+                        .path(BASE_URL)
                         .queryParam("publicKey", newPeer.getPublicKey())
                         .queryParam("presharedKey", newPeer.getPresharedKey())
                         .queryParam("privateKey", newPeer.getPrivateKey())
@@ -219,7 +219,7 @@ class PeerControllerTest {
     @Test
     void createPeerWhenNoFreeIps() {
         Mockito.when(wgPeerService.createPeerGenerateNulls(Mockito.any())).thenThrow(new NoFreeIpException("No free ip"));
-        webClient.post().uri("/peer/create").exchange()
+        webClient.post().uri(BASE_URL).exchange()
                 .expectStatus().is5xxServerError()
                 .expectBody()
                 .jsonPath("$.code").isEqualTo(500)
@@ -231,7 +231,7 @@ class PeerControllerTest {
         WgPeer peerToDelete = peerList.get(1);
         Mockito.when(wgPeerService.deletePeer(Mockito.anyString())).thenReturn(peerToDelete);
         webClient.delete().uri(uriBuilder -> uriBuilder
-                        .path("/peer/delete")
+                        .path(BASE_URL)
                         .queryParam("publicKey", getFakePubKey())
                         .build())
                 .exchange()
@@ -242,10 +242,10 @@ class PeerControllerTest {
 
 
     @Test
-    void deletePeerNotExists(){
+    void deletePeerNotExists() {
         Mockito.when(wgPeerService.deletePeer(Mockito.anyString())).thenThrow(new NoSuchElementException("not found"));
         webClient.delete().uri(uriBuilder -> uriBuilder
-                        .path("/peer/delete")
+                        .path(BASE_URL)
                         .queryParam("publicKey", getFakePubKey())
 
                         .build())
@@ -260,11 +260,11 @@ class PeerControllerTest {
     private String getFakePubKey() {
         return "CkwTo0AKBXMyX9Mqf0SRrq31hZAb6s5C7k1UU94m024=";
     }
+
     @SneakyThrows
     private String urlEncodeValue(String value) {
         return URLEncoder.encode(value, StandardCharsets.UTF_8.toString());
     }
-
 
 
 }

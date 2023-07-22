@@ -33,6 +33,7 @@ public class WgPeerParserTest {
         });
         Assertions.assertThat(exception.getMessage()).isEqualTo("WgPeerParser.parse: invalid number of arguments in [], 8 expected");
     }
+
     @Test
     public void testParse() {
         int dataHash = data.hashCode();
@@ -49,7 +50,7 @@ public class WgPeerParserTest {
     }
 
     @Test
-    void invalidIpTest(){
+    void invalidIpTest() {
         List<String> invalidIpsData = new ArrayList<>(data);
         invalidIpsData.set(3, "invalidIp");
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
@@ -58,7 +59,7 @@ public class WgPeerParserTest {
     }
 
     @Test
-    void invalidPersistenceKeepaliveData(){
+    void invalidPersistenceKeepaliveData() {
         List<String> invalidPersistenceKeepaliveData = new ArrayList<>(data);
         invalidPersistenceKeepaliveData.set(7, "invalid");
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {

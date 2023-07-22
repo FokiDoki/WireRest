@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/service")
+@RequestMapping("/v1/service")
 public class ServiceController {
 
     LogsDao logsDao;

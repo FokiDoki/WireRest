@@ -27,7 +27,7 @@ public class StreamToStringConverter implements Converter<InputStream, String> {
     @Override
     @Nullable
     public String convert(InputStream source) {
-        try{
+        try {
             return new String(source.readAllBytes(), charset);
         } catch (IOException e) {
             logger.error("Error converting stream", e);

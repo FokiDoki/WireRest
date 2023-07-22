@@ -20,6 +20,7 @@ class PagingTest {
             new TestClass("c", 3),
             new TestClass("d", 4)
     );
+
     @Test
     void applyNoRules() {
         Page<String> paged = paging.apply(Pageable.ofSize(3), List.of("a", "b", "c", "d"));
@@ -29,21 +30,21 @@ class PagingTest {
     }
 
     @Test
-    void applyNoFieldException(){
+    void applyNoFieldException() {
         Assertions.assertThrows(ParsingException.class, () -> {
             paging.apply(PageRequest.of(0, 1, Sort.by("not_exits")), List.of("a", "b", "c", "d"));
         });
     }
 
     @Test
-    void emptyListTest(){
+    void emptyListTest() {
         Page<String> paged = paging.apply(Pageable.ofSize(3), List.of());
         Assertions.assertEquals(0, paged.getTotalPages());
         Assertions.assertEquals(0, paged.getTotalElements());
     }
 
     @Test
-    void normalSortingTest(){
+    void normalSortingTest() {
         Page<TestClass> paged = pagingTestClass.apply(PageRequest.of(0, 2, Sort.by("str")), testList);
         Assertions.assertEquals(2, paged.getTotalPages());
         Assertions.assertEquals(4, paged.getTotalElements());
@@ -53,14 +54,14 @@ class PagingTest {
     }
 
     @Test
-    void reverseSortingTest(){
+    void reverseSortingTest() {
         Page<TestClass> paged = pagingTestClass.apply(PageRequest.of(0, 2, Sort.by("str").descending()), testList);
         Assertions.assertEquals("d", paged.getContent().get(0).str);
         Assertions.assertEquals("c", paged.getContent().get(1).str);
     }
 
     @Test
-    void nullObjectsSortingTest(){
+    void nullObjectsSortingTest() {
         List<TestClass> testListNulls = new ArrayList<>();
         testListNulls.add(new TestClass("a", 1));
         testListNulls.add(null);
@@ -74,7 +75,7 @@ class PagingTest {
     }
 
     @Test
-    void nullValuesSortingTest(){
+    void nullValuesSortingTest() {
         List<TestClass> testListNulls = new ArrayList<>();
         testListNulls.add(new TestClass("a", 1));
         testListNulls.add(new TestClass(null, 2));
@@ -87,7 +88,7 @@ class PagingTest {
         Assertions.assertNull(paged.getContent().get(2).str);
     }
 
-    private static class TestClass{
+    private static class TestClass {
         private final String str;
         private final int num;
 
@@ -96,7 +97,6 @@ class PagingTest {
             this.num = num;
         }
     }
-
 
 
 }

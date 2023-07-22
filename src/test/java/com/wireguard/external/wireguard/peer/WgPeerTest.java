@@ -10,13 +10,13 @@ import static org.junit.jupiter.api.Assertions.*;
 class WgPeerTest {
 
     @Test
-    public void testBuilder(){
+    public void testBuilder() {
         WgPeer peer = WgPeer.publicKey("publicKey").build();
         assertEquals("publicKey", peer.getPublicKey());
     }
 
     @Test
-    public void testBuilderAllArgs(){
+    public void testBuilderAllArgs() {
         WgPeer peer = WgPeer.publicKey("pubkey")
                 .presharedKey("presharedKey")
                 .endpoint("endpoint")
@@ -37,7 +37,7 @@ class WgPeerTest {
     }
 
     @Test
-    void testCompareAndEmptyAllowedSubnets(){
+    void testCompareAndEmptyAllowedSubnets() {
         WgPeer.AllowedSubnets allowedSubnets = new WgPeer.AllowedSubnets();
         assertTrue(allowedSubnets.isEmpty());
         allowedSubnets.addIpv4("0.0.0.32/32");

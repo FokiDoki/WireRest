@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 class AppErrorTest {
     AppError appError;
+
     @BeforeEach
     void setUp() {
         appError = new AppError(1, "test");
