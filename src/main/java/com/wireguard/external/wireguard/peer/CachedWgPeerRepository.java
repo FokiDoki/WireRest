@@ -1,7 +1,7 @@
 package com.wireguard.external.wireguard.peer;
 
+import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.wireguard.external.network.IV4SubnetSolver;
 import com.wireguard.external.network.NetworkInterfaceData;
 import com.wireguard.external.wireguard.RepositoryPageable;
@@ -19,25 +19,26 @@ import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @Component
 @ConditionalOnProperty(value = "wg.cache.enabled", havingValue = "true")
 public class CachedWgPeerRepository extends WgPeerRepository implements RepositoryPageable<WgPeer> {
 
-    private final LoadingCache<String, WgPeer> wgPeerCache;
+    private static final ReentrantReadWriteLock lock =
+            new ReentrantReadWriteLock(true);
+    private final Cache<String, WgPeer> wgPeerCache;
     private final ScheduledExecutorService cacheUpdateScheduler = Executors.newSingleThreadScheduledExecutor();
-    private final int UPDATE_INTERVAL_SECONDS;
 
     @Autowired
     public CachedWgPeerRepository(WgTool wgTool, NetworkInterfaceData wgInterface, IV4SubnetSolver subnetSolver,
                                   @Value("${wg.cache.update-interval}") int cacheUpdateIntervalSeconds) {
         super(wgTool, wgInterface);
-        UPDATE_INTERVAL_SECONDS = cacheUpdateIntervalSeconds;
-        wgPeerCache = Caffeine.newBuilder()
-                .refreshAfterWrite(UPDATE_INTERVAL_SECONDS, TimeUnit.SECONDS)
-                .expireAfterWrite(UPDATE_INTERVAL_SECONDS* 1000L + 100, TimeUnit.MILLISECONDS)
-                .build(key -> super.getBySpecification(new FindByPublicKey(key)).stream().findFirst().orElse(null));
-        cacheUpdateScheduler.scheduleAtFixedRate(() -> updateCache(subnetSolver), 0, UPDATE_INTERVAL_SECONDS, TimeUnit.SECONDS);
+        wgPeerCache = Caffeine.newBuilder().build();
+        cacheUpdateScheduler.scheduleAtFixedRate(() -> updateCache(subnetSolver),
+                0, cacheUpdateIntervalSeconds, TimeUnit.SECONDS);
+
 
     }
 
@@ -47,10 +48,17 @@ public class CachedWgPeerRepository extends WgPeerRepository implements Reposito
         super.add(wgPeer);
     }
 
+
     @Override
     public void remove(WgPeer wgPeer) {
-        wgPeerCache.invalidate(wgPeer.getPublicKey());
-        super.remove(wgPeer);
+        Lock readLock = lock.readLock();
+        readLock.lock();
+        try {
+            wgPeerCache.invalidate(wgPeer.getPublicKey());
+            super.remove(wgPeer);
+        } finally {
+            readLock.unlock();
+        }
     }
 
     @Override
@@ -68,7 +76,7 @@ public class CachedWgPeerRepository extends WgPeerRepository implements Reposito
                 .map(spec -> (FindByPublicKey) spec)
                 .findFirst();
         List<WgPeer> peers = new ArrayList<>();
-        if (findByPublicKeySpec.isPresent()){
+        if (findByPublicKeySpec.isPresent()) {
             Optional<WgPeer> peer = getFromCacheByPublicKey(findByPublicKeySpec.get().getPublicKey());
             specifications = new ArrayList<>(specifications);
             specifications.remove(findByPublicKeySpec.get());
@@ -79,22 +87,33 @@ public class CachedWgPeerRepository extends WgPeerRepository implements Reposito
         return super.getByAllSpecifications(specifications, peers);
     }
 
-    private Optional<WgPeer> getFromCacheByPublicKey(String publicKey){
-        return Optional.ofNullable(wgPeerCache.getIfPresent(publicKey));
+    private Optional<WgPeer> getFromCacheByPublicKey(String publicKey) {
+        Optional<WgPeer> peer = Optional.ofNullable(wgPeerCache.getIfPresent(publicKey));
+        return peer;
     }
 
+
     synchronized private void updateCache(IV4SubnetSolver subnetSolver) {
-        for (WgPeer wgPeer : super.getAll()) {
-            wgPeerCache.put(wgPeer.getPublicKey(), wgPeer);
-            wgPeer.getAllowedSubnets().getIPv4Subnets().stream()
-                    .filter(subnet -> !subnetSolver.isUsed(subnet))
-                    .forEach(subnetSolver::obtain);
+        Lock writeLock = lock.writeLock();
+        writeLock.lock();
+        try {
+            List<WgPeer> newPeers = super.getAll();
+            newPeers.forEach(wgPeer -> {
+                wgPeerCache.put(wgPeer.getPublicKey(), wgPeer);
+                wgPeer.getAllowedSubnets().getIPv4Subnets().stream()
+                        .filter(subnet -> !subnetSolver.isUsed(subnet))
+                        .forEach(subnetSolver::obtain);
+            });
+        } finally {
+            writeLock.unlock();
         }
     }
+
 
     @Override
     public List<WgPeer> getAll() {
         return wgPeerCache.asMap().values().stream().toList();
+
     }
 
 }
