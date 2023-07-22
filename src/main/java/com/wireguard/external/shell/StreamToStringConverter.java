@@ -12,9 +12,8 @@ import java.nio.charset.StandardCharsets;
 
 public class StreamToStringConverter implements Converter<InputStream, String> {
 
-    private Charset charset = StandardCharsets.UTF_8;
-
     private static final Logger logger = LoggerFactory.getLogger(StreamToStringConverter.class);
+    private Charset charset = StandardCharsets.UTF_8;
 
     public StreamToStringConverter(Charset charset) {
         this.charset = charset;
@@ -27,7 +26,7 @@ public class StreamToStringConverter implements Converter<InputStream, String> {
     @Override
     @Nullable
     public String convert(InputStream source) {
-        try{
+        try {
             return new String(source.readAllBytes(), charset);
         } catch (IOException e) {
             logger.error("Error converting stream", e);

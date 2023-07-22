@@ -17,11 +17,10 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class WgPeerServiceTest {
-    private WgPeerService wgPeerService;
-
     WgPeerRepository wgPeerRepository = Mockito.mock(WgPeerRepository.class);
     WgPeerGenerator wgPeerGenerator = Mockito.mock(WgPeerGenerator.class);
     SubnetService subnetService = Mockito.mock(SubnetService.class);
+    private WgPeerService wgPeerService;
 
     @BeforeEach
     public void setup() {
@@ -91,7 +90,7 @@ class WgPeerServiceTest {
         Mockito.verify(subnetService, Mockito.times(1)).generateV4(Mockito.anyInt());
         Mockito.verify(wgPeerGenerator, Mockito.times(1)).createPeerGenerateNulls(
                 new PeerCreationRequest(shouldBeReturned.getPublicKey(), shouldBeReturned.getPresharedKey(), shouldBeReturned.getPrivateKey(),
-                Mockito.any(), shouldBeReturned.getPersistentKeepalive()));
+                        Mockito.any(), shouldBeReturned.getPersistentKeepalive()));
         Mockito.verify(wgPeerRepository, Mockito.times(1)).add(Mockito.any(WgPeer.class));
     }
 
@@ -107,7 +106,7 @@ class WgPeerServiceTest {
     }
 
     @Test
-    public void deletePeer(){
+    public void deletePeer() {
         Mockito.when(wgPeerRepository.getBySpecification(new FindByPublicKey("publicKey")))
                 .thenReturn(List.of(WgPeer.publicKey("publicKey").build()));
         wgPeerService.deletePeer("publicKey");

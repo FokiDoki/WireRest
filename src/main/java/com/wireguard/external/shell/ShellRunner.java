@@ -23,7 +23,6 @@ public class ShellRunner {
     }
 
 
-
     public String execute(String[] command, List<Integer> allowedExitCodes) {
         Process process = startProcess(command);
         int exitCode = waitForProcess(process);
@@ -36,7 +35,7 @@ public class ShellRunner {
         return stdout;
     }
 
-    public String execute(String[] command){
+    public String execute(String[] command) {
         return execute(command, List.of(0));
     }
 
@@ -55,8 +54,7 @@ public class ShellRunner {
     private int waitForProcess(Process process) {
         try {
             return process.waitFor();
-        }
-        catch (InterruptedException ex) {
+        } catch (InterruptedException ex) {
             throw new IllegalStateException("Interrupted waiting for %s".formatted(process));
         }
     }
@@ -64,7 +62,6 @@ public class ShellRunner {
     private String readInputStream(InputStream inputStream) {
         return new StreamToStringConverter(charset).convert(inputStream);
     }
-
 
 
 }

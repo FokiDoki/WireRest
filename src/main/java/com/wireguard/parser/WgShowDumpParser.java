@@ -42,7 +42,7 @@ public class WgShowDumpParser {
         List<WgPeer> peers = new LinkedList<>();
         while (peersDump.hasNextLine()) {
             String line = peersDump.nextLine();
-            logger.trace("Parsing peer "+line);
+            logger.trace("Parsing peer " + line);
             WgPeer peer = WgPeerParser.parse(line, SPLITTER);
             peers.add(peer);
         }
@@ -50,11 +50,10 @@ public class WgShowDumpParser {
     }
 
     private static WgInterface parseInterface(String wgShowInterfaceLine) {
-        logger.trace("Parsing interface "+wgShowInterfaceLine);
+        logger.trace("Parsing interface " + wgShowInterfaceLine);
         Assert.notNull(wgShowInterfaceLine, "Wg interface dump is null");
         return WgInterfaceParser.parse(wgShowInterfaceLine, SPLITTER);
     }
-
 
 
 }

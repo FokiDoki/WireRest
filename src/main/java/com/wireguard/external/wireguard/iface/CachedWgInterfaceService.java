@@ -16,6 +16,7 @@ public class CachedWgInterfaceService extends WgInterfaceService {
     private final int REFRESH_INTERVAL_SECONDS = 300;
 
     LoadingCache<String, WgInterface> wgInterfaceCache;
+
     public CachedWgInterfaceService(NetworkInterfaceData wgInterface, WgTool wgTool) {
         super(wgInterface, wgTool);
         wgInterfaceCache = Caffeine.newBuilder()

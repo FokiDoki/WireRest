@@ -13,11 +13,11 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @WebFluxTest(InterfaceController.class)
 class InterfaceControllerTest {
 
+    @MockBean
+    WgInterfaceService wgInterfaceService;
     @Autowired
     private WebTestClient webClient;
 
-    @MockBean
-    WgInterfaceService wgInterfaceService;
     @Test
     void getInterface() {
         WgInterface wgInterface = new WgInterface("PrivateKey", "PublicKey", 1234, 5678);

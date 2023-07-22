@@ -23,6 +23,7 @@ import java.util.NoSuchElementException;
 @ControllerAdvice
 public class GlobalExceptionHandler {
     Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
     @ExceptionHandler
     public ResponseEntity<AppError> catchResourceNotFoundException(ResourceNotFoundException e) {
         logger.error(e.getMessage(), e);
@@ -90,10 +91,10 @@ public class GlobalExceptionHandler {
         return getAppErrorResponseEntity(HttpStatus.BAD_REQUEST, e);
     }
 
-    private List<String> getValidationErrorStrings(WebExchangeBindException e){
+    private List<String> getValidationErrorStrings(WebExchangeBindException e) {
         return e.getFieldErrors().stream()
-                        .map(fieldError -> "%s: %s (%s provided)".formatted(fieldError.getField(), fieldError.getDefaultMessage(), fieldError.getRejectedValue()))
-                        .toList();
+                .map(fieldError -> "%s: %s (%s provided)".formatted(fieldError.getField(), fieldError.getDefaultMessage(), fieldError.getRejectedValue()))
+                .toList();
     }
 
     private ResponseEntity<AppError> getAppErrorResponseEntity(HttpStatusCode statusCode, Throwable cause) {
@@ -101,6 +102,7 @@ public class GlobalExceptionHandler {
                 new AppError(statusCode.value(),
                         cause.getMessage()), statusCode);
     }
+
     private ResponseEntity<AppError> getAppErrorResponseEntity(HttpStatusCode statusCode, String causeMessage) {
         return new ResponseEntity<>(
                 new AppError(statusCode.value(),
