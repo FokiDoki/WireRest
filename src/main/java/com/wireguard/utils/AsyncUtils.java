@@ -8,7 +8,7 @@ import java.util.concurrent.Future;
 public class AsyncUtils {
 
     @SneakyThrows
-    public static <T> T await(Future<T> future){
+    public static <T> T await(Future<T> future) {
         try {
             return future.get();
         } catch (ExecutionException e) {

@@ -18,6 +18,7 @@ class InterfaceControllerTest {
 
     @MockBean
     WgInterfaceService wgInterfaceService;
+
     @Test
     void getInterface() {
         WgInterface wgInterface = new WgInterface("PrivateKey", "PublicKey", 1234, 5678);

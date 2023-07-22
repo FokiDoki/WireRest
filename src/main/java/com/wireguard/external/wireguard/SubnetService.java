@@ -46,15 +46,14 @@ public class SubnetService {
     }
 
 
-
     public Set<SubnetV6> generateV6(int countOfIpsToGenerate, int mask) {
         throw new UnsupportedOperationException("It doesn't support yet");
     }
 
     private void releaseIfException(Set<? extends ISubnet> subnets, Consumer<Set<? extends ISubnet>> consumer) {
-        try{
+        try {
             consumer.accept(subnets);
-        } catch (Exception e){
+        } catch (Exception e) {
             logger.debug("Exception occurred during obtaining subnets, releasing subnets: {}", subnets);
             release(subnets);
             throw e;
@@ -77,9 +76,9 @@ public class SubnetService {
         releaseIfException(obtainedSubnets, (s) -> {
             logger.debug("Obtaining subnets: {}", subnets);
             subnets.forEach((subnet) -> {
-                if (subnet instanceof Subnet){
+                if (subnet instanceof Subnet) {
                     v4SubnetSolver.obtain((Subnet) subnet);
-                } else if (subnet instanceof SubnetV6){
+                } else if (subnet instanceof SubnetV6) {
 
                 }
                 obtainedSubnets.add(subnet);
