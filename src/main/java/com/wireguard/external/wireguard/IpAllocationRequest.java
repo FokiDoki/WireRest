@@ -9,7 +9,7 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 public class IpAllocationRequest {
-    private final Integer countOfIpsToGenerate;
     private Set<? extends ISubnet> subnets;
+    private final Integer countOfIpsToGenerate;
 
 }

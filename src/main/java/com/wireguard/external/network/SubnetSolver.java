@@ -17,14 +17,14 @@ public class SubnetSolver implements IV4SubnetSolver {
 
     private static final Logger logger = LoggerFactory.getLogger(SubnetSolver.class);
 
-    private final List<IpRange> availableRanges = Collections.synchronizedList(new ArrayList<>());
+    private final List<IpRange> availableRanges =  Collections.synchronizedList(new ArrayList<>());
     private final IpRange totalAvailableRange;
     @Getter
     private final long totalIpsCount;
     @Getter
     private long availableIpsCount;
 
-    public SubnetSolver(Subnet allowedIpsSubnet) {
+    public SubnetSolver(Subnet allowedIpsSubnet){
         long firstAddress = allowedIpsSubnet.getFirstIpNumeric();
         long lastAddress = allowedIpsSubnet.getLastIpNumeric();
         availableIpsCount = totalIpsCount = lastAddress - firstAddress + 1;
@@ -33,9 +33,9 @@ public class SubnetSolver implements IV4SubnetSolver {
     }
 
     @Override
-    public Subnet obtainFree(int mask) {
+    public Subnet obtainFree(int mask){
         ImmutablePair<Subnet, IpRange> subnetAndRange = findFreeSubnetAndRange(mask);
-        if (subnetAndRange != null) {
+        if (subnetAndRange != null){
             Subnet requestedSubnet = subnetAndRange.getLeft();
             int requestedSubnetIndex = calculatePreviousRangeIndex(findFirstGreater(requestedSubnet.getFirstIpNumeric()));
             availableRanges.remove(requestedSubnetIndex);
@@ -48,8 +48,8 @@ public class SubnetSolver implements IV4SubnetSolver {
         }
     }
 
-    private ImmutablePair<Subnet, IpRange> findFreeSubnetAndRange(Integer mask) {
-        long addressRequestCount = (long) Math.pow(2, 32 - mask);
+    private ImmutablePair<Subnet, IpRange> findFreeSubnetAndRange(Integer mask){
+        long addressRequestCount = (long) Math.pow(2, 32-mask);
 
         for (IpRange range : availableRanges) {
             long firstAddress = Math.ceilDiv(range.getLeast(), addressRequestCount);
@@ -66,26 +66,26 @@ public class SubnetSolver implements IV4SubnetSolver {
     }
 
     @Override
-    public void obtainIp(String ip) {
-        obtain(Subnet.valueOf(ip + "/32"));
+    public void obtainIp(String ip){
+        obtain(Subnet.valueOf(ip+"/32"));
     }
 
 
     public void obtain(Subnet subnet) throws AlreadyUsedException {
         long firstAddress = subnet.getFirstIpNumeric();
         long lastAddress = subnet.getLastIpNumeric();
-        if (!isIpsInRange(firstAddress, lastAddress, totalAvailableRange)) {
+        if (!isIpsInRange(firstAddress, lastAddress, totalAvailableRange)){
             throw new IllegalArgumentException("Subnet %s is not in allowed ips range %s - %s"
                     .formatted(subnet, totalAvailableRange.getLeastString(), totalAvailableRange.getBiggestString()));
         }
-        if (getAvailableIpsCount() == 0L) {
-            throw new NoFreeIpException("No free ip left in " + totalAvailableRange);
+        if (getAvailableIpsCount()==0L){
+            throw new NoFreeIpException("No free ip left in "+ totalAvailableRange);
         }
 
         int firstGreater = findFirstGreater(firstAddress);
         int currRangeIndex = calculatePreviousRangeIndex(firstGreater);
         IpRange availableRange = availableRanges.get(currRangeIndex);
-        if (isIpsInRange(firstAddress, lastAddress, availableRange)) {
+        if (isIpsInRange(firstAddress, lastAddress, availableRange)){
             availableRanges.remove(currRangeIndex);
             availableRanges.addAll(currRangeIndex, insertSubnetIntoIpRange(subnet, availableRange));
             availableIpsCount -= subnet.getIpCount().longValue();
@@ -95,16 +95,16 @@ public class SubnetSolver implements IV4SubnetSolver {
         }
     }
 
-    private boolean isIpsInRange(long firstAddress, long lastAddress, IpRange ipRange) {
+    private boolean isIpsInRange(long firstAddress, long lastAddress, IpRange ipRange){
         return firstAddress >= ipRange.getLeast() && lastAddress <= ipRange.getBiggest();
     }
 
-    private boolean isIpsNotTouchingRange(long firstAddress, long lastAddress, IpRange ipRange) {
+    private boolean isIpsNotTouchingRange(long firstAddress, long lastAddress, IpRange ipRange){
         return ipRange.getBiggest() < firstAddress || lastAddress < ipRange.getLeast();
     }
 
-    private int calculatePreviousRangeIndex(int greaterIndex) {
-        if (greaterIndex == -1) {
+    private int calculatePreviousRangeIndex(int greaterIndex){
+        if (greaterIndex==-1) {
             return availableRanges.size() - 1;
         } else {
             return Math.max(greaterIndex - 1, 0);
@@ -112,13 +112,13 @@ public class SubnetSolver implements IV4SubnetSolver {
     }
 
     @Override
-    public void release(Subnet subnet) {
+    public void release(Subnet subnet){
         long firstAddress = subnet.getFirstIpNumeric();
         long lastAddress = subnet.getLastIpNumeric();
-        if (!isIpsInRange(firstAddress, lastAddress, totalAvailableRange)) {
-            throw new IllegalArgumentException("Subnet " + subnet + " is not in allowed ips range +" + totalAvailableRange);
+        if (!isIpsInRange(firstAddress, lastAddress, totalAvailableRange)){
+            throw new IllegalArgumentException("Subnet " + subnet + " is not in allowed ips range +"+ totalAvailableRange);
         }
-        if (getAvailableIpsCount() == 0L) {
+        if (getAvailableIpsCount()==0L){
             availableRanges.add(new IpRange(firstAddress, lastAddress));
             availableIpsCount += subnet.getIpCount().longValue();
             return;
@@ -128,14 +128,14 @@ public class SubnetSolver implements IV4SubnetSolver {
         int leastIndex = calculatePreviousRangeIndex(greaterIndex);
         IpRange greater = availableRanges.get(greaterIndex);
         IpRange least = availableRanges.get(leastIndex);
-        if (isIpsNotTouchingRange(firstAddress, lastAddress, least)) {
-            if (greater.getLeast() - 1 == lastAddress && least.getBiggest() + 1 == firstAddress) {
+        if (isIpsNotTouchingRange(firstAddress, lastAddress, least)){
+            if (greater.getLeast()-1 == lastAddress && least.getBiggest()+1 == firstAddress){
                 availableRanges.removeAll(Arrays.asList(greater, least));
                 availableRanges.add(leastIndex, new IpRange(least.getLeast(), greater.getBiggest()));
-            } else if (greater.getLeast() - 1 == lastAddress) {
+            } else if (greater.getLeast()-1 == lastAddress){
                 availableRanges.remove(greater);
                 availableRanges.add(leastIndex, new IpRange(firstAddress, greater.getBiggest()));
-            } else if (least.getBiggest() + 1 == firstAddress) {
+            } else if (least.getBiggest()+1 == firstAddress){
                 availableRanges.remove(least);
                 availableRanges.add(leastIndex, new IpRange(least.getLeast(), lastAddress));
             } else {
@@ -156,51 +156,52 @@ public class SubnetSolver implements IV4SubnetSolver {
         return !isIpsInRange(subnet.getFirstIpNumeric(), subnet.getLastIpNumeric(), availableRange);
     }
 
-    private int findFirstGreater(long ip) {
+    private int findFirstGreater(long ip){
         int left = 0;
-        int right = availableRanges.size() - 1;
-        while (left < right) {
-            int mid = (left + right) / 2;
-            if (availableRanges.get(mid).getLeast() <= ip) {
-                left = mid + 1;
+        int right = availableRanges.size()-1;
+        while (left < right){
+            int mid = (left+right)/2;
+            if (availableRanges.get(mid).getLeast() <= ip){
+                left = mid+1;
             } else {
                 right = mid;
             }
         }
-        if (availableRanges.get(left).getLeast() <= ip) {
+        if (availableRanges.get(left).getLeast() <= ip){
             return -1;
         }
         return left;
     }
 
 
-    private List<IpRange> insertSubnetIntoIpRange(Subnet subnet, IpRange ipRange) {
-        if (ipRange.getLeast() == subnet.getFirstIpNumeric() && ipRange.getBiggest() == subnet.getLastIpNumeric()) {
+
+    private List<IpRange> insertSubnetIntoIpRange(Subnet subnet, IpRange ipRange){
+        if (ipRange.getLeast()==subnet.getFirstIpNumeric() && ipRange.getBiggest()==subnet.getLastIpNumeric()){
             return Collections.emptyList();
-        } else if (ipRange.getLeast() == subnet.getFirstIpNumeric()) {
-            return Collections.singletonList(new IpRange(subnet.getLastIpNumeric() + 1, ipRange.getBiggest()));
-        } else if (ipRange.getBiggest() == subnet.getLastIpNumeric()) {
-            return Collections.singletonList(new IpRange(ipRange.getLeast(), subnet.getFirstIpNumeric() - 1));
+        } else if (ipRange.getLeast()==subnet.getFirstIpNumeric()){
+            return Collections.singletonList(new IpRange(subnet.getLastIpNumeric()+1, ipRange.getBiggest()));
+        } else if (ipRange.getBiggest()==subnet.getLastIpNumeric()){
+            return Collections.singletonList(new IpRange(ipRange.getLeast(), subnet.getFirstIpNumeric()-1));
         } else {
             return Arrays.asList(
-                    new IpRange(ipRange.getLeast(), subnet.getFirstIpNumeric() - 1),
-                    new IpRange(subnet.getLastIpNumeric() + 1, ipRange.getBiggest())
+                    new IpRange(ipRange.getLeast(), subnet.getFirstIpNumeric()-1),
+                    new IpRange(subnet.getLastIpNumeric()+1, ipRange.getBiggest())
             );
         }
     }
 
     @Override
-    public long getUsedIpsCount() {
+    public long getUsedIpsCount(){
         return totalIpsCount - availableIpsCount;
     }
 
-    public List<IpRange> getAvailableRanges() {
+    public List<IpRange> getAvailableRanges(){
         return Collections.unmodifiableList(availableRanges);
     }
 
-    private byte[] numericIpToByte(long ip) {
+    private byte[] numericIpToByte(long ip){
         byte[] result = new byte[4];
-        for (int i = 3; i >= 0; i--) {
+        for (int i = 3; i >= 0; i--){
             result[i] = (byte) (ip % 256);
             ip /= 256;
         }

@@ -13,8 +13,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 @EnabledOnOs(OS.WINDOWS)
 public class ShellRunnerWindowsTests {
-    private final ShellRunner shellRunner = new ShellRunner();
-
+    private ShellRunner shellRunner = new ShellRunner();
     @Test
     public void run() {
         String result = shellRunner.execute(new String[]{"cmd.exe", "/c", "echo hello"});
@@ -22,14 +21,14 @@ public class ShellRunnerWindowsTests {
     }
 
     @Test
-    public void runWhenExeDoesNotExists() {
+    public void runWhenExeDoesNotExists(){
         assertThatExceptionOfType(ProcessStartException.class).isThrownBy(
                 () -> shellRunner.execute(new String[]{"imnotexists", "echo", "hello"})
         );
     }
 
     @Test
-    public void runWhenExitCodeIsNotZero() {
+    public void runWhenExitCodeIsNotZero(){
         assertThatExceptionOfType(CommandExecutionException.class).isThrownBy(
                 () -> shellRunner.execute(new String[]{"cmd.exe", "/c", "exit 1"})
         );

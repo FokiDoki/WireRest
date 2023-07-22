@@ -22,11 +22,11 @@ public class Paging<T> {
     public Page<T> apply(Pageable pageable, List<T> list) {
         return buildPage(pageable, list);
     }
-
-    private ArrayList<T> sort(Sort sort, ArrayList<T> list) {
-        try {
+    
+    private ArrayList<T> sort(Sort sort, ArrayList<T> list)  {
+        try{
             return sortList(sort.iterator(), list);
-        } catch (NoSuchFieldException e) {
+        } catch (NoSuchFieldException e){
             throw new ParsingException("Field %s not exist".formatted(e.getMessage()), e);
         }
     }
@@ -43,14 +43,14 @@ public class Paging<T> {
 
         Comparator<Object> comparator = (o1, o2) -> {
             try {
-                if ((o1 == null && o2 == null) || (!(o1 == null || o2 == null) && (field.get(o1) == null && field.get(o2) == null))) {
+                if ((o1 == null && o2 == null) || (!(o1==null || o2==null) && (field.get(o1) == null && field.get(o2) == null))) {
                     return 0;
                 } else if (o1 == null || field.get(o1) == null) {
                     return -1;
                 } else if (o2 == null || field.get(o2) == null) {
                     return 1;
                 }
-                if (field.get(o1) instanceof Comparable) {
+                if (field.get(o1) instanceof Comparable){
                     return ((Comparable<Object>) field.get(o1)).compareTo(field.get(o2));
                 }
                 return field.get(o1).toString().compareTo(field.get(o2).toString());

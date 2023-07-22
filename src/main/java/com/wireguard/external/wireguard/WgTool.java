@@ -27,7 +27,7 @@ public class WgTool {
 
     private static final String WG_SHOW_DUMP_COMMAND = "wg show %s dump";
     private static final String WG_GENKEY_COMMAND = "wg genkey";
-    private static final String WG_PUBKEY_COMMAND = "echo %s | wg pubkey";
+    private static final String WG_PUBKEY_COMMAND =  "echo %s | wg pubkey";
     private static final String WG_PRESHARED_KEY_COMMAND = "wg genpsk";
     private static final String WG_ADD_PEER_COMMAND = "wg set %s peer %s";
     private static final String CREATE_FILE_COMMAND = "echo %s > %s";
@@ -52,7 +52,6 @@ public class WgTool {
         logger.debug("Running command: %s".formatted(String.join(" ", command)));
         return shell.execute(command).strip();
     }
-
     protected String[] getCommand(String commandStr, Boolean privileged) {
         String[] command;
         if (privileged) {
@@ -72,6 +71,7 @@ public class WgTool {
         Process process = shell.startProcess(command);
         return new Scanner(process.getInputStream());
     }
+
 
 
     public WgShowDump showDump(String interfaceName) {
@@ -112,7 +112,7 @@ public class WgTool {
     //I don't know how to do this without creating a file (wg set doesn't accept preshared key as a parameter)
     public void addPeer(String interfaceName, WgPeer peer) {
         StringBuilder command = new StringBuilder();
-        String filePath = presharedKeyPath + getRandomFileName();
+        String filePath = presharedKeyPath+getRandomFileName();
         command.append(WG_ADD_PEER_COMMAND.formatted(
                 interfaceName,
                 peer.getPublicKey()));
@@ -127,7 +127,7 @@ public class WgTool {
         );
         appendArgumentsIfPresentAndNotEmpty(arguments, command);
 
-        try {
+        try{
             run(command.toString(), true);
         } finally {
             if (!peer.getPresharedKey().isEmpty())
@@ -140,32 +140,7 @@ public class WgTool {
         return UUID.randomUUID().toString();
     }
 
-    private void appendArgumentsIfPresentAndNotEmpty(List<Argument> arguments, StringBuilder command) {
-        for (Argument argument : arguments) {
-            if (argument.isPresent()) {
-                command.append(argument.getCommand());
-            }
-        }
-
-    }
-
-    private void saveConfig(String interfaceName) {
-        if (configSaveTasks.isEmpty()) {
-            logger.debug("Scheduling config save for interface %s".formatted(interfaceName));
-            configSaveTasks.add(new Task(() ->
-            {
-                run(WG_SAVE_COMMAND.formatted(interfaceName), true);
-                logger.debug("Config saved for interface %s".formatted(interfaceName));
-            }));
-        }
-    }
-
-    public void deletePeer(String interfaceName, String publicKey) {
-        run(WG_DEL_PEER_COMMAND.formatted(interfaceName, publicKey), true);
-        saveConfig(interfaceName);
-    }
-
-    private static class Argument {
+    private static class Argument{
         private final String name;
         private final String value;
         private final Function<String, String> valueTransformer;
@@ -180,12 +155,38 @@ public class WgTool {
             this(name, value, (v) -> v);
         }
 
-        public boolean isPresent() {
+        public boolean isPresent(){
             return value != null && !value.isEmpty();
         }
 
-        public String getCommand() {
+        public String getCommand(){
             return String.format(" %s %s", name, valueTransformer.apply(value));
         }
+    }
+
+    private void appendArgumentsIfPresentAndNotEmpty(List<Argument> arguments, StringBuilder command) {
+        for (Argument argument: arguments) {
+            if (argument.isPresent()) {
+                command.append(argument.getCommand());
+            }
+        }
+
+    }
+    private void saveConfig(String interfaceName) {
+        if (configSaveTasks.isEmpty()) {
+            logger.debug("Scheduling config save for interface %s".formatted(interfaceName));
+            configSaveTasks.add(new Task(() ->
+            {
+                run(WG_SAVE_COMMAND.formatted(interfaceName), true);
+                logger.debug("Config saved for interface %s".formatted(interfaceName));
+            }));
+        }
+    }
+
+
+
+    public void deletePeer(String interfaceName, String publicKey) {
+        run(WG_DEL_PEER_COMMAND.formatted(interfaceName, publicKey), true);
+        saveConfig(interfaceName);
     }
 }

@@ -11,7 +11,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class WgInterfaceDTOParserTests {
 
     private final String validbase64 = "ZHdjdmRlZXd2ZXd2ZXd2ZXd2ZXdibGVyYm1yLGJlcg==";
-
     @Test
     void emptyStringParsingTest() {
         String emptyString = "";
@@ -33,14 +32,14 @@ class WgInterfaceDTOParserTests {
     }
 
     @Test
-    void noPortParsingTest() {
-        String noPort = "%s\t%s\t \t1234\n".formatted(validbase64, validbase64);
+    void noPortParsingTest(){
+        String noPort = "%s\t%s\t \t1234\n".formatted(validbase64,validbase64);
         assertThrows(IllegalArgumentException.class, () -> WgInterfaceParser.parse(noPort, "\t"));
     }
 
     @Test
-    void validStringParsingTest() {
-        String validString = "%s\t%s\t1234\t321  ".formatted(validbase64, validbase64);
+    void validStringParsingTest(){
+        String validString =   "%s\t%s\t1234\t321  ".formatted(validbase64,validbase64);
         WgInterface wgInterface = WgInterfaceParser.parse(validString, "\t");
         assertEquals(wgInterface.getPrivateKey(), validbase64);
         assertEquals(wgInterface.getPublicKey(), validbase64);
@@ -49,8 +48,8 @@ class WgInterfaceDTOParserTests {
     }
 
     @Test
-    void validStringWithOffFwmark() {
-        String validString = "%s\t%s\t64444\toff  ".formatted(validbase64, validbase64);
+    void validStringWithOffFwmark(){
+        String validString =   "%s\t%s\t64444\toff  ".formatted(validbase64,validbase64);
         WgInterface wgInterface = WgInterfaceParser.parse(validString, "\t");
         assertEquals(wgInterface.getPrivateKey(), validbase64);
         assertEquals(wgInterface.getPublicKey(), validbase64);

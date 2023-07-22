@@ -16,7 +16,7 @@ public class QueuedSubnetSolver implements IV4SubnetSolver {
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
-    public QueuedSubnetSolver(IV4SubnetSolver subnetSolver) {
+    public QueuedSubnetSolver(IV4SubnetSolver subnetSolver){
         this.subnetSolver = subnetSolver;
     }
 
@@ -31,7 +31,7 @@ public class QueuedSubnetSolver implements IV4SubnetSolver {
     }
 
     @Override
-    public void obtain(Subnet subnet) throws AlreadyUsedException {
+    public void obtain(Subnet subnet) throws AlreadyUsedException{
         await(executor.submit(() -> subnetSolver.obtain(subnet)));
     }
 
@@ -52,6 +52,7 @@ public class QueuedSubnetSolver implements IV4SubnetSolver {
         await(isUsedFuture);
         return isUsedFuture.get();
     }
+
 
 
     @Override

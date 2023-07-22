@@ -16,15 +16,15 @@ public class PeerCreationRequestFromDTOConverter implements Converter<PeerCreati
     @Override
     public PeerCreationRequest convert(PeerCreationRequestDTO dto) {
         return new PeerCreationRequest(
-                Objects.requireNonNullElse(dto.getPublicKey(), new WgKey(null)).getValue(),
-                Objects.requireNonNullElse(dto.getPresharedKey(), new WgKey(null)).getValue(),
-                Objects.requireNonNullElse(dto.getPrivateKey(), new WgKey(null)).getValue(),
-                new IpAllocationRequestOneIfNullSubnets(
-                        Optional.ofNullable(dto.getAllowedIps())
-                                .map(allowedIps -> IpUtils.stringToSubnetSet(new HashSet<>(allowedIps)))
-                                .orElse(null)
-                ),
-                dto.getPersistentKeepalive()
-        );
+                    Objects.requireNonNullElse(dto.getPublicKey(), new WgKey(null)).getValue(),
+                    Objects.requireNonNullElse(dto.getPresharedKey(), new WgKey(null)).getValue(),
+                    Objects.requireNonNullElse(dto.getPrivateKey(), new WgKey(null)).getValue(),
+                    new IpAllocationRequestOneIfNullSubnets(
+                            Optional.ofNullable(dto.getAllowedIps())
+                                    .map(allowedIps -> IpUtils.stringToSubnetSet(new HashSet<>(allowedIps)))
+                                    .orElse(null)
+                    ),
+                    dto.getPersistentKeepalive()
+            );
+        }
     }
-}

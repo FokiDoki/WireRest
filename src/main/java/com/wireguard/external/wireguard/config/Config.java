@@ -39,11 +39,11 @@ public class Config {
                 wgInterface.getName(),
                 interfaceSubnet.toString(),
                 interfaceSubnet.getNumericMask()
-        ));
+                ));
         SubnetSolver UnprotectedSubnetSolver = new SubnetSolver(interfaceSubnet);
         QueuedSubnetSolver subnetSolver = new QueuedSubnetSolver(UnprotectedSubnetSolver);
 
-        if (interfaceSubnet.getNumericMask() <= 30) {
+        if (interfaceSubnet.getNumericMask()<=30) {
             subnetSolver.obtainIp(interfaceSubnet.getFirstIpString());
             subnetSolver.obtainIp(interfaceSubnet.getLastIpString());
             wgInterface.getIpv4Addresses().forEach(iNet4Address -> subnetSolver.obtainIp(iNet4Address.getHostAddress()));
@@ -53,10 +53,11 @@ public class Config {
         logger.info("SubnetSolver configured, available IPs: %d, used IPs: %d, Total: %d".formatted(
                 subnetSolver.getAvailableIpsCount(),
                 subnetSolver.getUsedIpsCount(),
-                subnetSolver.getTotalIpsCount() - 2
+                subnetSolver.getTotalIpsCount()-2
         ));
         return subnetSolver;
     }
+
 
 
     private void consumeUsedIps(Consumer<String> consumer, String interfaceName) {
@@ -80,16 +81,15 @@ public class Config {
         }
         NetworkInterfaceData networkInterfaceData = new NetworkInterfaceData(interfaceName);
         networkInterface.getInterfaceAddresses().stream()
-                .filter(interfaceAddress -> interfaceAddress.getAddress() instanceof Inet4Address)
-                .findFirst().ifPresentOrElse(networkInterfaceData::addInterfaceAddress,
-                        () -> {
-                            logger.error("Network interface {} has no IPv4 address", interfaceName);
-                            throw new RuntimeException("Network interface %s has no IPv4 address".formatted(interfaceName));
-                        });
+                        .filter(interfaceAddress -> interfaceAddress.getAddress() instanceof Inet4Address)
+                        .findFirst().ifPresentOrElse( networkInterfaceData::addInterfaceAddress,
+                            () -> {
+                                logger.error("Network interface {} has no IPv4 address", interfaceName);
+                                throw new RuntimeException("Network interface %s has no IPv4 address".formatted(interfaceName));
+                            });
         networkInterface.getInetAddresses().asIterator().forEachRemaining(
                 inetAddress -> {
-                    if (inetAddress instanceof Inet4Address)
-                        networkInterfaceData.addAddress((Inet4Address) inetAddress);
+                    if (inetAddress instanceof Inet4Address) networkInterfaceData.addAddress((Inet4Address) inetAddress);
                 });
         return networkInterfaceData;
     }

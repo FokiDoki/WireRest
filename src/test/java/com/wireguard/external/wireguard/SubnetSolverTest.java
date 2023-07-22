@@ -13,7 +13,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class SubnetSolverTest {
     private static final Subnet SUBNET = Subnet.valueOf("0.0.0.0/16");
     SubnetSolver subnetSolver;
-
     @BeforeEach
     void setUp() {
         subnetSolver = new SubnetSolver(SUBNET);
@@ -62,7 +61,7 @@ class SubnetSolverTest {
     }
 
     @Test
-    void testTakeWith17Mask() {
+    void testTakeWith17Mask(){
         subnetSolver.obtain(Subnet.valueOf("0.0.0.0/17"));
         assertEquals(32768L, subnetSolver.getUsedIpsCount(), ".getTakenIpCount()");
         assertEquals(32768L, subnetSolver.getAvailableRanges().get(0).getLeast());
@@ -83,7 +82,7 @@ class SubnetSolverTest {
     }
 
     @Test
-    void testFreeWhenNoIpLeft() {
+    void testFreeWhenNoIpLeft(){
         SubnetSolver subnetSolver = new SubnetSolver(Subnet.valueOf("0.0.0.0/32"));
         subnetSolver.obtain(Subnet.valueOf("0.0.0.0/32"));
         subnetSolver.release(Subnet.valueOf("0.0.0.0/32"));
@@ -91,15 +90,16 @@ class SubnetSolverTest {
     }
 
     @Test
-    void testFreeWhenNoIpLeftAndOutOfRange() {
+    void testFreeWhenNoIpLeftAndOutOfRange(){
         SubnetSolver subnetSolver = new SubnetSolver(Subnet.valueOf("0.0.0.0/32"));
         subnetSolver.obtain(Subnet.valueOf("0.0.0.0/32"));
-        assertThrows(IllegalArgumentException.class, () -> subnetSolver.obtain(Subnet.valueOf("0.0.0.1/32")));
+        assertThrows(IllegalArgumentException.class, () ->  subnetSolver.obtain(Subnet.valueOf("0.0.0.1/32")));
     }
 
 
+
     @Test
-    void testTakeFreeSubnet() {
+    void testTakeFreeSubnet(){
         Subnet subnet = subnetSolver.obtainFree(32);
         assertEquals(1L, subnetSolver.getUsedIpsCount(), ".getTakenIpCount()");
         assertEquals(Subnet.valueOf("0.0.0.0/32"), subnet);
@@ -124,7 +124,7 @@ class SubnetSolverTest {
     }
 
     @Test
-    void testTakeFreeWhenNoPlaceOnFirst() {
+    void testTakeFreeWhenNoPlaceOnFirst(){
         subnetSolver.obtain(Subnet.valueOf("0.0.0.63/32"));
         Subnet subnet = subnetSolver.obtainFree(26);
         assertEquals(Subnet.valueOf("0.0.0.64/26"), subnet);
@@ -139,7 +139,7 @@ class SubnetSolverTest {
     }
 
     @Test
-    void testTakeFreeWhenNoIpLeft() {
+    void testTakeFreeWhenNoIpLeft(){
         subnetSolver = new SubnetSolver(Subnet.valueOf("0.0.0.0/32"));
         subnetSolver.obtain(Subnet.valueOf("0.0.0.0/32"));
         assertThrows(NoFreeIpException.class, () -> subnetSolver.obtainFree(32));

@@ -20,22 +20,17 @@ class SubnetServiceTest {
     IV4SubnetSolver subnetSolver = Mockito.mock(IV4SubnetSolver.class);
     private final SubnetService subnetService = new SubnetService(peerCreationRules, subnetSolver);
 
-    public SubnetServiceTest() {
+    public SubnetServiceTest(){
         Mockito.when(subnetSolver.obtainFree(Mockito.anyInt())).then((Answer<Subnet>) invocation -> getRandomSubnetMock());
         Mockito.when(peerCreationRules.getDefaultMask()).thenReturn(32);
     }
 
-    @BeforeAll
-    static void setUp() {
-
-    }
-
-    private ISubnet getRandomISubnetMock() {
+    private ISubnet getRandomISubnetMock(){
         return Mockito.mock(ISubnet.class);
 
     }
 
-    private Set<ISubnet> generateRandomISubnets(int count) {
+    private Set<ISubnet> generateRandomISubnets(int count){
         Set<ISubnet> subnets = new HashSet<>();
         for (int i = 0; i < count; i++) {
             subnets.add(getRandomISubnetMock());
@@ -43,27 +38,29 @@ class SubnetServiceTest {
         return subnets;
     }
 
-    private Set<Subnet> generateRandomSubnets(int count) {
+    private Set<Subnet> generateRandomSubnets(int count){
         Set<Subnet> subnets = new HashSet<>();
         for (int i = 0; i < count; i++) {
             subnets.add(getRandomSubnetMock());
         }
         return subnets;
     }
-
-    private Subnet getRandomSubnetMock() {
+    private Subnet getRandomSubnetMock(){
         return Mockito.mock(Subnet.class);
     }
 
+    @BeforeAll
+    static void setUp(){
+
+    }
     void generateV4(int mask, int count) {
         Set<Subnet> generatedSubnets = subnetService.generateV4(count, mask);
         Mockito.verify(subnetSolver, Mockito.times(count)).obtainFree(mask);
         Assertions.assertNotNull(generatedSubnets);
         Assertions.assertEquals(generatedSubnets.size(), count);
     }
-
     @Test
-    void generateV4Test() {
+    void generateV4Test(){
         generateV4(30, 10);
     }
 
@@ -77,10 +74,9 @@ class SubnetServiceTest {
         subnetService.generateV4(10);
         Mockito.verify(peerCreationRules, Mockito.times(1)).getDefaultMask();
     }
-
     @Test
     void generateV6() {
-        Assertions.assertThrows(UnsupportedOperationException.class, () -> subnetService.generateV6(32, 1));
+        Assertions.assertThrows(UnsupportedOperationException.class, () -> subnetService.generateV6(32,1));
     }
 
     void release(Set<? extends ISubnet> subnets) {
@@ -89,17 +85,17 @@ class SubnetServiceTest {
     }
 
     @Test
-    void releaseTest() {
+    void releaseTest(){
         release(generateRandomSubnets(10));
     }
 
     @Test
-    void releaseTestCount0() {
+    void releaseTestCount0(){
         release(generateRandomSubnets(0));
     }
 
     @Test
-    void releaseTestNull() {
+    void releaseTestNull(){
         Assertions.assertThrows(NullPointerException.class, () -> release(null));
     }
 
@@ -109,22 +105,22 @@ class SubnetServiceTest {
     }
 
     @Test
-    void obtainTest() {
+    void obtainTest(){
         obtain(generateRandomSubnets(10));
     }
 
     @Test
-    void obtainTestCount0() {
+    void obtainTestCount0(){
         obtain(generateRandomSubnets(0));
     }
 
     @Test
-    void obtainTestNull() {
+    void obtainTestNull(){
         Assertions.assertThrows(NullPointerException.class, () -> obtain(null));
     }
 
     @Test
-    void obtainException() {
+    void obtainException(){
         Mockito.doNothing()
                 .doThrow(new RuntimeException())
                 .when(subnetSolver).obtain(Mockito.any(Subnet.class));
@@ -143,39 +139,39 @@ class SubnetServiceTest {
     }
 
     @Test
-    void testApplyState() {
+    void testApplyState(){
         applyState(generateRandomSubnets(10), generateRandomSubnets(10));
     }
 
     @Test
-    void testApplyStateCount0() {
+    void testApplyStateCount0(){
         applyState(generateRandomSubnets(0), generateRandomSubnets(0));
     }
 
     @Test
-    void testApplyStateNull() {
+    void testApplyStateNull(){
         Assertions.assertThrows(NullPointerException.class, () -> applyState(null, null));
     }
 
     @Test
-    void testApplyStateNullBefore() {
+    void testApplyStateNullBefore(){
         Assertions.assertThrows(NullPointerException.class, () -> applyState(null, generateRandomSubnets(10)));
     }
 
     @Test
-    void testApplyStateNullAfter() {
+    void testApplyStateNullAfter(){
         Assertions.assertThrows(NullPointerException.class, () -> applyState(generateRandomSubnets(10), null));
     }
 
     @Test
-    void testApplyStateBeforeIncludeAfter() {
+    void testApplyStateBeforeIncludeAfter(){
         Set<Subnet> before = generateRandomSubnets(10);
         Set<Subnet> after = new HashSet<>(before);
         applyState(before, after);
     }
 
     @Test
-    void testApplyStateAfterIncludeBefore() {
+    void testApplyStateAfterIncludeBefore(){
         Set<Subnet> after = generateRandomSubnets(10);
         Set<Subnet> before = new HashSet<>(after);
         applyState(before, after);

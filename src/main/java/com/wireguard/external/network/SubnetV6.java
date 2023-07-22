@@ -4,7 +4,7 @@ import com.googlecode.ipv6.IPv6Network;
 
 import java.math.BigInteger;
 
-public class SubnetV6 implements ISubnet, Comparable<SubnetV6> {
+public class SubnetV6 implements ISubnet, Comparable<SubnetV6>{
 
     private final IPv6Network address;
 

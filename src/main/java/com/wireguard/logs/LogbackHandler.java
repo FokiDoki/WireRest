@@ -21,7 +21,7 @@ public class LogbackHandler extends UnsynchronizedAppenderBase<ILoggingEvent> im
     private int maxElements;
 
     @Override
-    protected void append(ILoggingEvent event) {
+    protected void append(ILoggingEvent event)  {
         if (logs.size() >= maxElements) {
             logs.poll();
         }

@@ -25,22 +25,21 @@ public class LogsDao {
         return logbackHandler.getLogs().size();
     }
 
-    private Stream<LoggingEventDto> getLogsDtoStream() {
+    private Stream<LoggingEventDto> getLogsDtoStream(){
         return logbackHandler.getLogs().stream()
                 .map(LoggingEventDto::from);
     }
 
-    public List<LoggingEventDto> getLogs(long from, long limit) {
+    public List<LoggingEventDto> getLogs(long from, long limit){
         limit = limit == 0 ? getLogsSize() : limit;
-        return getLogsDtoStream()
+        return  getLogsDtoStream()
                 .filter(loggingEventDto -> loggingEventDto.getTimestamp() >= from)
                 .skip(getLogsSize() - limit)
                 .collect(Collectors.toList());
     }
-
-    public List<LoggingEventDto> getLogs(long from, long limit, List<String> levels) {
+    public List<LoggingEventDto> getLogs(long from, long limit, List<String> levels){
         limit = limit == 0 ? getLogsSize() : limit;
-        return getLogsDtoStream()
+        return  getLogsDtoStream()
                 .filter(loggingEventDto -> loggingEventDto.getTimestamp() >= from)
                 .filter(loggingEventDto -> levels.contains(loggingEventDto.getLevel()))
                 .skip(getLogsSize() - limit)

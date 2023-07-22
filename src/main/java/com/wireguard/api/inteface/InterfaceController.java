@@ -24,11 +24,11 @@ public class InterfaceController {
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = WgInterfaceDTO.class))}),
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = WgInterfaceDTO.class)) }),
             @ApiResponse(responseCode = "500", description = "Internal Server Error",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = AppError.class))})})
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = AppError.class)) }) })
     @GetMapping("/interface")
     public WgInterfaceDTO getInterface() throws ParsingException {
         return WgInterfaceDTO.from(interfaceService.getInterface());

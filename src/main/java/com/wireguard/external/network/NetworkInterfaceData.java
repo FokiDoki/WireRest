@@ -9,14 +9,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class NetworkInterfaceData {
-    @Getter
-    private final String name;
+    @Getter  private final String name;
 
 
     private final Set<Subnet> ipv4Subnets = new HashSet<>();
     private final Set<Inet4Address> ipv4Addresses = new HashSet<>();
 
-    public NetworkInterfaceData(String name) {
+    public NetworkInterfaceData(String name){
         this.name = name;
     }
 
@@ -24,22 +23,22 @@ public class NetworkInterfaceData {
         return Collections.unmodifiableSet(ipv4Subnets);
     }
 
-    public Set<Inet4Address> getIpv4Addresses() {
+    public Set<Inet4Address> getIpv4Addresses(){
         return Collections.unmodifiableSet(ipv4Addresses);
     }
 
-    public void addInterfaceAddress(InterfaceAddress interfaceAddress) {
+    public void addInterfaceAddress(InterfaceAddress interfaceAddress){
         if (interfaceAddress.getAddress() instanceof Inet4Address)
             ipv4Subnets.add(Subnet.valueOf(interfaceAddress.getAddress(),
                     interfaceAddress.getNetworkPrefixLength()));
         else throw new IllegalArgumentException("Only IPv4 addresses are supported");
     }
 
-    public void addInterfaceAddress(Subnet subnet) {
+    public void addInterfaceAddress(Subnet subnet){
         ipv4Subnets.add(subnet);
     }
 
-    public void addAddress(Inet4Address address) {
+    public void addAddress(Inet4Address address){
         ipv4Addresses.add(address);
     }
 }

@@ -10,13 +10,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class WgPeerParser {
-    public static WgPeer parse(String wgShowPeerDump, String splitter) {
+   public static WgPeer parse(String wgShowPeerDump, String splitter){
         String[] splitWgShowPeerDump = wgShowPeerDump.split(splitter);
         return parse(List.of(splitWgShowPeerDump));
     }
 
 
-    public static WgPeer parse(List<String> wgShowPeerDumpSource) {
+    public static WgPeer parse(List<String> wgShowPeerDumpSource){
         Assert.isTrue(wgShowPeerDumpSource.size() == 8,
                 "WgPeerParser.parse: invalid number of arguments in %s, 8 expected"
                         .formatted(wgShowPeerDumpSource.toString())
@@ -27,7 +27,7 @@ public class WgPeerParser {
 
         Set<ISubnet> allowedIps = IpUtils.stringToSubnetSet(splitToStringSet(WgShowPeerDump.get(3), ","));
         return WgPeer.
-                publicKey(WgShowPeerDump.get(0))
+                publicKey( WgShowPeerDump.get(0))
                 .presharedKey(WgShowPeerDump.get(1))
                 .endpoint(WgShowPeerDump.get(2))
                 .allowedIps(allowedIps)
@@ -38,15 +38,16 @@ public class WgPeerParser {
                 .build();
     }
 
-    private static Set<String> splitToStringSet(String string, String splitter) {
-        if (string == null) return Set.of();
+    private static Set<String> splitToStringSet(String string, String splitter){
+        if (string==null) return Set.of();
         return Set.of(string.split(splitter));
     }
 
-    private static int parsePersistentKeepalive(String persistentKeepalive) {
+    private static int parsePersistentKeepalive(String persistentKeepalive){
         if (persistentKeepalive.equals("off")) return 0;
         return Integer.parseInt(persistentKeepalive);
     }
+
 
 
 }

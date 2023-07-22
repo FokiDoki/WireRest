@@ -15,13 +15,12 @@ import java.util.Scanner;
 import java.util.Set;
 
 class WgShowDumpParserTest {
-    //public-key, preshared-key, endpoint, allowed-ips, latest-handshake, transfer-rx, transfer-tx, persistent-keepalive.
+    private Scanner wgShowDump;
+//public-key, preshared-key, endpoint, allowed-ips, latest-handshake, transfer-rx, transfer-tx, persistent-keepalive.
     private static final String FIRST_PEER_ALLOWED_IPS = "10.66.66.2/32,fd42:42:42::2/128";
     private static final String FIRST_PEER_ENDPOINT = "90.255.84.234:62517";
     private static final int FIRST_PEER_PERSISTENT_KEEPALIVE = 0;
     private static final Long FIRST_PEER_LAST_HANDSHAKE_TIME = 1683030306L;
-    private Scanner wgShowDump;
-
     @BeforeEach
     void setUp() throws FileNotFoundException {
         File wgshowdumpFile = new File("src/test/resources/wg_show_dump.txt");
@@ -58,14 +57,14 @@ class WgShowDumpParserTest {
     }
 
     @Test
-    void emptyDumpTest() {
+    void emptyDumpTest(){
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             WgShowDumpParser.fromDump(new Scanner(""));
         });
     }
 
     @Test
-    void invalidDumpTest() {
+    void invalidDumpTest(){
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             WgShowDumpParser.fromDump(new Scanner("invalid dump"));
         });

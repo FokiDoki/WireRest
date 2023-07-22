@@ -14,24 +14,23 @@ public class RateLimitedExecutorService {
     private final ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
     private final int rateMs;
     private final Queue<Task> tasks;
-
-    public RateLimitedExecutorService(Queue<Task> tasks, int rateMs) {
+    public RateLimitedExecutorService(Queue<Task> tasks, int rateMs){
         this(tasks, rateMs, 1);
     }
 
-    public RateLimitedExecutorService(Queue<Task> tasks, int rateMs, int poolSize) {
+    public RateLimitedExecutorService(Queue<Task> tasks, int rateMs, int poolSize){
         this.rateMs = rateMs;
         this.tasks = tasks;
         this.executorService.setCorePoolSize(poolSize);
         start();
     }
 
-    public void stop() {
+    public void stop(){
         scheduledExecutorService.shutdown();
         executorService.shutdown();
     }
 
-    public void start() {
+    public void start(){
         scheduledExecutorService.scheduleAtFixedRate(() -> {
             if (executorService.getActiveCount() == executorService.getCorePoolSize()) return;
             final Task task = tasks.poll();

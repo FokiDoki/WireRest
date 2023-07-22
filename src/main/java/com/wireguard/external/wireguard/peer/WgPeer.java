@@ -23,11 +23,9 @@ public class WgPeer implements Comparable<WgPeer> {
     private long transferRx;
     private long transferTx;
     private int persistentKeepalive;
-
     public static Builder publicKey(String publicKey) {
         return new Builder().publicKey(publicKey);
     }
-
     public static Builder from(WgPeer wgPeer) {
         return new Builder().from(wgPeer);
     }
@@ -45,7 +43,7 @@ public class WgPeer implements Comparable<WgPeer> {
                 ", persistentKeepalive=" + persistentKeepalive +
                 '}';
     }
-
+    
     @Override
     public int compareTo(WgPeer o) {
         return this.publicKey.compareTo(o.publicKey);
@@ -53,44 +51,42 @@ public class WgPeer implements Comparable<WgPeer> {
 
     @Data
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class AllowedSubnets implements Comparable<AllowedSubnets> {
+    public static class AllowedSubnets implements Comparable<AllowedSubnets>{
         private Set<Subnet> IPv4Subnets = new HashSet<>();
         private Set<SubnetV6> IPv6Subnets = new HashSet<>();
 
-        public void addIpv4(String allowedIPv4Ip) {
+        public void addIpv4(String allowedIPv4Ip){
             IPv4Subnets.add(Subnet.valueOf(allowedIPv4Ip));
         }
 
-        public void addIpv6(String allowedIPv6Ip) {
+        public void addIpv6(String allowedIPv6Ip){
             IPv6Subnets.add(SubnetV6.valueOf(allowedIPv6Ip));
         }
 
-        public Set<String> getAllStrings() {
+        public Set<String> getAllStrings(){
             Set<String> allowedIps = new HashSet<>();
             IPv4Subnets.forEach(subnet -> allowedIps.add(subnet.toString()));
             IPv6Subnets.forEach(subnet -> allowedIps.add(subnet.toString()));
             return Collections.unmodifiableSet(allowedIps);
         }
 
-        public Set<ISubnet> getAll() {
+        public Set<ISubnet> getAll(){
             Set<ISubnet> allowedIps = new HashSet<>();
             allowedIps.addAll(IPv4Subnets);
             allowedIps.addAll(IPv6Subnets);
             return Collections.unmodifiableSet(allowedIps);
         }
-
         @Override
-        public String toString() {
+        public String toString(){
             return String.join(",", getAllStrings());
         }
-
-        public boolean isEmpty() {
+        public boolean isEmpty(){
             return IPv4Subnets.isEmpty() && IPv6Subnets.isEmpty();
         }
 
         @Override
         public int compareTo(AllowedSubnets o) {
-            if (IPv4Subnets.isEmpty() && o.IPv4Subnets.isEmpty()) {
+            if (IPv4Subnets.isEmpty() && o.IPv4Subnets.isEmpty()){
                 return IPv6Subnets.stream().findFirst().orElse(SubnetV6.valueOf("::/128"))
                         .compareTo(o.IPv6Subnets.stream().findFirst().orElse(SubnetV6.valueOf("::/128")));
             }
@@ -100,7 +96,7 @@ public class WgPeer implements Comparable<WgPeer> {
     }
 
 
-    public static class Builder {
+    public static class Builder{
         private String publicKey;
         private String presharedKey;
         private String endpoint;
@@ -110,8 +106,7 @@ public class WgPeer implements Comparable<WgPeer> {
         private long transferTx;
         private int persistentKeepalive;
 
-        protected Builder() {
-        }
+        protected Builder(){}
 
         public Builder publicKey(String publicKey) {
             this.publicKey = publicKey;
@@ -142,9 +137,9 @@ public class WgPeer implements Comparable<WgPeer> {
             this.allowedSubnets = new AllowedSubnets();
             allowedSubnets.forEach(
                     subnet -> {
-                        if (subnet instanceof Subnet) {
+                        if(subnet instanceof Subnet){
                             this.allowedSubnets.IPv4Subnets.add((Subnet) subnet);
-                        } else if (subnet instanceof SubnetV6) {
+                        }else if(subnet instanceof SubnetV6){
                             this.allowedSubnets.IPv6Subnets.add((SubnetV6) subnet);
                         }
                     }
@@ -184,7 +179,7 @@ public class WgPeer implements Comparable<WgPeer> {
             return this;
         }
 
-        public WgPeer build() {
+        public WgPeer build(){
             Assert.notNull(publicKey, "WgPeer.Builder: Public key must not be null");
             return new WgPeer(publicKey,
                     presharedKey,
