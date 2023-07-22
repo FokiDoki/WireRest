@@ -14,9 +14,12 @@ Swagger UI is available at http://127.0.0.1:8081/swagger-ui
 --- 
 
 - Get interface 
-- Get all peers 
+- Get all peers (Sorting available) 
 - Get peer by public key
-- Add peer (auto-configured)
+- Automaticly create and add peer
+- Manually create and add peer
+- Update peer
+- Delete peer 
 
 ### How to run:
 
@@ -53,9 +56,9 @@ ___
 - Metrics for Prometheus
 - ~~Add peer (Custom configuration)~~
 - ~~Delete peer~~
-- Update peer
+- ~~Update peer~~
 - Oauth2 authorization
 - Authorization key rate limits & scopes 
 - ~~Sort peers by key, ip, received, sent, last handshake etc.~~
 - Callback API 
-- Caching 
+- ~~Caching~~
