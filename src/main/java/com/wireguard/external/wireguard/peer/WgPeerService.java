@@ -87,7 +87,7 @@ public class WgPeerService {
 
     private boolean isUpdateRequestHasNewPublicKey(PeerUpdateRequest updateRequest) {
         return updateRequest.getNewPublicKey() != null &&
-                updateRequest.getNewPublicKey().equals(updateRequest.getCurrentPublicKey());
+                !updateRequest.getNewPublicKey().equals(updateRequest.getCurrentPublicKey());
     }
 
 
