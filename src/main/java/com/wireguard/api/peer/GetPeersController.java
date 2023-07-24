@@ -49,28 +49,10 @@ public class GetPeersController {
                             content = {
                                     @Content(
                                             mediaType = "application/json",
-                                            array = @ArraySchema(schema = @Schema(implementation = WgPeerDTO.class)),
+                                            array = @ArraySchema(schema = @Schema(nullable = true, implementation = PageDTO.class)),
                                             examples = {
-                                                    @ExampleObject(name = "Example response",
-                                                            value = "{\n" +
-                                                                    "  \"totalPages\": 15911,\n" +
-                                                                    "  \"currentPage\": 0,\n" +
-                                                                    "  \"content\": [\n" +
-                                                                    "    {\n" +
-                                                                    "      \"publicKey\": \"5qp6gy7reAr+1hWEwGM/+WQYEQeP5o2W5/+jVyvRvlE=\",\n" +
-                                                                    "      \"presharedKey\": \"lM7XVZ5p/uoIg7ywPALHZdBrMhdQAbhpsKGzjhZd8mQ=\",\n" +
-                                                                    "      \"endpoint\": \"145.45.45.45:44612\",\n" +
-                                                                    "      \"allowedSubnets\": [\n" +
-                                                                    "        \"2002:0:0:1234::/64\",\n" +
-                                                                    "        \"10.1.142.196/32\"\n" +
-                                                                    "      ],\n" +
-                                                                    "      \"latestHandshake\": 1690200608,\n" +
-                                                                    "      \"transferRx\": 123456,\n" +
-                                                                    "      \"transferTx\": 654321,\n" +
-                                                                    "      \"persistentKeepalive\": 20\n" +
-                                                                    "    }\n" +
-                                                                    "  ]\n" +
-                                                                    "}")
+                                                    @ExampleObject(name = "Non-null", ref = "#/components/examples/PageWithPeers"),
+                                                    @ExampleObject(name = "Nulls", ref = "#/components/examples/PageWithPeersWithNulls"),
                                             }
                                     )
                             }
@@ -88,8 +70,8 @@ public class GetPeersController {
                             content = {@Content(mediaType = "application/json",
                                     schema = @Schema(implementation = AppError.class),
                                     examples = {
-                                            @ExampleObject(ref = "#/components/examples/RangeNoFreeIp500"),
-                                            @ExampleObject(ref = "#/components/examples/UnexpectedError500")
+                                            @ExampleObject(name="No free ip", ref = "#/components/examples/RangeNoFreeIp500"),
+                                            @ExampleObject(name="Other errors", ref = "#/components/examples/UnexpectedError500")
                                     }
                             )}
                     )
