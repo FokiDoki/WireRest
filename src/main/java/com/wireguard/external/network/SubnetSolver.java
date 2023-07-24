@@ -79,7 +79,7 @@ public class SubnetSolver implements IV4SubnetSolver {
                     .formatted(subnet, totalAvailableRange.getLeastString(), totalAvailableRange.getBiggestString()));
         }
         if (getAvailableIpsCount() == 0L) {
-            throw new NoFreeIpException("No free ip left in " + totalAvailableRange);
+            throw new NoFreeIpException("The range %s has no free ip that can be assigned".formatted(totalAvailableRange.toString()));
         }
 
         int firstGreater = findFirstGreater(firstAddress);
