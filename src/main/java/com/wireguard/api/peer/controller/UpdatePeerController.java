@@ -69,15 +69,7 @@ public class UpdatePeerController {
                                             examples = {
                                                     @ExampleObject(name = "Peer exists", ref = "#/components/examples/peerAlreadyExists409")
                                             }
-                                    )}),
-                    @ApiResponse(responseCode = "500", description = "Internal Server Error",
-                            content = {@Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = AppError.class),
-                                    examples = {
-                                            @ExampleObject(name = "Other errors", ref = "#/components/examples/UnexpectedError500")
-                                    }
-                            )}
-                    )
+                                    )})
             }
     )
     @Parameter(name = "publicKey", description = "Current public key of the peer", required = true)

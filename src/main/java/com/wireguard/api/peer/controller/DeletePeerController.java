@@ -65,17 +65,7 @@ public class DeletePeerController {
                                         examples = {
                                                 @ExampleObject(name = "Invalid key format",
                                                         ref = "#/components/examples/peerNotFound")
-                                        }
-
-                                )}),
-                        @ApiResponse(responseCode = "500", description = "Internal Server Error",
-                                content = {@Content(mediaType = "application/json",
-                                        schema = @Schema(implementation = AppError.class),
-                                        examples = {
-                                                @ExampleObject(name = "Other errors", ref = "#/components/examples/UnexpectedError500")
-                                        }
-                                )}
-                        )
+                                        })})
             }
     )
     @Parameter(name = "publicKey", description = "The public key of the peer to be deleted", required = true)

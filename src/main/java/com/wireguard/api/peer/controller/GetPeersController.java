@@ -67,14 +67,6 @@ public class GetPeersController {
                                                     ref = "#/components/examples/InvalidPage400"),
                                     }
                             )}
-                    ),
-                    @ApiResponse(responseCode = "500", description = "Internal Server Error",
-                            content = {@Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = AppError.class),
-                                    examples = {
-                                            @ExampleObject(name="Other errors", ref = "#/components/examples/UnexpectedError500")
-                                    }
-                            )}
                     )
             }
     )

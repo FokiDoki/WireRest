@@ -74,15 +74,15 @@ public class CreatePeerController {
                                             mediaType = "application/json",
                                             array = @ArraySchema(schema = @Schema(implementation = WgPeerDTO.class)),
                                             examples = {
-                                                    @ExampleObject(name = "Peer exists", ref = "#/components/examples/peerAlreadyExists409")
+                                                    @ExampleObject(name = "Peer already exists",
+                                                            ref = "#/components/examples/peerAlreadyExists409")
                                             }
                                     )}),
                     @ApiResponse(responseCode = "500", description = "Internal Server Error",
                             content = {@Content(mediaType = "application/json",
                                     schema = @Schema(implementation = AppError.class),
                                     examples = {
-                                            @ExampleObject(name="No free ip", ref = "#/components/examples/RangeNoFreeIp500"),
-                                            @ExampleObject(name="Other errors", ref = "#/components/examples/UnexpectedError500")
+                                            @ExampleObject(name="No free ip", ref = "#/components/examples/RangeNoFreeIp500")
                                     }
                             )}
                     )

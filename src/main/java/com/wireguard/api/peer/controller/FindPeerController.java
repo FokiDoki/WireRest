@@ -33,7 +33,7 @@ import java.util.Objects;
 @RestController
 @RequestMapping(value = "v1/peers")
 @Validated
-public class PeerController {
+public class FindPeerController {
 
     private final WgPeerService wgPeerService;
 
@@ -41,7 +41,7 @@ public class PeerController {
 
     private final WgPeerDTOFromWgPeerConverter peerDTOConverter = new WgPeerDTOFromWgPeerConverter();
 
-    public PeerController(WgPeerService wgPeerService) {
+    public FindPeerController(WgPeerService wgPeerService) {
         this.wgPeerService = wgPeerService;
     }
 
@@ -57,10 +57,12 @@ public class PeerController {
             ),
             @ApiResponse(responseCode = "404", description = "Not Found",
                     content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = AppError.class))}),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = AppError.class))})})
+                            schema = @Schema(implementation = AppError.class),
+                            examples = {
+                                    @ExampleObject(name = "Invalid key format",
+                                            ref = "#/components/examples/peerNotFound")
+                            })})
+    })
     @Parameter(name = "publicKey", description = "The public key of the peer to be found", required = true)
     @Parameter(name = "publicKeyDTO", hidden = true)
     @GetMapping("/find")

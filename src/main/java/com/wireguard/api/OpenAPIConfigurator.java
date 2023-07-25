@@ -10,6 +10,11 @@ import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Contact;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.models.examples.Example;
+import io.swagger.v3.oas.models.media.Content;
+import io.swagger.v3.oas.models.media.MediaType;
+import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.responses.ApiResponse;
+import io.swagger.v3.oas.models.responses.ApiResponses;
 import jakarta.annotation.PostConstruct;
 import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springdoc.core.providers.ObjectMapperProvider;
@@ -18,9 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @OpenAPIDefinition(
 
@@ -36,10 +39,10 @@ import java.util.Set;
 )
 
 @Configuration
-public class OpenAPIExamplesConfigurator {
+public class OpenAPIConfigurator {
     private final ExamplesCustomizer examplesCustomizer;
     @Autowired
-    public OpenAPIExamplesConfigurator(ExamplesCustomizer examplesCustomizer) {
+    public OpenAPIConfigurator(ExamplesCustomizer examplesCustomizer) {
         this.examplesCustomizer = examplesCustomizer;
     }
 
@@ -72,6 +75,56 @@ public class OpenAPIExamplesConfigurator {
             openApi.getComponents().setExamples(examplesCustomizer.getMap());
         };
     }
+
+    @Bean
+    public OpenApiCustomizer openApiDefaultCodes() {
+        return openApi -> {
+            Map<String, Schema> schemas = openApi.getComponents().getSchemas();
+            openApi.getPaths().values().forEach(pathItem -> pathItem.readOperations().forEach(operation -> {
+                ApiResponses apiResponses = operation.getResponses();
+                addApiResponseNoOverride(apiResponses, "500",
+                        createApiResponse("Server Error",
+                            schemas.get(AppError.class.getSimpleName()),
+                            Map.of("UnexpectedError500", examplesCustomizer.getMap().get("UnexpectedError500"))
+                        )
+                );
+
+            }));
+        };
+    }
+    private void addApiResponseNoOverride(ApiResponses apiResponses, String code, ApiResponse apiResponse){
+        if (apiResponses.containsKey(code)) {
+            MediaType newMediaType = apiResponse.getContent().get(org.springframework.http.MediaType.APPLICATION_JSON_VALUE);
+            MediaType oldMediaType = apiResponses.get(code).getContent().get(org.springframework.http.MediaType.APPLICATION_JSON_VALUE);
+            Map<String, Example> oldExamples = Objects.requireNonNullElse(
+                    oldMediaType.getExamples(),
+                    new HashMap<>());
+            Map<String, Example> newExamples = Objects.requireNonNullElse(
+                            newMediaType.getExamples(),
+                            new HashMap<>());
+            oldExamples.putAll(newExamples);
+            setExamples(apiResponse, oldExamples);
+        }
+        apiResponses.addApiResponse(code, apiResponse);
+    }
+    private ApiResponse createApiResponse(String message, Schema schema, Map<String, Example> example) {
+        ApiResponse apiResponse = createApiResponse(message, schema);
+        setExamples(apiResponse, example);
+        return apiResponse;
+    }
+
+    private ApiResponse createApiResponse(String message, Schema schema) {
+        MediaType mediaType = new MediaType();
+        mediaType.schema(schema);
+        return new ApiResponse().description(message)
+                .content(new Content().addMediaType(org.springframework.http.MediaType.APPLICATION_JSON_VALUE, mediaType));
+    }
+
+    private void setExamples(ApiResponse apiResponse, Map<String, Example> examples){
+        apiResponse.getContent()
+                .get(org.springframework.http.MediaType.APPLICATION_JSON_VALUE).setExamples(examples);
+    }
+
 
     private void addObject(String key, String summary, Object object){
         examplesCustomizer.put(key,
@@ -140,4 +193,5 @@ public class OpenAPIExamplesConfigurator {
         addError("peerNotFound", "Peer not found", 404,
                 ex.getMessage());
     }
+
 }

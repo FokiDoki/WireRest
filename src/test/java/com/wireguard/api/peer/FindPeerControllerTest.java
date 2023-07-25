@@ -3,7 +3,7 @@ package com.wireguard.api.peer;
 import com.wireguard.api.ResourceNotFoundException;
 import com.wireguard.api.converters.WgPeerDTOFromWgPeerConverter;
 import com.wireguard.api.dto.PageDTO;
-import com.wireguard.api.peer.controller.PeerController;
+import com.wireguard.api.peer.controller.FindPeerController;
 import com.wireguard.external.network.NoFreeIpException;
 import com.wireguard.external.network.Subnet;
 import com.wireguard.external.network.SubnetV6;
@@ -32,8 +32,8 @@ import java.util.*;
 
 import static org.hamcrest.Matchers.containsString;
 
-@WebFluxTest(PeerController.class)
-class PeerControllerTest {
+@WebFluxTest(FindPeerController.class)
+class FindPeerControllerTest {
 
     @Autowired
     private WebTestClient webClient;
