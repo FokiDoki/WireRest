@@ -50,7 +50,7 @@ public class WgPeerService {
 
     public WgPeer getPeerByPublicKeyOrThrow(String publicKey) throws ParsingException {
         return getPeerByPublicKey(publicKey).orElseThrow(
-                () -> new NoSuchElementException("Peer with public key %s not found".formatted(publicKey))
+                () -> new PeerNotFoundException(publicKey)
         );
     }
 

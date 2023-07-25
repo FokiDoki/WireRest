@@ -5,6 +5,7 @@ import com.wireguard.api.dto.PageDTO;
 import com.wireguard.api.peer.CreatedPeerDTO;
 import com.wireguard.api.peer.WgPeerDTO;
 import com.wireguard.external.wireguard.PageOutOfRangeException;
+import com.wireguard.external.wireguard.peer.PeerNotFoundException;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Contact;
 import io.swagger.v3.oas.annotations.info.Info;
@@ -131,5 +132,12 @@ public class OpenAPIExamplesConfigurator {
     @PostConstruct
     public void peerCreated(){
         addObject("createdPeer", "Created peer", createdPeerDTO());
+    }
+
+    @PostConstruct
+    public void peerNotFound(){
+        PeerNotFoundException ex = new PeerNotFoundException("cHViQ0F4Tnc9PUZha2VQdWJLZXkgICAgICAgICAxOA==");
+        addError("peerNotFound", "Peer not found", 404,
+                ex.getMessage());
     }
 }
