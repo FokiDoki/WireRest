@@ -72,30 +72,5 @@ public class PeerController {
 
 
 
-
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "OK",
-                    content = {
-                            @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = WgPeerDTO.class)
-                            )
-                    }
-            ),
-            @ApiResponse(responseCode = "404", description = "Not Found",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = AppError.class))}),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = AppError.class))})})
-
-
-    @Parameter(name = "publicKey", description = "The public key of the peer to be deleted", required = true)
-    @DeleteMapping()
-    public WgPeerDTO deletePeer(@Valid PublicKeyDTO publicKeyDTO) {
-        WgPeer deletedPeer = wgPeerService.deletePeer(publicKeyDTO.getValue());
-        return peerDTOConverter.convert(deletedPeer);
-    }
-
-
+    
 }

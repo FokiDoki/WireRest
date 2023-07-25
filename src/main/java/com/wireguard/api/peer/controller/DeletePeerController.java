@@ -81,8 +81,8 @@ public class DeletePeerController {
             }
     )
     @Parameter(name = "publicKey", description = "The public key of the peer to be deleted", required = true)
-    
-    @DeleteMapping()
+    @Parameter(name = "publicKeyDTO", hidden = true)
+    @DeleteMapping
     public WgPeerDTO deletePeer(@Valid PublicKeyDTO publicKeyDTO) {
         WgPeer deletedPeer = wgPeerService.deletePeer(publicKeyDTO.getValue());
         return peerDTOConverter.convert(deletedPeer);
