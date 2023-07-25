@@ -38,7 +38,6 @@ public class FindPeerController {
     private final WgPeerService wgPeerService;
 
 
-
     private final WgPeerDTOFromWgPeerConverter peerDTOConverter = new WgPeerDTOFromWgPeerConverter();
 
     public FindPeerController(WgPeerService wgPeerService) {
@@ -46,23 +45,31 @@ public class FindPeerController {
     }
 
 
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "OK",
-                    content = {
-                            @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = WgPeerDTO.class)
-                            )
-                    }
-            ),
-            @ApiResponse(responseCode = "404", description = "Not Found",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = AppError.class),
-                            examples = {
-                                    @ExampleObject(name = "Invalid key format",
-                                            ref = "#/components/examples/peerNotFound")
-                            })})
-    })
+    @Operation(summary = "Find by public key",
+            description = "",
+            tags = {"Peers"},
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "OK",
+                            content = {
+                                    @Content(
+                                            mediaType = "application/json",
+                                            schema = @Schema(implementation = WgPeerDTO.class),
+                                            examples = {
+                                                    @ExampleObject(name = "Peer",
+                                                            ref = "#/components/examples/peer")
+                                            }
+
+                                    )
+                            }
+                    ),
+                    @ApiResponse(responseCode = "404", description = "Not Found",
+                            content = {@Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = AppError.class),
+                                    examples = {
+                                            @ExampleObject(name = "Invalid key format",
+                                                    ref = "#/components/examples/peerNotFound")
+                                    })})
+            })
     @Parameter(name = "publicKey", description = "The public key of the peer to be found", required = true)
     @Parameter(name = "publicKeyDTO", hidden = true)
     @GetMapping("/find")

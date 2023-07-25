@@ -2,6 +2,7 @@ package com.wireguard.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wireguard.api.dto.PageDTO;
+import com.wireguard.api.inteface.WgInterfaceDTO;
 import com.wireguard.api.peer.CreatedPeerDTO;
 import com.wireguard.api.peer.WgPeerDTO;
 import com.wireguard.external.wireguard.PageOutOfRangeException;
@@ -67,6 +68,15 @@ public class OpenAPIConfigurator {
                 Set.of("10.1.21.235/32"),
                 0
         );
+    }
+
+    private WgInterfaceDTO getInterfaceDTO(){
+        return new WgInterfaceDTO(
+                "iNpmL6pHFpBjOTKttQ2zfljJ6nMlyAeN1Xd7jQNVLGs=",
+                "YFsZ0UjLVPeFOKZhWiVBVQMPnObwY0tuXLtjPfbqmF8=",
+                51820,
+                0);
+
     }
 
     @Bean
@@ -192,6 +202,11 @@ public class OpenAPIConfigurator {
         PeerNotFoundException ex = new PeerNotFoundException("cHViQ0F4Tnc9PUZha2VQdWJLZXkgICAgICAgICAxOA==");
         addError("peerNotFound", "Peer not found", 404,
                 ex.getMessage());
+    }
+
+    @PostConstruct
+    public void getInterface(){
+        addObject("interface", "Interface", getInterfaceDTO());
     }
 
 }
