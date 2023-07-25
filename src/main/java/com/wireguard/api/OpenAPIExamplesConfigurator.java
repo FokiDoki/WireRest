@@ -3,6 +3,7 @@ package com.wireguard.api;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wireguard.api.dto.PageDTO;
 import com.wireguard.api.peer.WgPeerDTO;
+import com.wireguard.external.wireguard.PageOutOfRangeException;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Contact;
 import io.swagger.v3.oas.annotations.info.Info;
@@ -36,9 +37,8 @@ import java.util.Set;
 public class OpenAPIExamplesConfigurator {
     private final ExamplesCustomizer examplesCustomizer;
     @Autowired
-    public OpenAPIExamplesConfigurator(ExamplesCustomizer examplesCustomizer, ObjectMapper om) {
+    public OpenAPIExamplesConfigurator(ExamplesCustomizer examplesCustomizer) {
         this.examplesCustomizer = examplesCustomizer;
-        SpringDocProviders springDocProviders
     }
 
     private WgPeerDTO constructPeerWithAllFields(){
@@ -54,17 +54,6 @@ public class OpenAPIExamplesConfigurator {
         return peer;
     }
 
-    private WgPeerDTO constructPeerWithMinimumFields(){
-        WgPeerDTO peer = new WgPeerDTO();
-        peer.setPublicKey("ALD3x7qWP0W/4zC26jFozxw28vXJsazA33KnHF+AfHw=");
-        peer.setPublicKey(null);
-        peer.setPresharedKey(null);
-        peer.setEndpoint(null);
-        peer.setAllowedSubnets(Set.of());
-        return peer;
-    }
-
-
     @Bean
     public OpenApiCustomizer openApiExamplesCustomizer(ExamplesCustomizer examplesCustomizer) {
         return openApi -> {
@@ -72,57 +61,52 @@ public class OpenAPIExamplesConfigurator {
         };
     }
 
-    @PostConstruct
-    public void invalidPubKey() {
-        examplesCustomizer.put(
-                "InvalidPubKey400",
-                new Example().summary("Invalid public key").value(
-                        new AppError(400, "publicKey.value: Invalid key format (Base64 required) (test provided), " +
-                                "publicKey.value: Key must be 44 characters long (test provided)")
-                )
+    private void addObject(String key, String summary, Object object){
+        examplesCustomizer.put(key,
+                new Example().summary(summary).value(object)
         );
     }
 
+    private void addError(String key, String summary, int code, String errorMessage){
+        addObject(key, summary,
+                new AppError(code, errorMessage));
+    }
+
+    @PostConstruct
+    public void invalidPubKey() {
+        addError("InvalidPubKey400", "Invalid public key", 400,
+                "publicKey.value: Invalid key format (Base64 required) (test provided), \" +\n" +
+                        "\"publicKey.value: Key must be 44 characters long (test provided)");
+    }
+
+    @PostConstruct
+    public void invalidPage() {
+        PageOutOfRangeException ex = new PageOutOfRangeException(101, 100);
+        addError("InvalidPage400", "Invalid Page", 400,
+                ex.getMessage());
+    }
+
+
     @PostConstruct
     public void unexpectedError(){
-        examplesCustomizer.put(
-                "UnexpectedError500",
-                new Example().summary("Unexpected error").value(
-                        new AppError(500, "Error text")
-                )
-        );
+        addError("UnexpectedError500", "Unexpected error", 500,
+                "Error text");
     }
 
     @PostConstruct
     public void rangeNoFreeIp(){
-        examplesCustomizer.put(
-                "RangeNoFreeIp500",
-                new Example().summary("No free ip").value(
-                        new AppError(500, "Range 10.0.0.0 - 10.0.0.255 has no free ip that can be assigned")
-                )
-        );
+        addError("RangeNoFreeIp500", "No free ip", 500,
+                "Range 10.0.0.0 - 10.0.0.255 has no free ip that can be assigned");
     }
 
     @PostConstruct
     public void pageWithPeers(){
-        examplesCustomizer.put(
-                "PageWithPeers",
-                 new Example().summary("One peer").value(
-                         new PageDTO<>(100, 0, List.of(constructPeerWithAllFields()))
-                 )
+        addObject("PageWithPeers", "One peer",
+                new PageDTO<>(100, 0, List.of(constructPeerWithAllFields()))
         );
     }
 
     @PostConstruct
-    public void pageWithPeersWithNulls(){
-        List<WgPeerDTO> peers = List.of(constructPeerWithMinimumFields(),
-                constructPeerWithAllFields());
-        Example example =                 new Example().summary("Peer with nulls").value(
-                new PageDTO<>(100, 0, peers)
-        );
-        examplesCustomizer.put(
-                "PageWithPeersWithNulls",
-                example
-        );
-    }
+    public void
+
 }

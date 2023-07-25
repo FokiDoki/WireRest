@@ -51,8 +51,7 @@ public class GetPeersController {
                                             mediaType = "application/json",
                                             array = @ArraySchema(schema = @Schema(nullable = true, implementation = PageDTO.class)),
                                             examples = {
-                                                    @ExampleObject(name = "Non-null", ref = "#/components/examples/PageWithPeers"),
-                                                    @ExampleObject(name = "Nulls", ref = "#/components/examples/PageWithPeersWithNulls"),
+                                                    @ExampleObject(name = "Non-null", ref = "#/components/examples/PageWithPeers")
                                             }
                                     )
                             }
@@ -62,7 +61,9 @@ public class GetPeersController {
                                     schema = @Schema(implementation = AppError.class, name = "BadRequestExample"),
                                     examples = {
                                     @ExampleObject(name = "Invalid key format",
-                                            ref = "#/components/examples/InvalidPubKey400")
+                                            ref = "#/components/examples/InvalidPubKey400"),
+                                            @ExampleObject(name = "Invalid key format",
+                                                    ref = "#/components/examples/InvalidPage400"),
                                     }
                             )}
                     ),
