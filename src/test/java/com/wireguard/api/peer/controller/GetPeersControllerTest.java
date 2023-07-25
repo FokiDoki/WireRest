@@ -4,8 +4,6 @@ import com.wireguard.api.converters.WgPeerDTOFromWgPeerConverter;
 import com.wireguard.api.dto.PageDTO;
 import com.wireguard.api.peer.WgPeerDTO;
 import com.wireguard.api.peer.testData;
-import com.wireguard.external.network.Subnet;
-import com.wireguard.external.network.SubnetV6;
 import com.wireguard.external.wireguard.Paging;
 import com.wireguard.external.wireguard.ParsingException;
 import com.wireguard.external.wireguard.peer.WgPeer;
@@ -23,10 +21,8 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import static org.hamcrest.Matchers.containsString;
-import static org.junit.jupiter.api.Assertions.*;
 
 @WebFluxTest(GetPeersController.class)
 class GetPeersControllerTest {
@@ -41,6 +37,7 @@ class GetPeersControllerTest {
 
 
     Paging<WgPeer> paging = new Paging<>(WgPeer.class);
+
     @Test
     void getPeers() {
         Page<WgPeer> expected = paging.apply(Pageable.ofSize(2), peerList);

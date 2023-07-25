@@ -1,6 +1,5 @@
 package com.wireguard.api;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wireguard.api.dto.PageDTO;
 import com.wireguard.api.inteface.WgInterfaceDTO;
 import com.wireguard.api.peer.CreatedPeerDTO;
@@ -21,8 +20,6 @@ import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 import jakarta.annotation.PostConstruct;
 import org.springdoc.core.customizers.OpenApiCustomizer;
-import org.springdoc.core.providers.ObjectMapperProvider;
-import org.springdoc.core.providers.SpringDocProviders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -45,12 +42,13 @@ import java.util.*;
 @Configuration
 public class OpenAPIConfigurator {
     private final ExamplesCustomizer examplesCustomizer;
+
     @Autowired
     public OpenAPIConfigurator(ExamplesCustomizer examplesCustomizer) {
         this.examplesCustomizer = examplesCustomizer;
     }
 
-    private WgPeerDTO constructPeerWithAllFields(){
+    private WgPeerDTO constructPeerWithAllFields() {
         WgPeerDTO peer = new WgPeerDTO();
         peer.setPublicKey("ALD3x7qWP0W/4zC26jFozxw28vXJsazA33KnHF+AfHw=");
         peer.setPresharedKey("3hFqZXqzO+YkVL4nX2siavxK1Z3h5lRLkEQz1qf3giI=");
@@ -63,7 +61,7 @@ public class OpenAPIConfigurator {
         return peer;
     }
 
-    private CreatedPeerDTO createdPeerDTO(){
+    private CreatedPeerDTO createdPeerDTO() {
         return new CreatedPeerDTO(
                 "AhM4WLR7ETzLYDQ0zEq/0pvbYAxsbLwzzlIAdWhR7yg=",
                 "q2MpyyqfAarG+zoVztTJk9ykQCVmOdBePtcmwZEc2iY=",
@@ -73,7 +71,7 @@ public class OpenAPIConfigurator {
         );
     }
 
-    private WgInterfaceDTO getInterfaceDTO(){
+    private WgInterfaceDTO getInterfaceDTO() {
         return new WgInterfaceDTO(
                 "iNpmL6pHFpBjOTKttQ2zfljJ6nMlyAeN1Xd7jQNVLGs=",
                 "YFsZ0UjLVPeFOKZhWiVBVQMPnObwY0tuXLtjPfbqmF8=",
@@ -97,15 +95,16 @@ public class OpenAPIConfigurator {
                 ApiResponses apiResponses = operation.getResponses();
                 addApiResponseNoOverride(apiResponses, "500",
                         createApiResponse("Server Error",
-                            schemas.get(AppError.class.getSimpleName()),
-                            Map.of("UnexpectedError500", examplesCustomizer.getMap().get("UnexpectedError500"))
+                                schemas.get(AppError.class.getSimpleName()),
+                                Map.of("UnexpectedError500", examplesCustomizer.getMap().get("UnexpectedError500"))
                         )
                 );
 
             }));
         };
     }
-    private void addApiResponseNoOverride(ApiResponses apiResponses, String code, ApiResponse apiResponse){
+
+    private void addApiResponseNoOverride(ApiResponses apiResponses, String code, ApiResponse apiResponse) {
         if (apiResponses.containsKey(code)) {
             MediaType newMediaType = apiResponse.getContent().get(org.springframework.http.MediaType.APPLICATION_JSON_VALUE);
             MediaType oldMediaType = apiResponses.get(code).getContent().get(org.springframework.http.MediaType.APPLICATION_JSON_VALUE);
@@ -113,13 +112,14 @@ public class OpenAPIConfigurator {
                     oldMediaType.getExamples(),
                     new HashMap<>());
             Map<String, Example> newExamples = Objects.requireNonNullElse(
-                            newMediaType.getExamples(),
-                            new HashMap<>());
+                    newMediaType.getExamples(),
+                    new HashMap<>());
             oldExamples.putAll(newExamples);
             setExamples(apiResponse, oldExamples);
         }
         apiResponses.addApiResponse(code, apiResponse);
     }
+
     private ApiResponse createApiResponse(String message, Schema schema, Map<String, Example> example) {
         ApiResponse apiResponse = createApiResponse(message, schema);
         setExamples(apiResponse, example);
@@ -133,19 +133,19 @@ public class OpenAPIConfigurator {
                 .content(new Content().addMediaType(org.springframework.http.MediaType.APPLICATION_JSON_VALUE, mediaType));
     }
 
-    private void setExamples(ApiResponse apiResponse, Map<String, Example> examples){
+    private void setExamples(ApiResponse apiResponse, Map<String, Example> examples) {
         apiResponse.getContent()
                 .get(org.springframework.http.MediaType.APPLICATION_JSON_VALUE).setExamples(examples);
     }
 
 
-    private void addObject(String key, String summary, Object object){
+    private void addObject(String key, String summary, Object object) {
         examplesCustomizer.put(key,
                 new Example().summary(summary).value(object)
         );
     }
 
-    private void addError(String key, String summary, int code, String errorMessage){
+    private void addError(String key, String summary, int code, String errorMessage) {
         addObject(key, summary,
                 new AppError(code, errorMessage));
     }
@@ -166,54 +166,54 @@ public class OpenAPIConfigurator {
 
 
     @PostConstruct
-    public void unexpectedError(){
+    public void unexpectedError() {
         addError("UnexpectedError500", "Unexpected error", 500,
                 "Error text");
     }
 
     @PostConstruct
-    public void rangeNoFreeIp(){
+    public void rangeNoFreeIp() {
         addError("RangeNoFreeIp500", "No free ip", 500,
                 "Range 10.0.0.0 - 10.0.0.255 has no free ip that can be assigned");
     }
 
     @PostConstruct
-    public void pageWithPeers(){
+    public void pageWithPeers() {
         addObject("PageWithPeers", "Page with limit 1",
                 new PageDTO<>(100, 0, List.of(constructPeerWithAllFields()))
         );
     }
 
     @PostConstruct
-    public void peer(){
+    public void peer() {
         addObject("peer", "Peer", constructPeerWithAllFields());
     }
 
     @PostConstruct
-    public void peerAlreadyExists(){
+    public void peerAlreadyExists() {
         addError("peerAlreadyExists409", "Peer already exists", 409,
                 "Peer with public key cHViQ0F4Tnc9PUZha2VQdWJLZXkgICAgICAgICAxOA== already exists");
     }
 
     @PostConstruct
-    public void peerCreated(){
+    public void peerCreated() {
         addObject("createdPeer", "Created peer", createdPeerDTO());
     }
 
     @PostConstruct
-    public void peerNotFound(){
+    public void peerNotFound() {
         PeerNotFoundException ex = new PeerNotFoundException("cHViQ0F4Tnc9PUZha2VQdWJLZXkgICAgICAgICAxOA==");
         addError("peerNotFound", "Peer not found", 404,
                 ex.getMessage());
     }
 
     @PostConstruct
-    public void getInterface(){
+    public void getInterface() {
         addObject("interface", "Interface", getInterfaceDTO());
     }
 
     @PostConstruct
-    public void getLogs(){
+    public void getLogs() {
         List<LoggingEventDto> loggingEventDtos = List.of(
                 new LoggingEventDto("INFO", "Init duration for springdoc-openapi is: 529 ms", 1690301255231L),
                 new LoggingEventDto("ERROR", "Peer with public key ALD3x7qWP0W/4zC26jFozxw28vXJsazA33KnHF+AfHw= not found", 1690301333239L)
@@ -222,13 +222,13 @@ public class OpenAPIConfigurator {
     }
 
     @PostConstruct
-    public void logsLimit(){
+    public void logsLimit() {
         addError("logsLimit400", "Invalid limit", 400,
                 "getLogs.limit: must be greater than or equal to 0");
     }
 
     @PostConstruct
-    public void alreadyUsedException(){
+    public void alreadyUsedException() {
         AlreadyUsedException alreadyUsedException = new AlreadyUsedException(Subnet.valueOf("10.0.0.100/32"));
         addError("alreadyUsed409", "Already used", 409,
                 alreadyUsedException.getMessage());

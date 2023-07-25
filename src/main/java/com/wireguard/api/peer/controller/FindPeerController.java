@@ -1,34 +1,22 @@
 package com.wireguard.api.peer.controller;
 
 import com.wireguard.api.AppError;
-import com.wireguard.api.converters.*;
-import com.wireguard.api.dto.PageDTO;
-import com.wireguard.api.dto.PageRequestDTO;
+import com.wireguard.api.converters.WgPeerDTOFromWgPeerConverter;
 import com.wireguard.api.dto.PublicKeyDTO;
-import com.wireguard.api.peer.CreatedPeerDTO;
-import com.wireguard.api.peer.PeerCreationRequestDTO;
 import com.wireguard.api.peer.WgPeerDTO;
-import com.wireguard.external.wireguard.ParsingException;
-import com.wireguard.external.wireguard.peer.CreatedPeer;
 import com.wireguard.external.wireguard.peer.WgPeer;
 import com.wireguard.external.wireguard.peer.WgPeerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.Objects;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(value = "v1/peers")
@@ -78,8 +66,6 @@ public class FindPeerController {
         WgPeer peer = wgPeerService.getPeerByPublicKeyOrThrow(publicKeyDTO.getValue());
         return peerDTOConverter.convert(peer);
     }
-
-
 
 
 }

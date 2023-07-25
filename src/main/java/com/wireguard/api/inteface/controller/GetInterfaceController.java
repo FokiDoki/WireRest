@@ -1,6 +1,5 @@
 package com.wireguard.api.inteface.controller;
 
-import com.wireguard.api.AppError;
 import com.wireguard.api.inteface.WgInterfaceDTO;
 import com.wireguard.external.wireguard.ParsingException;
 import com.wireguard.external.wireguard.iface.WgInterfaceService;
@@ -9,11 +8,8 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import org.checkerframework.common.reflection.qual.GetClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -30,14 +26,14 @@ public class GetInterfaceController {
             description = "If caching is enabled, the interface configuration is updated every 300 seconds",
             tags = {"Interface"},
             responses = {
-            @ApiResponse(responseCode = "200", description = "OK",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = WgInterfaceDTO.class),
-                    examples = {
-                            @ExampleObject(name = "Interface",
-                                    ref = "#/components/examples/interface")
-                    })}),
-    })
+                    @ApiResponse(responseCode = "200", description = "OK",
+                            content = {@Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = WgInterfaceDTO.class),
+                                    examples = {
+                                            @ExampleObject(name = "Interface",
+                                                    ref = "#/components/examples/interface")
+                                    })}),
+            })
     @GetMapping("v1/interface")
     public WgInterfaceDTO getInterface() throws ParsingException {
         return WgInterfaceDTO.from(interfaceService.getInterface());

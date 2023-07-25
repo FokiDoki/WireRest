@@ -123,7 +123,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler
-    public ResponseEntity<AppError> parsingException(ParsingException e){
+    public ResponseEntity<AppError> parsingException(ParsingException e) {
         logger.error(e.getMessage(), e);
         return getAppErrorResponseEntity(HttpStatus.BAD_REQUEST, e);
     }

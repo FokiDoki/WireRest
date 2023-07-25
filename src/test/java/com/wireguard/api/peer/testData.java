@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 public class testData {
-    public static List<WgPeer> getPeers(){
+    public static List<WgPeer> getPeers() {
         return List.of(
                 WgPeer.publicKey(getFakePubKey()).build(),
                 WgPeer.publicKey("PubKey2")

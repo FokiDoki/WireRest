@@ -39,7 +39,7 @@ public class UpdatePeerController {
     @Operation(summary = "Update peer by public key",
             description = "Update peer by public key. " +
                     "Do not provide fields that you do not want to change.",
-            tags = {"Peers" },
+            tags = {"Peers"},
             responses = {
                     @ApiResponse(responseCode = "200", description = "OK",
                             content = {

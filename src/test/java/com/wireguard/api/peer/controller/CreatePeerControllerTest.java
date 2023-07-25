@@ -1,6 +1,5 @@
 package com.wireguard.api.peer.controller;
 
-import com.wireguard.api.converters.WgPeerDTOFromWgPeerConverter;
 import com.wireguard.api.peer.CreatedPeerDTO;
 import com.wireguard.api.peer.testData;
 import com.wireguard.external.network.NoFreeIpException;
@@ -8,7 +7,6 @@ import com.wireguard.external.network.Subnet;
 import com.wireguard.external.wireguard.IpAllocationRequestOneIfNullSubnets;
 import com.wireguard.external.wireguard.PeerCreationRequest;
 import com.wireguard.external.wireguard.peer.CreatedPeer;
-import com.wireguard.external.wireguard.peer.WgPeer;
 import com.wireguard.external.wireguard.peer.WgPeerService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -17,21 +15,18 @@ import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-import java.util.List;
 import java.util.Set;
 
 import static org.hamcrest.Matchers.containsString;
-import static org.junit.jupiter.api.Assertions.*;
 
 @WebFluxTest(CreatePeerController.class)
 class CreatePeerControllerTest {
 
-        @MockBean
-        WgPeerService wgPeerService;
-        @Autowired
-        private WebTestClient webClient;
-        private final static String BASE_URL = "/v1/peers";
-
+    @MockBean
+    WgPeerService wgPeerService;
+    @Autowired
+    private WebTestClient webClient;
+    private final static String BASE_URL = "/v1/peers";
 
 
     @Test

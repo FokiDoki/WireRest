@@ -2,35 +2,18 @@ package com.wireguard.api.peer.controller;
 
 import com.wireguard.api.ResourceNotFoundException;
 import com.wireguard.api.converters.WgPeerDTOFromWgPeerConverter;
-import com.wireguard.api.dto.PageDTO;
 import com.wireguard.api.peer.WgPeerDTO;
-import com.wireguard.api.peer.controller.FindPeerController;
 import com.wireguard.api.peer.testData;
-import com.wireguard.external.network.NoFreeIpException;
-import com.wireguard.external.network.Subnet;
-import com.wireguard.external.network.SubnetV6;
-import com.wireguard.external.wireguard.IpAllocationRequestOneIfNullSubnets;
-import com.wireguard.external.wireguard.Paging;
-import com.wireguard.external.wireguard.ParsingException;
-import com.wireguard.external.wireguard.PeerCreationRequest;
-import com.wireguard.external.wireguard.peer.CreatedPeer;
 import com.wireguard.external.wireguard.peer.WgPeer;
 import com.wireguard.external.wireguard.peer.WgPeerService;
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Optional;
 
 import static com.wireguard.api.peer.testData.getFakePubKey;
 import static org.hamcrest.Matchers.containsString;
@@ -56,7 +39,7 @@ class FindPeerControllerTest {
         Mockito.when(wgPeerService.getPeerByPublicKeyOrThrow(getFakePubKey()))
                 .thenReturn(peer.get());
         webClient.get().uri(uriBuilder -> uriBuilder
-                        .path(BASE_URL+"/find")
+                        .path(BASE_URL + "/find")
                         .queryParam("publicKey", getFakePubKey())
                         .build())
                 .exchange()
@@ -69,7 +52,7 @@ class FindPeerControllerTest {
         Mockito.when(wgPeerService.getPeerByPublicKeyOrThrow(getFakePubKey()))
                 .thenThrow(new ResourceNotFoundException("not found"));
         webClient.get().uri(uriBuilder -> uriBuilder
-                        .path(BASE_URL+"/find")
+                        .path(BASE_URL + "/find")
                         .queryParam("publicKey", getFakePubKey())
                         .build())
                 .exchange()

@@ -61,8 +61,8 @@ public class GetPeersController {
                             content = {@Content(mediaType = "application/json",
                                     schema = @Schema(implementation = AppError.class, name = "BadRequestExample"),
                                     examples = {
-                                    @ExampleObject(name = "Invalid key format",
-                                            ref = "#/components/examples/InvalidPubKey400"),
+                                            @ExampleObject(name = "Invalid key format",
+                                                    ref = "#/components/examples/InvalidPubKey400"),
                                             @ExampleObject(name = "Invalid page",
                                                     ref = "#/components/examples/InvalidPage400"),
                                     }

@@ -40,7 +40,7 @@ class SubnetSolverTest {
     }
 
     @Test
-    void testTakeReleaseSideBySide(){
+    void testTakeReleaseSideBySide() {
         subnetSolver.obtain(Subnet.valueOf("0.0.0.16/31"));
         subnetSolver.release(Subnet.valueOf("0.0.0.17/32"));
         subnetSolver.obtain(Subnet.valueOf("0.0.0.18/32"));

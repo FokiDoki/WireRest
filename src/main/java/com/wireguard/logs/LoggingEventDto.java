@@ -1,7 +1,6 @@
 package com.wireguard.logs;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
