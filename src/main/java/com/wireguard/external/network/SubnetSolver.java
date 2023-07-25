@@ -126,7 +126,7 @@ public class SubnetSolver implements IV4SubnetSolver {
 
         int greaterIndex = findFirstGreater(firstAddress);
         int leastIndex = calculatePreviousRangeIndex(greaterIndex);
-        IpRange greater = availableRanges.get(greaterIndex);
+        IpRange greater = availableRanges.get(Math.max(0, greaterIndex));
         IpRange least = availableRanges.get(leastIndex);
         if (isIpsNotTouchingRange(firstAddress, lastAddress, least)) {
             if (greater.getLeast() - 1 == lastAddress && least.getBiggest() + 1 == firstAddress) {
@@ -134,7 +134,7 @@ public class SubnetSolver implements IV4SubnetSolver {
                 availableRanges.add(leastIndex, new IpRange(least.getLeast(), greater.getBiggest()));
             } else if (greater.getLeast() - 1 == lastAddress) {
                 availableRanges.remove(greater);
-                availableRanges.add(leastIndex+1, new IpRange(firstAddress, greater.getBiggest()));
+                availableRanges.add(Math.min(leastIndex+1, availableRanges.size()), new IpRange(firstAddress, greater.getBiggest()));
             } else if (least.getBiggest() + 1 == firstAddress) {
                 availableRanges.remove(least);
                 availableRanges.add(leastIndex, new IpRange(least.getLeast(), lastAddress));
