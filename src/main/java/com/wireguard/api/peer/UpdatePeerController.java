@@ -45,23 +45,19 @@ public class UpdatePeerController {
                                             mediaType = "application/json",
                                             array = @ArraySchema(schema = @Schema(implementation = WgPeerDTO.class)),
                                             examples = {
-                                                    @ExampleObject(name = "Example response",
-                                                            value = "{\n" +
-                                                                    "  \"publicKey\": \"5qp6gy7reAr+1hWEwGM/+WQYEQeP5o2W5/+jVyvRvlE=\",\n" +
-                                                                    "  \"presharedKey\": \"lM7XVZ5p/uoIg7ywPALHZdBrMhdQAbhpsKGzjhZd8mQ=\",\n" +
-                                                                    "  \"endpoint\": \"145.45.45.45:44612\",\n" +
-                                                                    "  \"allowedSubnets\": [\n" +
-                                                                    "    \"2002:0:0:1234::/64\",\n" +
-                                                                    "    \"10.1.142.196/32\"\n" +
-                                                                    "  ],\n" +
-                                                                    "  \"latestHandshake\": 123,\n" +
-                                                                    "  \"transferRx\": 4321,\n" +
-                                                                    "  \"transferTx\": 1234,\n" +
-                                                                    "  \"persistentKeepalive\": 0\n" +
-                                                                    "}"),
+                                                    @ExampleObject(name = "Peer", ref = "#/components/examples/peer"),
                                             }
                                     )
                             }
+                    ),
+                    @ApiResponse(responseCode = "400", description = "Bad Request",
+                            content = {@Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = AppError.class, name = "BadRequestExample"),
+                                    examples = {
+                                            @ExampleObject(name = "Invalid key format",
+                                                    ref = "#/components/examples/InvalidPubKey400")
+                                    }
+                            )}
                     ),
                     @ApiResponse(responseCode = "409", description = "Peer with new public key already exists",
                             content = {
@@ -69,24 +65,16 @@ public class UpdatePeerController {
                                             mediaType = "application/json",
                                             array = @ArraySchema(schema = @Schema(implementation = WgPeerDTO.class)),
                                             examples = {
-                                                    @ExampleObject(name = "Example response",
-                                                            value = "{\n" +
-                                                                    "  \"code\": 409,\n" +
-                                                                    "  \"message\": \"Peer with public key cHViQ0F4Tnc9PUZha2VQdWJLZXkgICAgICAgICAxOA== already exists\"\n" +
-                                                                    "}"),
+                                                    @ExampleObject(name = "Peer exists", ref = "#/components/examples/peerAlreadyExists409")
                                             }
                                     )
                             }
                     ),
-                    @ApiResponse(responseCode = "400", description = "Bad Request",
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error",
                             content = {@Content(mediaType = "application/json",
                                     schema = @Schema(implementation = AppError.class),
                                     examples = {
-                                            @ExampleObject(name = "Invalid key format",
-                                                    value = "{\n" +
-                                                            "  \"code\": 400,\n" +
-                                                            "  \"message\": \"publicKey.value: Key must be 44 characters long (test provided), publicKey.value: Invalid key format (Base64 required) (test provided)\"\n" +
-                                                            "}")
+                                            @ExampleObject(name="Other errors", ref = "#/components/examples/UnexpectedError500")
                                     }
                             )}
                     )

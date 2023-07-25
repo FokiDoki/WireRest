@@ -75,8 +75,8 @@ public class OpenAPIExamplesConfigurator {
     @PostConstruct
     public void invalidPubKey() {
         addError("InvalidPubKey400", "Invalid public key", 400,
-                "publicKey.value: Invalid key format (Base64 required) (test provided), \" +\n" +
-                        "\"publicKey.value: Key must be 44 characters long (test provided)");
+                "publicKey.value: Invalid key format (Base64 required) (test provided), " +
+                        "publicKey.value: Key must be 44 characters long (test provided)");
     }
 
     @PostConstruct
@@ -101,12 +101,20 @@ public class OpenAPIExamplesConfigurator {
 
     @PostConstruct
     public void pageWithPeers(){
-        addObject("PageWithPeers", "One peer",
+        addObject("PageWithPeers", "Page with limit 1",
                 new PageDTO<>(100, 0, List.of(constructPeerWithAllFields()))
         );
     }
 
     @PostConstruct
-    public void
+    public void peer(){
+        addObject("peer", "Peer", constructPeerWithAllFields());
+    }
+
+    @PostConstruct
+    public void peerAlreadyExists(){
+        addError("peerAlreadyExists409", "Peer already exists", 409,
+                "Peer with public key cHViQ0F4Tnc9PUZha2VQdWJLZXkgICAgICAgICAxOA== already exists");
+    }
 
 }
