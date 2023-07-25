@@ -134,7 +134,7 @@ public class SubnetSolver implements IV4SubnetSolver {
                 availableRanges.add(leastIndex, new IpRange(least.getLeast(), greater.getBiggest()));
             } else if (greater.getLeast() - 1 == lastAddress) {
                 availableRanges.remove(greater);
-                availableRanges.add(leastIndex, new IpRange(firstAddress, greater.getBiggest()));
+                availableRanges.add(leastIndex+1, new IpRange(firstAddress, greater.getBiggest()));
             } else if (least.getBiggest() + 1 == firstAddress) {
                 availableRanges.remove(least);
                 availableRanges.add(leastIndex, new IpRange(least.getLeast(), lastAddress));
