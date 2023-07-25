@@ -48,7 +48,7 @@ public class ServiceLogsController {
                             content = {@Content(mediaType = "application/json",
                                     array = @ArraySchema(schema = @Schema(implementation = AppError.class)),
                                     examples = {
-                                            @ExampleObject(name = "BAD_LIMIT",
+                                            @ExampleObject(name = "Bad limit",
                                                     ref = "#/components/examples/logsLimit400")
                                     })})
             })

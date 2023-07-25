@@ -63,7 +63,7 @@ public class CreatePeerController {
                             content = {@Content(mediaType = "application/json",
                                     schema = @Schema(implementation = AppError.class, name = "BadRequestExample"),
                                     examples = {
-                                            @ExampleObject(name = "Invalid key format",
+                                            @ExampleObject(name = "Invalid key",
                                                     ref = "#/components/examples/InvalidPubKey400")
                                     }
                             )}
@@ -74,7 +74,7 @@ public class CreatePeerController {
                                             mediaType = "application/json",
                                             array = @ArraySchema(schema = @Schema(implementation = WgPeerDTO.class)),
                                             examples = {
-                                                    @ExampleObject(name = "Peer already exists",
+                                                    @ExampleObject(name = "Already exists",
                                                             ref = "#/components/examples/peerAlreadyExists409")
                                             }
                                     )}),

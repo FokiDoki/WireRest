@@ -52,7 +52,7 @@ public class GetPeersController {
                                             mediaType = "application/json",
                                             array = @ArraySchema(schema = @Schema(nullable = true, implementation = PageDTO.class)),
                                             examples = {
-                                                    @ExampleObject(name = "Non-null", ref = "#/components/examples/PageWithPeers")
+                                                    @ExampleObject(name = "Page", ref = "#/components/examples/PageWithPeers")
                                             }
                                     )
                             }
