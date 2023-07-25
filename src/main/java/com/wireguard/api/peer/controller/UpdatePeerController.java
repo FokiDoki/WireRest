@@ -61,13 +61,14 @@ public class UpdatePeerController {
                                     }
                             )}
                     ),
-                    @ApiResponse(responseCode = "409", description = "Peer with new public key already exists",
+                    @ApiResponse(responseCode = "409", description = "Conflict",
                             content = {
                                     @Content(
                                             mediaType = "application/json",
                                             array = @ArraySchema(schema = @Schema(implementation = WgPeerDTO.class)),
                                             examples = {
-                                                    @ExampleObject(name = "Peer exists", ref = "#/components/examples/peerAlreadyExists409")
+                                                    @ExampleObject(name = "Peer exists", ref = "#/components/examples/peerAlreadyExists409"),
+                                                    @ExampleObject(name = "Ip already used", ref = "#/components/examples/alreadyUsed409")
                                             }
                                     )})
             }

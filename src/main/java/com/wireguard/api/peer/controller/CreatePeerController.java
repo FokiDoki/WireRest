@@ -74,8 +74,8 @@ public class CreatePeerController {
                                             mediaType = "application/json",
                                             array = @ArraySchema(schema = @Schema(implementation = WgPeerDTO.class)),
                                             examples = {
-                                                    @ExampleObject(name = "Already exists",
-                                                            ref = "#/components/examples/peerAlreadyExists409")
+                                                    @ExampleObject(name = "Already exists", ref = "#/components/examples/peerAlreadyExists409"),
+                                                    @ExampleObject(name = "Ip already used", ref = "#/components/examples/alreadyUsed409")
                                             }
                                     )}),
                     @ApiResponse(responseCode = "500", description = "Internal Server Error",

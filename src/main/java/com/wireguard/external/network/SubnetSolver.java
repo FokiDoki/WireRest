@@ -91,7 +91,7 @@ public class SubnetSolver implements IV4SubnetSolver {
             availableIpsCount -= subnet.getIpCount().longValue();
             logger.debug("Obtained subnet " + subnet + " from range " + availableRange);
         } else {
-            throw new AlreadyUsedException("Subnet " + subnet + " is is already used");
+            throw new AlreadyUsedException(subnet);
         }
     }
 
@@ -144,7 +144,7 @@ public class SubnetSolver implements IV4SubnetSolver {
             availableIpsCount += subnet.getIpCount().longValue();
             logger.debug("Released subnet " + subnet);
         } else {
-            throw new UncheckedIOException(new IOException("This subnet is not used"));
+            throw new UncheckedIOException(new IOException("Subnet %s is not used".formatted(subnet)));
         }
     }
 

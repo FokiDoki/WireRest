@@ -74,8 +74,8 @@ public class GetPeersController {
     @Parameter(name = "page", description = "Page number")
     @Parameter(name = "limit", description = "Page size (In case of 0, all peers will be returned)", schema = @Schema(defaultValue = "100"))
     @Parameter(name = "sort", description = "Sort key and direction separated by a dot. The keys are the same as in the answer. " +
-            "Direction is optional and may have value DESC (High to low) and ASC (Low to high). Using with a large number of the peers (3000 or more) affects performance. ",
-            example = "allowedSubnets.desc")
+            "Direction is optional and may have value DESC (High to low) and ASC (Low to high). Using with a large number " +
+            "of the peers (3000 or more) affects performance. Example: \"lastHandshakeTime.DESC\"")
     @Parameter(name = "pageRequestDTO", hidden = true)
     public PageDTO<WgPeerDTO> getPeers(
             @Valid PageRequestDTO pageRequestDTO

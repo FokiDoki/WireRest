@@ -5,6 +5,8 @@ import com.wireguard.api.dto.PageDTO;
 import com.wireguard.api.inteface.WgInterfaceDTO;
 import com.wireguard.api.peer.CreatedPeerDTO;
 import com.wireguard.api.peer.WgPeerDTO;
+import com.wireguard.external.network.AlreadyUsedException;
+import com.wireguard.external.network.Subnet;
 import com.wireguard.external.wireguard.PageOutOfRangeException;
 import com.wireguard.external.wireguard.peer.PeerNotFoundException;
 import com.wireguard.logs.LoggingEventDto;
@@ -223,6 +225,13 @@ public class OpenAPIConfigurator {
     public void logsLimit(){
         addError("logsLimit400", "Invalid limit", 400,
                 "getLogs.limit: must be greater than or equal to 0");
+    }
+
+    @PostConstruct
+    public void alreadyUsedException(){
+        AlreadyUsedException alreadyUsedException = new AlreadyUsedException(Subnet.valueOf("10.0.0.100/32"));
+        addError("alreadyUsed409", "Already used", 409,
+                alreadyUsedException.getMessage());
     }
 
 }
