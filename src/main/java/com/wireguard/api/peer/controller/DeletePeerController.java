@@ -35,10 +35,8 @@ public class DeletePeerController {
         this.wgPeerService = wgPeerService;
     }
 
-    @Operation(summary = "List of peers",
-            description = "Get a list of all existing peers. Peers are displayed not completely, but page by page." +
-                    " Warning, caching is enabled by default, any changes made NOT with wirerest will not appear " +
-                    "immediately, but during the next synchronization (60s by default)",
+    @Operation(summary = "Delete peer",
+            description = "Delete peer by public key",
             tags = {"Peers"},
             responses = {
                         @ApiResponse(responseCode = "200", description = "OK",
