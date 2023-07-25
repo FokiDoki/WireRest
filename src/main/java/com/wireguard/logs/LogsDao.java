@@ -38,13 +38,21 @@ public class LogsDao {
                 .collect(Collectors.toList());
     }
 
-    public List<LoggingEventDto> getLogs(long from, long limit, List<String> levels) {
+    public List<LoggingEventDto> getLogs(long from, long limit, List<Level> levels) {
         limit = limit == 0 ? getLogsSize() : limit;
         return getLogsDtoStream()
                 .filter(loggingEventDto -> loggingEventDto.getTimestamp() >= from)
-                .filter(loggingEventDto -> levels.contains(loggingEventDto.getLevel()))
+                .filter(loggingEventDto -> levels.contains(Level.valueOf(loggingEventDto.getLevel())))
                 .skip(getLogsSize() - limit)
                 .collect(Collectors.toList());
+    }
+
+    public enum Level {
+        TRACE,
+        DEBUG,
+        INFO,
+        WARN,
+        ERROR
     }
 
 }

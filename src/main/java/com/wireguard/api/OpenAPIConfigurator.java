@@ -7,6 +7,7 @@ import com.wireguard.api.peer.CreatedPeerDTO;
 import com.wireguard.api.peer.WgPeerDTO;
 import com.wireguard.external.wireguard.PageOutOfRangeException;
 import com.wireguard.external.wireguard.peer.PeerNotFoundException;
+import com.wireguard.logs.LoggingEventDto;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Contact;
 import io.swagger.v3.oas.annotations.info.Info;
@@ -207,6 +208,21 @@ public class OpenAPIConfigurator {
     @PostConstruct
     public void getInterface(){
         addObject("interface", "Interface", getInterfaceDTO());
+    }
+
+    @PostConstruct
+    public void getLogs(){
+        List<LoggingEventDto> loggingEventDtos = List.of(
+                new LoggingEventDto("INFO", "Init duration for springdoc-openapi is: 529 ms", 1690301255231L),
+                new LoggingEventDto("ERROR", "Peer with public key ALD3x7qWP0W/4zC26jFozxw28vXJsazA33KnHF+AfHw= not found", 1690301333239L)
+        );
+        addObject("logs", "Logs", loggingEventDtos);
+    }
+
+    @PostConstruct
+    public void logsLimit(){
+        addError("logsLimit400", "Invalid limit", 400,
+                "getLogs.limit: must be greater than or equal to 0");
     }
 
 }
