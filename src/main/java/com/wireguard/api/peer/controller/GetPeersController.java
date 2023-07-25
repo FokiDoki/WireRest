@@ -1,4 +1,4 @@
-package com.wireguard.api.peer;
+package com.wireguard.api.peer.controller;
 
 import com.wireguard.api.AppError;
 import com.wireguard.api.converters.PageDTOFromPageTypeChangeConverter;
@@ -6,6 +6,7 @@ import com.wireguard.api.converters.PageRequestFromDTOConverter;
 import com.wireguard.api.converters.WgPeerDTOFromWgPeerConverter;
 import com.wireguard.api.dto.PageDTO;
 import com.wireguard.api.dto.PageRequestDTO;
+import com.wireguard.api.peer.WgPeerDTO;
 import com.wireguard.external.wireguard.ParsingException;
 import com.wireguard.external.wireguard.peer.WgPeer;
 import com.wireguard.external.wireguard.peer.WgPeerService;
@@ -62,7 +63,7 @@ public class GetPeersController {
                                     examples = {
                                     @ExampleObject(name = "Invalid key format",
                                             ref = "#/components/examples/InvalidPubKey400"),
-                                            @ExampleObject(name = "Invalid key format",
+                                            @ExampleObject(name = "Invalid page",
                                                     ref = "#/components/examples/InvalidPage400"),
                                     }
                             )}
@@ -71,14 +72,13 @@ public class GetPeersController {
                             content = {@Content(mediaType = "application/json",
                                     schema = @Schema(implementation = AppError.class),
                                     examples = {
-                                            @ExampleObject(name="No free ip", ref = "#/components/examples/RangeNoFreeIp500"),
                                             @ExampleObject(name="Other errors", ref = "#/components/examples/UnexpectedError500")
                                     }
                             )}
                     )
             }
     )
-    @GetMapping()
+    @GetMapping
     @Parameter(name = "page", description = "Page number")
     @Parameter(name = "limit", description = "Page size (In case of 0, all peers will be returned)", schema = @Schema(defaultValue = "100"))
     @Parameter(name = "sort", description = "Sort key and direction separated by a dot. The keys are the same as in the answer. " +

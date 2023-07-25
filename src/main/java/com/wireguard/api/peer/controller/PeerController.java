@@ -1,10 +1,13 @@
-package com.wireguard.api.peer;
+package com.wireguard.api.peer.controller;
 
 import com.wireguard.api.AppError;
 import com.wireguard.api.converters.*;
 import com.wireguard.api.dto.PageDTO;
 import com.wireguard.api.dto.PageRequestDTO;
 import com.wireguard.api.dto.PublicKeyDTO;
+import com.wireguard.api.peer.CreatedPeerDTO;
+import com.wireguard.api.peer.PeerCreationRequestDTO;
+import com.wireguard.api.peer.WgPeerDTO;
 import com.wireguard.external.wireguard.ParsingException;
 import com.wireguard.external.wireguard.peer.CreatedPeer;
 import com.wireguard.external.wireguard.peer.WgPeer;
@@ -34,7 +37,6 @@ public class PeerController {
 
     private final WgPeerService wgPeerService;
 
-    private final PeerCreationRequestFromDTOConverter creationRequestConverter = new PeerCreationRequestFromDTOConverter();
 
 
     private final WgPeerDTOFromWgPeerConverter peerDTOConverter = new WgPeerDTOFromWgPeerConverter();
@@ -68,39 +70,7 @@ public class PeerController {
         return peerDTOConverter.convert(peer);
     }
 
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Created",
-                    content = {
-                            @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = CreatedPeerDTO.class)
-                            )
-                    }
-            ),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = AppError.class))}),
-            @ApiResponse(responseCode = "400", description = "Bad request (Invalid parameters values)",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = AppError.class))})})
-    @PostMapping()
-    @Parameter(name = "publicKey", description = "Public key of the peer (Will be generated if not provided)")
-    @Parameter(name = "presharedKey", description = "Preshared key or empty if no psk required (Will be generated if not provided)", allowEmptyValue = true)
-    @Parameter(name = "privateKey", description = "Private key of the peer " +
-            "(Will be generated if not provided. " +
-            "If provided public key, empty string will be returned)")
-    @Parameter(name = "allowedIps", description = "Ip of new peer in wireguard network interface, or empty if no" +
-            " address is required (Will be generated if not provided). Example: 10.0.0.11/32", array = @ArraySchema(arraySchema = @Schema(implementation = String.class), uniqueItems = true), allowEmptyValue = true)
-    @Parameter(name = "persistentKeepalive", description = "Persistent keepalive interval in seconds (0 if not provided)", schema = @Schema(implementation = Integer.class, defaultValue = "0", example = "0", minimum = "0", maximum = "65535"))
-    @Parameter(name = "peerCreationRequestDTO", hidden = true)
-    public ResponseEntity<CreatedPeerDTO> createPeer(
-            @Valid PeerCreationRequestDTO peerCreationRequestDTO
-    ) {
-        CreatedPeer createdPeer = wgPeerService.createPeerGenerateNulls(
-                Objects.requireNonNull(creationRequestConverter.convert(peerCreationRequestDTO))
-        );
-        return new ResponseEntity<>(CreatedPeerDTO.from(createdPeer), HttpStatus.CREATED);
-    }
+
 
 
     @ApiResponses(value = {

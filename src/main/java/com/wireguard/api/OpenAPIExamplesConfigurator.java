@@ -2,6 +2,7 @@ package com.wireguard.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wireguard.api.dto.PageDTO;
+import com.wireguard.api.peer.CreatedPeerDTO;
 import com.wireguard.api.peer.WgPeerDTO;
 import com.wireguard.external.wireguard.PageOutOfRangeException;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
@@ -52,6 +53,16 @@ public class OpenAPIExamplesConfigurator {
         peer.setTransferTx(54321);
         peer.setPersistentKeepalive(25);
         return peer;
+    }
+
+    private CreatedPeerDTO createdPeerDTO(){
+        return new CreatedPeerDTO(
+                "AhM4WLR7ETzLYDQ0zEq/0pvbYAxsbLwzzlIAdWhR7yg=",
+                "q2MpyyqfAarG+zoVztTJk9ykQCVmOdBePtcmwZEc2iY=",
+                "+EWn9NeR2pVuFHihYMC6LKreccd5VIW4prUkzHLy0nw=",
+                Set.of("10.1.21.235/32"),
+                0
+        );
     }
 
     @Bean
@@ -117,4 +128,8 @@ public class OpenAPIExamplesConfigurator {
                 "Peer with public key cHViQ0F4Tnc9PUZha2VQdWJLZXkgICAgICAgICAxOA== already exists");
     }
 
+    @PostConstruct
+    public void peerCreated(){
+        addObject("createdPeer", "Created peer", createdPeerDTO());
+    }
 }

@@ -1,8 +1,15 @@
-package com.wireguard.api.peer;
+package com.wireguard.api.peer.controller;
 
 import com.wireguard.api.AppError;
-import com.wireguard.api.converters.PeerUpdateRequestFromDTOConverter;
+import com.wireguard.api.converters.PageDTOFromPageTypeChangeConverter;
+import com.wireguard.api.converters.PageRequestFromDTOConverter;
+import com.wireguard.api.converters.PeerCreationRequestFromDTOConverter;
 import com.wireguard.api.converters.WgPeerDTOFromWgPeerConverter;
+import com.wireguard.api.dto.PageDTO;
+import com.wireguard.api.peer.CreatedPeerDTO;
+import com.wireguard.api.peer.PeerCreationRequestDTO;
+import com.wireguard.api.peer.WgPeerDTO;
+import com.wireguard.external.wireguard.peer.CreatedPeer;
 import com.wireguard.external.wireguard.peer.WgPeer;
 import com.wireguard.external.wireguard.peer.WgPeerService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,10 +19,13 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Objects;
@@ -23,29 +33,28 @@ import java.util.Objects;
 @RestController
 @RequestMapping(value = "v1/peers")
 @Validated
-public class UpdatePeerController {
+public class CreatePeerController {
 
     private final WgPeerService wgPeerService;
 
-    private final PeerUpdateRequestFromDTOConverter updateRequestConverter = new PeerUpdateRequestFromDTOConverter();
-    private final WgPeerDTOFromWgPeerConverter peerDTOConverter = new WgPeerDTOFromWgPeerConverter();
+    private final PeerCreationRequestFromDTOConverter creationRequestConverter = new PeerCreationRequestFromDTOConverter();
 
-    public UpdatePeerController(WgPeerService wgPeerService) {
+    public CreatePeerController(WgPeerService wgPeerService) {
         this.wgPeerService = wgPeerService;
     }
 
-    @Operation(summary = "Update peer by public key",
-            description = "Update peer by public key. " +
-            "Do not provide fields that you do not want to change.",
+    @Operation(summary = "Create peer",
+            description = "Create peer. Data that is not provided will be generated automatically (Even the ip address!)." +
+                    "Generation of some fields (For example, Preshared key) can be disabled by sending an empty value.",
             tags = {"Peers"},
             responses = {
-                    @ApiResponse(responseCode = "200", description = "OK",
+                    @ApiResponse(responseCode = "201", description = "Created",
                             content = {
                                     @Content(
                                             mediaType = "application/json",
-                                            array = @ArraySchema(schema = @Schema(implementation = WgPeerDTO.class)),
+                                            schema = @Schema(implementation = CreatedPeerDTO.class),
                                             examples = {
-                                                    @ExampleObject(name = "Peer", ref = "#/components/examples/peer"),
+                                                    @ExampleObject(name = "Created peer", ref = "#/components/examples/createdPeer")
                                             }
                                     )
                             }
@@ -67,36 +76,34 @@ public class UpdatePeerController {
                                             examples = {
                                                     @ExampleObject(name = "Peer exists", ref = "#/components/examples/peerAlreadyExists409")
                                             }
-                                    )
-                            }
-                    ),
+                                    )}),
                     @ApiResponse(responseCode = "500", description = "Internal Server Error",
                             content = {@Content(mediaType = "application/json",
                                     schema = @Schema(implementation = AppError.class),
                                     examples = {
+                                            @ExampleObject(name="No free ip", ref = "#/components/examples/RangeNoFreeIp500"),
                                             @ExampleObject(name="Other errors", ref = "#/components/examples/UnexpectedError500")
                                     }
                             )}
                     )
             }
     )
-    @Parameter(name = "publicKey", description = "Current public key of the peer", required = true)
-    @Parameter(name = "newPublicKey", description = "New public key of the peer. Warning: If you change the public key, latest handshake and transfer data will be lost. ")
-    @Parameter(name = "presharedKey", description = "Preshared key or empty if no psk required (Empty if not provided)",
-            allowEmptyValue = true)
-    @Parameter(name = "endpoint", description = "Socket IP:port ",
-            allowEmptyValue = true)
-    @Parameter(name = "allowedIps", description = "New ips of the peer (Exists will be replaced)  Example: 10.0.0.11/32",
-            array = @ArraySchema(arraySchema = @Schema(implementation = String.class), uniqueItems = true), allowEmptyValue = true)
-    @Parameter(name = "persistentKeepalive", description = "New persistent keepalive interval in seconds (0 if not provided)", schema = @Schema(implementation = Integer.class, defaultValue = "0", example = "0", minimum = "0", maximum = "65535"))
-    @Parameter(name = "peerUpdateRequestDTO", hidden = true)
-    @RequestMapping(method = RequestMethod.PATCH)
-    public WgPeerDTO updatePeer(
-            @Valid PeerUpdateRequestDTO peerUpdateRequestDTO
+    @PostMapping
+    @Parameter(name = "publicKey", description = "Public key of the peer (Will be generated if not provided)")
+    @Parameter(name = "presharedKey", description = "Preshared key or empty if no psk required (Will be generated if not provided)", allowEmptyValue = true)
+    @Parameter(name = "privateKey", description = "Private key of the peer " +
+            "(Will be generated if not provided. " +
+            "If provided public key, empty string will be returned)")
+    @Parameter(name = "allowedIps", description = "Ip of new peer in wireguard network interface, or empty if no" +
+            " address is required (Will be generated if not provided). Example: 10.0.0.11/32", array = @ArraySchema(arraySchema = @Schema(implementation = String.class), uniqueItems = true), allowEmptyValue = true)
+    @Parameter(name = "persistentKeepalive", description = "Persistent keepalive interval in seconds (0 if not provided)", schema = @Schema(implementation = Integer.class, defaultValue = "0", example = "0", minimum = "0", maximum = "65535"))
+    @Parameter(name = "peerCreationRequestDTO", hidden = true)
+    public ResponseEntity<CreatedPeerDTO> createPeer(
+            @Valid PeerCreationRequestDTO peerCreationRequestDTO
     ) {
-        WgPeer wgPeer = wgPeerService.updatePeer(
-                Objects.requireNonNull(updateRequestConverter.convert(peerUpdateRequestDTO)));
-        return peerDTOConverter.convert(wgPeer);
+        CreatedPeer createdPeer = wgPeerService.createPeerGenerateNulls(
+                Objects.requireNonNull(creationRequestConverter.convert(peerCreationRequestDTO))
+        );
+        return new ResponseEntity<>(CreatedPeerDTO.from(createdPeer), HttpStatus.CREATED);
     }
-
 }
