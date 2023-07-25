@@ -34,6 +34,11 @@ public interface IV4SubnetSolver extends ISubnetSolver {
                     ip & 0xff);
         }
 
+        @Override
+        public String toString() {
+            return String.format("%s - %s", getLeastString(), getBiggestString());
+        }
+
         public String getLeastString() {
             return toIpString(least);
         }

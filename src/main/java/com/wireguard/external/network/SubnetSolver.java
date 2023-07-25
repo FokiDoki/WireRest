@@ -79,7 +79,7 @@ public class SubnetSolver implements IV4SubnetSolver {
                     .formatted(subnet, totalAvailableRange.getLeastString(), totalAvailableRange.getBiggestString()));
         }
         if (getAvailableIpsCount() == 0L) {
-            throw new NoFreeIpException("No free ip left in " + totalAvailableRange);
+            throw new NoFreeIpException("The range %s has no free ip that can be assigned".formatted(totalAvailableRange.toString()));
         }
 
         int firstGreater = findFirstGreater(firstAddress);
@@ -91,7 +91,7 @@ public class SubnetSolver implements IV4SubnetSolver {
             availableIpsCount -= subnet.getIpCount().longValue();
             logger.debug("Obtained subnet " + subnet + " from range " + availableRange);
         } else {
-            throw new AlreadyUsedException("Subnet " + subnet + " is is already used");
+            throw new AlreadyUsedException(subnet);
         }
     }
 
@@ -126,7 +126,7 @@ public class SubnetSolver implements IV4SubnetSolver {
 
         int greaterIndex = findFirstGreater(firstAddress);
         int leastIndex = calculatePreviousRangeIndex(greaterIndex);
-        IpRange greater = availableRanges.get(greaterIndex);
+        IpRange greater = availableRanges.get(Math.max(0, greaterIndex));
         IpRange least = availableRanges.get(leastIndex);
         if (isIpsNotTouchingRange(firstAddress, lastAddress, least)) {
             if (greater.getLeast() - 1 == lastAddress && least.getBiggest() + 1 == firstAddress) {
@@ -134,7 +134,7 @@ public class SubnetSolver implements IV4SubnetSolver {
                 availableRanges.add(leastIndex, new IpRange(least.getLeast(), greater.getBiggest()));
             } else if (greater.getLeast() - 1 == lastAddress) {
                 availableRanges.remove(greater);
-                availableRanges.add(leastIndex, new IpRange(firstAddress, greater.getBiggest()));
+                availableRanges.add(Math.min(leastIndex + 1, availableRanges.size()), new IpRange(firstAddress, greater.getBiggest()));
             } else if (least.getBiggest() + 1 == firstAddress) {
                 availableRanges.remove(least);
                 availableRanges.add(leastIndex, new IpRange(least.getLeast(), lastAddress));
@@ -144,7 +144,7 @@ public class SubnetSolver implements IV4SubnetSolver {
             availableIpsCount += subnet.getIpCount().longValue();
             logger.debug("Released subnet " + subnet);
         } else {
-            throw new UncheckedIOException(new IOException("This subnet is not used"));
+            throw new UncheckedIOException(new IOException("Subnet %s is not used".formatted(subnet)));
         }
     }
 

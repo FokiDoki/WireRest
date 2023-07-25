@@ -89,10 +89,10 @@ public class SubnetService {
     public void applyState(Set<? extends ISubnet> oldState, Set<? extends ISubnet> newState) {
         Set<ISubnet> subnetsToRelease = new HashSet<>(oldState);
         subnetsToRelease.removeAll(newState);
-        release(subnetsToRelease);
         Set<ISubnet> subnetsToObtain = new HashSet<>(newState);
         subnetsToObtain.removeAll(oldState);
         obtain(subnetsToObtain);
+        release(subnetsToRelease);
         logger.debug("Applied subnet state, old state: {}, new state: {}", oldState, newState);
     }
 

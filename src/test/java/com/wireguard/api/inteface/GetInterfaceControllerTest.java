@@ -1,5 +1,6 @@
 package com.wireguard.api.inteface;
 
+import com.wireguard.api.inteface.controller.GetInterfaceController;
 import com.wireguard.external.wireguard.iface.WgInterface;
 import com.wireguard.external.wireguard.iface.WgInterfaceService;
 import org.junit.jupiter.api.Test;
@@ -10,8 +11,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-@WebFluxTest(InterfaceController.class)
-class InterfaceControllerTest {
+@WebFluxTest(GetInterfaceController.class)
+class GetInterfaceControllerTest {
 
     @Autowired
     private WebTestClient webClient;

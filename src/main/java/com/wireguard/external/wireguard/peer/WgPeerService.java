@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.Future;
 
@@ -50,7 +49,7 @@ public class WgPeerService {
 
     public WgPeer getPeerByPublicKeyOrThrow(String publicKey) throws ParsingException {
         return getPeerByPublicKey(publicKey).orElseThrow(
-                () -> new NoSuchElementException("Peer with public key %s not found".formatted(publicKey))
+                () -> new PeerNotFoundException(publicKey)
         );
     }
 
@@ -87,7 +86,7 @@ public class WgPeerService {
 
     private boolean isUpdateRequestHasNewPublicKey(PeerUpdateRequest updateRequest) {
         return updateRequest.getNewPublicKey() != null &&
-                updateRequest.getNewPublicKey().equals(updateRequest.getCurrentPublicKey());
+                !updateRequest.getNewPublicKey().equals(updateRequest.getCurrentPublicKey());
     }
 
 

@@ -1,11 +1,10 @@
 package com.wireguard.logs;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor()
 @Getter
 public class LoggingEventDto {
     private final String level;

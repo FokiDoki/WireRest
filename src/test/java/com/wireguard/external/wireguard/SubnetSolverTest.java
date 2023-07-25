@@ -40,6 +40,15 @@ class SubnetSolverTest {
     }
 
     @Test
+    void testTakeReleaseSideBySide() {
+        subnetSolver.obtain(Subnet.valueOf("0.0.0.16/31"));
+        subnetSolver.release(Subnet.valueOf("0.0.0.17/32"));
+        subnetSolver.obtain(Subnet.valueOf("0.0.0.18/32"));
+        subnetSolver.release(Subnet.valueOf("0.0.0.18/32"));
+        subnetSolver.obtain(Subnet.valueOf("0.0.0.19/32"));
+    }
+
+    @Test
     void testTakeTakenTouching() {
         subnetSolver.obtain(Subnet.valueOf("0.0.0.1/28"));
         assertThrows(AlreadyUsedException.class, () -> subnetSolver.obtain(Subnet.valueOf("0.0.0.15/29")));
