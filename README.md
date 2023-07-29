@@ -31,7 +31,7 @@ java -jar wirerest-0.4.jar --wg.interface.name=wg0
 ```
 Default port is 8081.
 
-If the launch was successful, you can check the list of available methods and parameters in swagger at http://<SERVER-IP>:8081/swagger-ui
+If the launch was successful, you can check the list of available methods and parameters in swagger at http://SERVER-IP:8081/swagger-ui
 
 
 ### Available run parameters:
