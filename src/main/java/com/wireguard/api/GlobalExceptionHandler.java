@@ -119,7 +119,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler
     public ResponseEntity<AppError> commandExecutionException(CommandExecutionException e) {
         logger.error(e.getMessage(), e);
-        return getAppErrorResponseEntity(HttpStatus.BAD_REQUEST, e);
+        return getAppErrorResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, e);
     }
 
     @ExceptionHandler
