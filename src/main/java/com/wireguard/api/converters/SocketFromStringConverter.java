@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 public class SocketFromStringConverter implements Converter<String, Socket> {
     @Override
     public Socket convert(String source) {
+        if (source.isEmpty()) return null;
         return new Socket(source.split(":")[0], Integer.parseInt(source.split(":")[1]));
     }
 }
