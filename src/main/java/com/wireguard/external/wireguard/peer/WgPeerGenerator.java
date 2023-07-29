@@ -17,7 +17,7 @@ public class WgPeerGenerator {
     private static final Logger logger = LoggerFactory.getLogger(WgPeerGenerator.class);
     @Value("${wg.interface.default.mask}")
     public final int DEFAULT_MASK_FOR_NEW_CLIENTS = 32;
-    @Value("${wg.interface.default.persistent_keepalive}")
+    @Value("${wg.interface.default.persistent-keepalive}")
     public final int DEFAULT_PERSISTENT_KEEPALIVE = 0;
 
     private final WgTool wgTool;

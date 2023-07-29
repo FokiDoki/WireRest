@@ -20,13 +20,14 @@ public class QueuedSubnetSolver implements IV4SubnetSolver {
         this.subnetSolver = subnetSolver;
     }
 
+    @SneakyThrows
     @Override
     public Subnet obtainFree(int mask) {
         Future<Subnet> subnetFuture = executor.submit(() -> subnetSolver.obtainFree(mask));
         try {
             return subnetFuture.get();
-        } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(e);
+        } catch (ExecutionException e) {
+            throw e.getCause();    
         }
     }
 

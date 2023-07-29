@@ -34,7 +34,7 @@ public class LogsDao {
         limit = limit == 0 ? getLogsSize() : limit;
         return getLogsDtoStream()
                 .filter(loggingEventDto -> loggingEventDto.getTimestamp() >= from)
-                .skip(getLogsSize() - limit)
+                .skip(Math.max(getLogsSize() - limit, 0))
                 .collect(Collectors.toList());
     }
 
@@ -43,7 +43,7 @@ public class LogsDao {
         return getLogsDtoStream()
                 .filter(loggingEventDto -> loggingEventDto.getTimestamp() >= from)
                 .filter(loggingEventDto -> levels.contains(Level.valueOf(loggingEventDto.getLevel())))
-                .skip(getLogsSize() - limit)
+                .skip(Math.max(getLogsSize() - limit, 0))
                 .collect(Collectors.toList());
     }
 

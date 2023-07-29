@@ -11,9 +11,29 @@
       "description": "Mask for peers created with default params."
     },
     {
-      "name": "wg.inteface.default.persistent_keepalive",
-      "type": "java.lang.String",
+      "name": "wg.inteface.default.persistent-keepalive",
+      "type": "java.lang.Integer",
       "description": "Persistent keepalive for peers created with default params."
+    },
+    {
+      "name": "wg.config.save.min-interval",
+      "type": "java.lang.Integer",
+      "description": "Maximum frequency to save wireguard configuration to file. 10000 means that saving will occur no more than once every 10 seconds."
+    },
+    {
+      "name": "logging.api.max-elements",
+      "type": "java.lang.Integer",
+      "description": "The maximum number of logs that will be saved for access to them through the API."
+    },
+    {
+      "name": "wg.cache.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Is cache enabled."
+    },
+    {
+      "name": "wg.cache.update-interval",
+      "type": "java.lang.String",
+      "description": "Cache update interval."
     }
   ]
 }
