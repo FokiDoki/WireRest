@@ -4,7 +4,7 @@ pipeline {
     environment {
         RUN_PROFILES="prod"
         RUN_PORT=8081
-        POM_VERSION="0.3.4"
+        POM_VERSION="0.4"
         SERVICE_NAME="wirerest"
         RUN_ARGS="--spring.profiles.active=${RUN_PROFILES} " +
         "--server.port=${RUN_PORT} " +

@@ -10,7 +10,7 @@
     </parent>
     <groupId>wireguard</groupId>
     <artifactId>wirerest</artifactId>
-    <version>0.3.4</version>
+    <version>0.4</version>
     <name>WireRest</name>
     <description>WireRest - REST api for Wireguard</description>
     <properties>
