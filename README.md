@@ -2,12 +2,7 @@
 ![Jenkins JaCoCo Building status](https://img.shields.io/jenkins/build?jobUrl=http%3A%2F%2Fs2.fokidoki.su%2Fjob%2Fwg_controller_master&style=flat-square&t=1)
 ![Jenkins JaCoCo Tests Coverage](https://img.shields.io/jenkins/coverage/apiv4?jobUrl=http%3A%2F%2Fs2.fokidoki.su%2Fjob%2Fwg_controller_master&style=flat-square)
 ---
-This is a REST API for Wireguard. It is written in Java using Spring Boot and Spring MVC.
-Project is under early of development.
-
-Swagger UI is available at 
-
-
+WireRest is a powerful, restful stateless API for Wireguard. With built-in caching, it is optimized to work with large configurations. You can use both for your small private server and for public high-load applications. It is written in Java using Spring Boot and Spring WebFlux.
 
 ### Features:
 
@@ -24,35 +19,37 @@ Swagger UI is available at
 ### How to run:
 
 ---
-**Java 20 required**
-#### Default configuration:
+**[!!] Java 20 required**
 
+Syntax:
 ```shell
-java -jar wirerest-0.4.jar
+java -jar wirerest-0.4.jar --parameter=value --parameter2=value2 ...
 ```
-Server run on port 8081
-Now you can check the list of available methods and parameters in swagger at http://<SERVER-IP>:8081/swagger-ui
+Simple run:
+```shell
+java -jar wirerest-0.4.jar --wg.interface.name=wg0
+```
+Default port is 8081.
 
-#### Available run parameters:
+If the launch was successful, you can check the list of available methods and parameters in swagger at http://<SERVER-IP>:8081/swagger-ui
+
+
+### Available run parameters:
 
 All parameters that are set as an example are the default values 
 
-```shell
-java -jar wire-rest.jar 
-    --server.port=8081 # WireRest port
-    --wg.interface.name=wg0 # Wireguard interface name
-    --wg.interface.default.mask=32 # Mask for ip of new peers
-    --wg.interface.default.persistent-keepalive=0 # Default mask for new clients
-    --wg.cache.enabled=true # Enable or disable caching (true is recommend)
-    --wg.cache.update-interval=60 # A shorter interval can increase CPU usage. Be careful with this parameter
-    --logging.api.max-elements=1000 # The maximum number of logs that will be saved for access to them through the API
-```
+* `--server.port=8081` - WireRest port
+* `--wg.interface.name=wg0` - Wireguard interface name
+* `--wg.interface.default.mask=32` - Mask for ip of new peers
+* `--wg.interface.default.persistent-keepalive=0` - Default mask for new clients
+* `--wg.cache.enabled=true` - Enable or disable caching (true is recommend)
+* `--wg.cache.update-interval=60` - A shorter interval can increase CPU usage. Be careful with this parameter
+* `--logging.api.max-elements=1000` - The maximum number of logs that will be saved for access to them through the API
 
 
 
-### Examples:
+## Examples:
 
----
 ### Get all peers:
 ```shell
 curl -X 'GET' \
