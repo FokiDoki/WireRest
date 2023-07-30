@@ -41,7 +41,7 @@ All parameters that are set as an example are the default values
 * `--server.port=8081` - WireRest port
 * `--wg.interface.name=wg0` - Wireguard interface name
 * `--wg.interface.default.mask=32` - Mask for ip of new peers
-* `--wg.interface.default.persistent-keepalive=0` - Default mask for new clients
+* `--wg.interface.default.persistent-keepalive=0` - Default persistent keepalive for new clients
 * `--wg.cache.enabled=true` - Enable or disable caching (true is recommend)
 * `--wg.cache.update-interval=60` - Cache update interval (seconds). it is needed to track changes that have occurred bypassing WireRest. A shorter interval can increase CPU usage. Be careful with this parameter
 * `--logging.api.max-elements=1000` - The maximum number of logs that will be saved for access to them through the API
