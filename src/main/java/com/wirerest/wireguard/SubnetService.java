@@ -21,8 +21,8 @@ import java.util.function.Consumer;
 public class SubnetService {
 
     private static final Logger logger = LoggerFactory.getLogger(SubnetService.class);
-    PeerCreationRules peerCreationRules;
-    IV4SubnetSolver v4SubnetSolver;
+    private final PeerCreationRules peerCreationRules;
+    private final IV4SubnetSolver v4SubnetSolver;
 
     @Autowired
     public SubnetService(PeerCreationRules peerCreationRules, IV4SubnetSolver v4SubnetSolver) {

@@ -4,6 +4,7 @@ import com.wirerest.api.dto.PageDTO;
 import com.wirerest.api.inteface.WgInterfaceDTO;
 import com.wirerest.api.peer.CreatedPeerDTO;
 import com.wirerest.api.peer.WgPeerDTO;
+import com.wirerest.api.service.StatsSnapshotDto;
 import com.wirerest.logs.LoggingEventDto;
 import com.wirerest.network.AlreadyUsedException;
 import com.wirerest.network.Subnet;
@@ -232,6 +233,13 @@ public class OpenAPIConfigurator {
         AlreadyUsedException alreadyUsedException = new AlreadyUsedException(Subnet.valueOf("10.0.0.100/32"));
         addError("alreadyUsed409", "Already used", 409,
                 alreadyUsedException.getMessage());
+    }
+
+    @PostConstruct
+    public void stats() {
+        StatsSnapshotDto statsSnapshotDto = new StatsSnapshotDto(1691322509881L, 50208,
+                65536, 9562, 299314471044L, 300455868743L);
+        addObject("stats", "Stats", statsSnapshotDto);
     }
 
 }

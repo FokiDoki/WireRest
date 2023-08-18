@@ -10,10 +10,7 @@ import lombok.SneakyThrows;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Profile("test")
 @Component
@@ -39,9 +36,13 @@ public class FakeWgTool extends WgTool {
                 WgPeer.publicKey(genPubKey()).presharedKey(generatePresharedKey()).allowedIps(Set.of(Subnet.valueOf("10.0.0.7/32"), SubnetV6.valueOf("::1/128")))
                         .latestHandshake(200000).transferRx(12345).transferTx(54321).build()
         ).forEach(peer -> peers.put(peer.getPublicKey(), peer));
-        for (int i = 0; i < 20000; i++) {
+        Random random = new Random();
+        for (int i = 0; i < 60000; i++) {
             String pubkey = genPubKey();
-            peers.put(pubkey, WgPeer.publicKey(pubkey).presharedKey(generatePresharedKey()).build());
+            peers.put(pubkey, WgPeer.publicKey(pubkey).presharedKey(generatePresharedKey())
+                    .transferRx(random.nextInt(10000000))
+                    .transferTx(random.nextInt(10000000))
+                    .build());
         }
         keyCounter = peers.size() + 1;
     }

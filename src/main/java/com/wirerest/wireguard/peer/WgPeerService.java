@@ -31,10 +31,11 @@ import static com.wirerest.utils.AsyncUtils.await;
 public class WgPeerService {
 
     private static final Logger logger = LoggerFactory.getLogger(WgPeerService.class);
-    WgPeerGenerator peerGenerator;
-    RepositoryPageable<WgPeer> wgPeerRepository;
-    SubnetService subnetService;
-    BlockingByHashAsyncExecutor<WgPeer> blockingByHashAsyncExecutor = new BlockingByHashAsyncExecutor<>();
+    private final WgPeerGenerator peerGenerator;
+    private final RepositoryPageable<WgPeer> wgPeerRepository;
+    private final SubnetService subnetService;
+    private final BlockingByHashAsyncExecutor<WgPeer> blockingByHashAsyncExecutor = new BlockingByHashAsyncExecutor<>();
+
 
 
     @Autowired
