@@ -30,7 +30,7 @@ public class StatsController {
 
     @Operation(summary = "Get application statistics",
             description = """
-                    Timestamp - Unix milliseconds timestamp of the snapshot
+                    Timestamp - Unix milliseconds timestamp of the stats snapshot
                                         
                     peers - number of peers in the interface
                     
