@@ -53,7 +53,7 @@ All parameters that are set as an example are the default values
 ### Get all peers:
 ```shell
 curl -X 'GET' \
-  'http://localhost:8080/v1/peers?limit=1' \
+  'http://localhost:8081/v1/peers?limit=1' \
   -H 'accept: application/json'
 ```
 ```json
@@ -81,7 +81,7 @@ curl -X 'GET' \
 ### Create peer automatically:
 ```shell
 curl -X 'POST' \
-  'http://localhost:8080/v1/peers' \
+  'http://localhost:8081/v1/peers' \
   -H 'accept: application/json'
 ```
 ```json
@@ -99,7 +99,7 @@ curl -X 'POST' \
 ### Create peer with custom parameters:
 ```shell
 curl -X 'POST' \
-  'http://localhost:8080/v1/peers?publicKey=RmFrZVBydktleUZha2VQcnZLZXkgICAgICAyMDAxNQ%3D%3D&presharedKey=RmFrZVBza0tleUZha2VQc2tLZXkgICAgICAyMDAxNw%3D%3D&privateKey=cHViREF4TlE9PUZha2VQdWJLZXkgICAgICAyMDAxNg%3D%3D&allowedIps=10.0.0.32%2F32&allowedIps=2002%3A0%3A0%3A1234%3A%3A%2F64&persistentKeepalive=25' \
+  'http://localhost:8081/v1/peers?publicKey=RmFrZVBydktleUZha2VQcnZLZXkgICAgICAyMDAxNQ%3D%3D&presharedKey=RmFrZVBza0tleUZha2VQc2tLZXkgICAgICAyMDAxNw%3D%3D&privateKey=cHViREF4TlE9PUZha2VQdWJLZXkgICAgICAyMDAxNg%3D%3D&allowedIps=10.0.0.32%2F32&allowedIps=2002%3A0%3A0%3A1234%3A%3A%2F64&persistentKeepalive=25' \
   -H 'accept: application/json'
 ````
 ```json
@@ -118,7 +118,7 @@ curl -X 'POST' \
 #### Delete peer:
 ```shell
 curl -X 'DELETE' \
-  'http://localhost:8080/v1/peers?publicKey=AhM4WLR7ETzLYDQ0zEq%2F0pvbYAxsbLwzzlIAdWhR7yg%3D' \
+  'http://localhost:8081/v1/peers?publicKey=AhM4WLR7ETzLYDQ0zEq%2F0pvbYAxsbLwzzlIAdWhR7yg%3D' \
   -H 'accept: application/json'
   ```
 ```json
@@ -140,7 +140,7 @@ curl -X 'DELETE' \
 #### Update peer:
 ```shell
 curl -X 'PATCH' \
-  'http://localhost:8080/v1/peers?publicKey=cHViREF4T0E9PUZha2VQdWJLZXkgICAgICAyMDAxOQ%3D%3D&presharedKey=%2BEWn9NeR2pVuFHihYMC6LKreccd5VIW4prUkzHLy0nw%3D' \
+  'http://localhost:8081/v1/peers?publicKey=cHViREF4T0E9PUZha2VQdWJLZXkgICAgICAyMDAxOQ%3D%3D&presharedKey=%2BEWn9NeR2pVuFHihYMC6LKreccd5VIW4prUkzHLy0nw%3D' \
   -H 'accept: application/json'
   ```
 ```json
@@ -161,7 +161,7 @@ curl -X 'PATCH' \
 #### Get peer by public key:
 ```shell
 curl -X 'GET' \
-  'http://localhost:8080/v1/peers/find?publicKey=cHViREF4T0E9PUZha2VQdWJLZXkgICAgICAyMDAxOQ%3D%3D' \
+  'http://localhost:8081/v1/peers/find?publicKey=cHViREF4T0E9PUZha2VQdWJLZXkgICAgICAyMDAxOQ%3D%3D' \
   -H 'accept: application/json'
   ```
 ```json
@@ -181,7 +181,7 @@ curl -X 'GET' \
 ---
 ```shell
 curl -X 'GET' \
-  'http://localhost:8080/v1/interface' \
+  'http://localhost:8081/v1/interface' \
   -H 'accept: application/json'
 ```
 ```json
@@ -197,7 +197,7 @@ curl -X 'GET' \
 #### Get logs of service:
 ```shell
 curl -X 'GET' \
-  'http://localhost:8080/v1/service/logs?from=0&limit=100' \
+  'http://localhost:8081/v1/service/logs?from=0&limit=100' \
   -H 'accept: application/json'
   ````
 ```json
