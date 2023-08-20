@@ -3,7 +3,6 @@ package com.wirerest.api.security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
@@ -26,7 +25,7 @@ public class SecurityConfig {
 
 
 
-    @Order(Ordered.LOWEST_PRECEDENCE)
+    @Order()
     @Bean
     SecurityWebFilterChain apiHttpSecurity(ServerHttpSecurity http) {
         http.authenticationManager(this.authenticationManager);
@@ -35,8 +34,7 @@ public class SecurityConfig {
                 .authorizeExchange((exchanges) -> exchanges
                         .anyExchange().authenticated()
                 ).exceptionHandling()
-                    .accessDeniedHandler(new AccessDeniedHandler())
-                     .authenticationEntryPoint(new AuthEntryPoint());
+                    .accessDeniedHandler(new AccessDeniedHandler());
         return http.build();
     }
 
