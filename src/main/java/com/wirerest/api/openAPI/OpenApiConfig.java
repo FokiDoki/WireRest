@@ -22,11 +22,12 @@ public class OpenApiConfig {
     @Bean
     public OpenAPI openAPI() {
         return new OpenAPI().addSecurityItem(new SecurityRequirement().
-                        addList("Token Authentication (admin is default)"))
+                        addList("Token Authentication"))
                 .components(new Components().addSecuritySchemes
-                        ("Token Authentication", createAPIKeyScheme()))
+                        ("Token", createAPIKeyScheme()))
                 .info(new Info().title("WireRest")
-                        .description("WireRest is a powerful, restful stateless API for Wireguard.")
+                        .description("WireRest is a powerful, restful stateless API for Wireguard." +
+                                "Default token is 'admin'")
                         .version("0.4").contact(new Contact().name("FokiDoki")
                                 .url("https://github.com/FokiDoki/WireRest"))
                         .license(new License().name("License")

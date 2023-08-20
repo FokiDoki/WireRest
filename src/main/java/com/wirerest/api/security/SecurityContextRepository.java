@@ -4,7 +4,7 @@ import com.wirerest.api.security.authentication.AdminAuthentication;
 import com.wirerest.api.security.authentication.NoAuthentication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextImpl;
@@ -16,8 +16,12 @@ import reactor.core.publisher.Mono;
 @Component
 public class SecurityContextRepository implements ServerSecurityContextRepository {
 
-    @Value("${security.token}")
-    String INITIAL_TOKEN;
+    TokenRepository tokenRepository;
+
+    @Autowired
+    public SecurityContextRepository(TokenRepository tokenRepository){
+        this.tokenRepository = tokenRepository;
+    }
 
     private static final Logger logger = LoggerFactory.getLogger(SecurityContextRepository.class);
 
@@ -28,17 +32,31 @@ public class SecurityContextRepository implements ServerSecurityContextRepositor
 
     @Override
     public Mono<SecurityContext> load(ServerWebExchange serverWebExchange) {
-        String userToken = getTokenFromRequest(serverWebExchange);
-        logger.debug("Checking token %s".formatted(userToken));
-        Authentication authentication = (INITIAL_TOKEN.equals(userToken))?
-                new AdminAuthentication(): new NoAuthentication();
+        String userRequestToken = getTokenFromRequest(serverWebExchange);
+        String userBearerToken = getTokenFromAuthorizationHeader(serverWebExchange);
+        Authentication authentication;
+        logger.debug("Checking token request token '%s' and bearer '%s'".formatted(userRequestToken, userBearerToken));
+        if (tokenRepository.getByValue(userRequestToken).isEmpty() && tokenRepository.getByValue(userBearerToken).isEmpty()) {
+            authentication = new NoAuthentication();
+        } else {
+            authentication = new AdminAuthentication();
+        }
         logger.debug("Authorized as %s".formatted(authentication.getClass().getSimpleName()));
         return Mono.just(new SecurityContextImpl(authentication));
     }
 
     private String getTokenFromRequest(ServerWebExchange exchange){
-        String userToken = String.valueOf(exchange.getRequest().getQueryParams().get("token"));
-        userToken = userToken.substring(1, userToken.length()-1);
-        return userToken;
+        String token = String.valueOf(exchange.getRequest().getQueryParams().get("token"));
+        token = token.substring(1, token.length()-1);
+        return token;
+    }
+
+    private String getTokenFromAuthorizationHeader(ServerWebExchange exchange){
+        String token = String.valueOf(exchange.getRequest().getHeaders().get("Authorization"));
+        if (token == null || token.length() < 9) {
+            return "";
+        }
+        token = token.substring(8, token.length()-1);
+        return token;
     }
 }
