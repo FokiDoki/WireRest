@@ -46,7 +46,11 @@ public class SecurityContextRepository implements ServerSecurityContextRepositor
     }
 
     private String getTokenFromRequest(ServerWebExchange exchange){
-        String token = String.valueOf(exchange.getRequest().getQueryParams().get("token"));
+        Object tokenObj = exchange.getRequest().getQueryParams().get("token");
+        if (tokenObj == null) {
+            return "";
+        }
+        String token = String.valueOf(tokenObj);
         token = token.substring(1, token.length()-1);
         return token;
     }
