@@ -30,6 +30,10 @@ public class SecurityConfig {
     SecurityWebFilterChain apiHttpSecurity(ServerHttpSecurity http) {
         http.authenticationManager(this.authenticationManager);
         http.securityContextRepository(this.securityContextRepository);
+        http.csrf().disable();
+        http.logout().disable();
+        http.httpBasic().disable();
+        http.formLogin().disable();
         http
                 .authorizeExchange((exchanges) -> exchanges
                         .anyExchange().authenticated()
