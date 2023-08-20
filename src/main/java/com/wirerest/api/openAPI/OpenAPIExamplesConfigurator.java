@@ -1,5 +1,6 @@
-package com.wirerest.api;
+package com.wirerest.api.openAPI;
 
+import com.wirerest.api.AppError;
 import com.wirerest.api.dto.PageDTO;
 import com.wirerest.api.inteface.WgInterfaceDTO;
 import com.wirerest.api.peer.CreatedPeerDTO;
@@ -11,8 +12,11 @@ import com.wirerest.network.Subnet;
 import com.wirerest.wireguard.PageOutOfRangeException;
 import com.wirerest.wireguard.peer.PeerNotFoundException;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.info.Contact;
 import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.models.examples.Example;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
@@ -27,25 +31,12 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.*;
 
-@OpenAPIDefinition(
-
-        info = @Info(
-                title = "WireRest",
-                description = "Docs for Wireguard API",
-                version = "1",
-                contact = @Contact(
-                        name = "FokiDoki",
-                        url = "https://github.com/FokiDoki/"
-                )
-        )
-)
-
 @Configuration
-public class OpenAPIConfigurator {
+public class OpenAPIExamplesConfigurator {
     private final ExamplesCustomizer examplesCustomizer;
 
     @Autowired
-    public OpenAPIConfigurator(ExamplesCustomizer examplesCustomizer) {
+    public OpenAPIExamplesConfigurator(ExamplesCustomizer examplesCustomizer) {
         this.examplesCustomizer = examplesCustomizer;
     }
 
