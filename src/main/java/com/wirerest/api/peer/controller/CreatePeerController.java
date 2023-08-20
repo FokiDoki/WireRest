@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,6 +41,7 @@ public class CreatePeerController {
             description = "Create peer. Data that is not provided will be generated automatically (Even the ip address!)." +
                     "Generation of some fields (For example, Preshared key) can be disabled by sending an empty value.",
             tags = {"Peers"},
+            security = @SecurityRequirement(name = "Token"),
             responses = {
                     @ApiResponse(responseCode = "201", description = "Created",
                             content = {

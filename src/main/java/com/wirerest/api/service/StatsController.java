@@ -1,17 +1,14 @@
 package com.wirerest.api.service;
 
-import com.wirerest.api.AppError;
 import com.wirerest.api.converters.StatsSnapshotToDtoConverter;
-import com.wirerest.logs.LoggingEventDto;
-import com.wirerest.logs.LogsDao;
 import com.wirerest.stats.StatsService;
-import com.wirerest.stats.StatsSnapshot;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,6 +39,7 @@ public class StatsController {
                     
                     transferRx - total received bytes for all peers""",
             tags = {"Service"},
+            security = @SecurityRequirement(name = "Token"),
             responses = {
                     @ApiResponse(responseCode = "200", description = "OK",
                             content = {@Content(mediaType = "application/json",
