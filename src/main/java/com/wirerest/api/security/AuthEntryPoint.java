@@ -8,7 +8,7 @@ import reactor.core.publisher.Mono;
 
 @Controller
 public class AuthEntryPoint implements ServerAuthenticationEntryPoint {
-    
+
     @Override
     public Mono<Void> commence(ServerWebExchange exchange, AuthenticationException ex) {
         UnauthorizedAppError error = new UnauthorizedAppError();

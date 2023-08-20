@@ -2,6 +2,8 @@ package com.wirerest.api.security;
 
 import com.wirerest.api.security.authentication.AdminAuthentication;
 import com.wirerest.api.security.authentication.NoAuthentication;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -17,18 +19,26 @@ public class SecurityContextRepository implements ServerSecurityContextRepositor
     @Value("${security.token}")
     String INITIAL_TOKEN;
 
+    private static final Logger logger = LoggerFactory.getLogger(SecurityContextRepository.class);
+
     @Override
     public Mono<Void> save(ServerWebExchange serverWebExchange, SecurityContext securityContext) {
-        // Don't know yet where this is for.
         return null;
     }
 
     @Override
     public Mono<SecurityContext> load(ServerWebExchange serverWebExchange) {
-        String token = String.valueOf(serverWebExchange.getRequest().getQueryParams().get("token"));
-
-        Authentication authentication = (INITIAL_TOKEN.equals(token))?
+        String userToken = getTokenFromRequest(serverWebExchange);
+        logger.debug("Checking token %s".formatted(userToken));
+        Authentication authentication = (INITIAL_TOKEN.equals(userToken))?
                 new AdminAuthentication(): new NoAuthentication();
+        logger.debug("Authorized as %s".formatted(authentication.getClass().getSimpleName()));
         return Mono.just(new SecurityContextImpl(authentication));
+    }
+
+    private String getTokenFromRequest(ServerWebExchange exchange){
+        String userToken = String.valueOf(exchange.getRequest().getQueryParams().get("token"));
+        userToken = userToken.substring(1, userToken.length()-1);
+        return userToken;
     }
 }
