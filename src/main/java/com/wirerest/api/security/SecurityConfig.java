@@ -25,7 +25,7 @@ public class SecurityConfig {
 
 
 
-    @Order()
+    @Order
     @Bean
     SecurityWebFilterChain apiHttpSecurity(ServerHttpSecurity http) {
         http.authenticationManager(this.authenticationManager);
