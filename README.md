@@ -2,13 +2,13 @@
 ![Jenkins JaCoCo Building status](https://img.shields.io/jenkins/build?jobUrl=http%3A%2F%2Fs2.fokidoki.su%2Fjob%2Fwg_controller_master&style=flat-square&t=1)
 ![Jenkins JaCoCo Tests Coverage](https://img.shields.io/jenkins/coverage/apiv4?jobUrl=http%3A%2F%2Fs2.fokidoki.su%2Fjob%2Fwg_controller_master&style=flat-square)
 ---
-WireRest is a powerful, restful stateless API for Wireguard. With built-in caching, it is optimized to work with large configurations. You can use both for your small private server and for public high-load applications. It is written in Java using Spring Boot and Spring WebFlux.
+WireRest is a powerful, restful stateless API for Wireguard. With built-in caching, it is optimized to work with large configurations. You can use it both for your small private server and for high-load public applications. It is written in Java using Spring Boot and Spring WebFlux.
 
 ### Features:
 
 --- 
 
-- Get all peers (Sorting available)
+- Get all peers (sorting is available)
 - Automatically create and add peer
 - Manually create and add peer
 - Delete peer
@@ -21,7 +21,7 @@ WireRest is a powerful, restful stateless API for Wireguard. With built-in cachi
 ### How to run:
 
 ---
-**[!!] Java 20 required** ([How to install](#how-to-install-java-20))
+**[!!] Java 20 is required** ([how to install](#how-to-install-java-20))
 
 Syntax:
 ```shell
@@ -31,7 +31,7 @@ Simple run:
 ```shell
 java -jar wirerest-0.5.jar --wg.interface.name=wg0
 ```
-Default port is 8081.
+The default port is 8081.
 
 If the launch was successful, you can check the list of available methods and parameters in swagger at http://SERVER-IP:8081/swagger-ui
 
@@ -42,22 +42,23 @@ All parameters that are set as an example are the default values
 
 
 * `--wg.interface.name=wg0` - Wireguard interface name
-* `--security.token=admin` - Token for access to API (Change it! If you want to disable token auth, set it to empty string). [More info](#token-authentication)
+* `--security.token=admin` - Token for access to API (change it! If you want to disable token auth, set it to empty string). [More info](#token-authentication)
 * `--server.port=8081` - WireRest port
-* `--wg.cache.enabled=true` - Enable or disable caching (true is recommend). More info about caching [here](#caching)
+* `--wg.cache.enabled=true` - Enable or disable caching (true is recommended). More info about caching [here](#caching)
 * `--wg.interface.default.mask=32` - Mask for ip of new peers
 * `--wg.interface.default.persistent-keepalive=0` - Default persistent keepalive for new clients
-* `--wg.cache.update-interval=60` - Cache update interval (seconds). it is needed to track changes that have occurred bypassing WireRest. A shorter interval can increase CPU usage. Be careful with this parameter
+* `--wg.cache.update-interval=60` - Cache update interval (seconds). it is needed to track changes that have occurred bypassing WireRest. 
+A shorter interval can increase CPU usage. Be careful with this parameter.
 * `--logging.api.max-elements=1000` - The maximum number of logs that will be saved for access to them through the API
 
 ### Token authentication
 Each request to the API must contain a token. 
 The token is set in the `--security.token` parameter. 
-If you want to disable token auth, set it to empty.
+If you want to disable token authentication, set it to empty.
 
 Token can be passed in two ways:
 1. As a query parameter like `/v1/peers?token=TOKEN` (For POST requests, the token must be passed in the body)
-2. As a header (Basic access authentication): `Authorization: Basic TOKEN`
+2. As a header (basic access authentication): `Authorization: Basic TOKEN`
 
 
 ### Caching
@@ -66,7 +67,7 @@ Caching greatly improves performance on large configurations.
 The cache is updated every `--wg.cache.update-interval` seconds (default 60 seconds). \
 Quick overview: 
 * `transferRx`, `transferTx` and `latestHandshake` fields are updated after every sync
-* Peer creation, deletion and update operations work instantly
+* Peer creation, deletion, and update operations work instantly.
 * If you update the wireguard configuration bypassing WireRest, the changes will appear in WireRest during the next sync
 
 It's recommended to use caching, but if you want to disable it, set `--wg.cache.enabled=false`
@@ -120,7 +121,7 @@ java -version
 [Continue installation](#how-to-run)
 
 
-You can find tar archive with java 20 [here](https://www.oracle.com/java/technologies/downloads/)
+You can find the tar archive with Java 20 [here](https://www.oracle.com/java/technologies/downloads/)
 
 ## Examples:
 
