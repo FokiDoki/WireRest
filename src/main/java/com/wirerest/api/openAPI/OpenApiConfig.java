@@ -26,9 +26,9 @@ public class OpenApiConfig {
                 .components(new Components().addSecuritySchemes
                         ("Token", createAPIKeyScheme()))
                 .info(new Info().title("WireRest")
-                        .description("WireRest is a powerful, restful stateless API for Wireguard." +
+                        .description("WireRest is a powerful, restful stateless API for Wireguard.\n" +
                                 "Default token is 'admin'")
-                        .version("0.4").contact(new Contact().name("FokiDoki")
+                        .version("0.4").contact(new Contact().name("FokiDoki - GitHub")
                                 .url("https://github.com/FokiDoki/WireRest"))
                         .license(new License().name("License")
                                 .url("https://github.com/FokiDoki/WireRest/blob/master/LICENSE")));

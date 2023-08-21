@@ -34,14 +34,17 @@ public class SecurityContextRepository implements ServerSecurityContextRepositor
     public Mono<SecurityContext> load(ServerWebExchange serverWebExchange) {
         String userRequestToken = getTokenFromRequest(serverWebExchange);
         String userBearerToken = getTokenFromAuthorizationHeader(serverWebExchange);
+        String requestId = serverWebExchange.getRequest().getId();
         Authentication authentication;
-        logger.debug("Checking token request token '%s' and bearer '%s'".formatted(userRequestToken, userBearerToken));
+        logger.debug("[%s] Checking request token '%s' and bearer '%s'".formatted(
+                requestId,
+                userRequestToken, userBearerToken));
         if (tokenRepository.getByValue(userRequestToken).isEmpty() && tokenRepository.getByValue(userBearerToken).isEmpty()) {
             authentication = new NoAuthentication();
         } else {
             authentication = new AdminAuthentication();
         }
-        logger.debug("Authorized as %s".formatted(authentication.getClass().getSimpleName()));
+        logger.debug("[%s] Authorized as %s".formatted(requestId, authentication.getClass().getSimpleName()));
         return Mono.just(new SecurityContextImpl(authentication));
     }
 
