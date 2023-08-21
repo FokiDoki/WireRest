@@ -34,6 +34,11 @@
       "name": "wg.cache.update-interval",
       "type": "java.lang.String",
       "description": "Cache update interval."
+    },
+    {
+      "name": "security.token",
+      "type": "java.lang.String",
+      "description": "Token for access to API."
     }
   ]
 }

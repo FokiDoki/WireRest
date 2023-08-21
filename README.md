@@ -15,7 +15,8 @@ WireRest is a powerful, restful stateless API for Wireguard. With built-in cachi
 - Update peer
 - Get peer by public key
 - Get interface configuration
-- Token aut
+- Get general config (interface) information
+- Token authentication
 
 ### How to run:
 
@@ -39,16 +40,36 @@ If the launch was successful, you can check the list of available methods and pa
 
 All parameters that are set as an example are the default values 
 
-* `--server.port=8081` - WireRest port
+
 * `--wg.interface.name=wg0` - Wireguard interface name
+* `--security.token=admin` - Token for access to API (Change it! If you want to disable token auth, set it to empty string). [More info](#token-authentication)
+* `--server.port=8081` - WireRest port
+* `--wg.cache.enabled=true` - Enable or disable caching (true is recommend). More info about caching [here](#caching)
 * `--wg.interface.default.mask=32` - Mask for ip of new peers
 * `--wg.interface.default.persistent-keepalive=0` - Default persistent keepalive for new clients
-* `--wg.cache.enabled=true` - Enable or disable caching (true is recommend)
 * `--wg.cache.update-interval=60` - Cache update interval (seconds). it is needed to track changes that have occurred bypassing WireRest. A shorter interval can increase CPU usage. Be careful with this parameter
 * `--logging.api.max-elements=1000` - The maximum number of logs that will be saved for access to them through the API
 
+### Token authentication
+Each request to the API must contain a token. 
+The token is set in the `--security.token` parameter. 
+If you want to disable token auth, set it to empty.
+
+Token can be passed in two ways:
+1. As a query parameter like `/v1/peers?token=TOKEN` (For POST requests, the token must be passed in the body)
+2. As a header (Basic access authentication): `Authorization: Basic TOKEN`
 
 
+### Caching
+WireRest has built-in caching. It is enabled by default.
+Caching greatly improves performance on large configurations.
+The cache is updated every `--wg.cache.update-interval` seconds (default 60 seconds). \
+Quick overview: 
+* `transferRx`, `transferTx` and `latestHandshake` fields are updated after every sync
+* Peer creation, deletion and update operations work instantly
+* If you update the wireguard configuration bypassing WireRest, the changes will appear in WireRest during the next sync
+
+It's recommended to use caching, but if you want to disable it, set `--wg.cache.enabled=false`
 ## Examples:
 
 ### Get all peers:
@@ -275,7 +296,7 @@ java -version
 ```
 
 
-You can found tar archive with java 20 [here](https://www.oracle.com/java/technologies/downloads/)
+You can find tar archive with java 20 [here](https://www.oracle.com/java/technologies/downloads/)
 ### TODO:
 
 
