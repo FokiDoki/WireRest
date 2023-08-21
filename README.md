@@ -2,34 +2,36 @@
 ![Jenkins JaCoCo Building status](https://img.shields.io/jenkins/build?jobUrl=http%3A%2F%2Fs2.fokidoki.su%2Fjob%2Fwg_controller_master&style=flat-square&t=1)
 ![Jenkins JaCoCo Tests Coverage](https://img.shields.io/jenkins/coverage/apiv4?jobUrl=http%3A%2F%2Fs2.fokidoki.su%2Fjob%2Fwg_controller_master&style=flat-square)
 ---
-WireRest is a powerful, restful stateless API for Wireguard. With built-in caching, it is optimized to work with large configurations. You can use both for your small private server and for public high-load applications. It is written in Java using Spring Boot and Spring WebFlux.
+WireRest is a powerful, restful stateless API for Wireguard. With built-in caching, it is optimized to work with large configurations. You can use it both for your small private server and for high-load public applications. It is written in Java using Spring Boot and Spring WebFlux.
 
 ### Features:
 
 --- 
 
-- Get all peers (Sorting available)
-- Automaticly create and add peer
+- Get all peers (sorting is available)
+- Automatically create and add peer
 - Manually create and add peer
 - Delete peer
 - Update peer
 - Get peer by public key
 - Get interface configuration
+- Get general config (interface) information
+- Token authentication
 
 ### How to run:
 
 ---
-**[!!] Java 20 required**
+**[!!] Java 20 is required** ([how to install](#how-to-install-java-20))
 
 Syntax:
 ```shell
-java -jar wirerest-0.4.jar --parameter=value --parameter2=value2 ...
+java -jar wirerest-0.5.jar --parameter=value --parameter2=value2 ...
 ```
 Simple run:
 ```shell
-java -jar wirerest-0.4.jar --wg.interface.name=wg0
+java -jar wirerest-0.5.jar --wg.interface.name=wg0
 ```
-Default port is 8081.
+The default port is 8081.
 
 If the launch was successful, you can check the list of available methods and parameters in swagger at http://SERVER-IP:8081/swagger-ui
 
@@ -38,15 +40,88 @@ If the launch was successful, you can check the list of available methods and pa
 
 All parameters that are set as an example are the default values 
 
-* `--server.port=8081` - WireRest port
+
 * `--wg.interface.name=wg0` - Wireguard interface name
+* `--security.token=admin` - Token for access to API (change it! If you want to disable token auth, set it to empty string). [More info](#token-authentication)
+* `--server.port=8081` - WireRest port
+* `--wg.cache.enabled=true` - Enable or disable caching (true is recommended). More info about caching [here](#caching)
 * `--wg.interface.default.mask=32` - Mask for ip of new peers
 * `--wg.interface.default.persistent-keepalive=0` - Default persistent keepalive for new clients
-* `--wg.cache.enabled=true` - Enable or disable caching (true is recommend)
-* `--wg.cache.update-interval=60` - Cache update interval (seconds). it is needed to track changes that have occurred bypassing WireRest. A shorter interval can increase CPU usage. Be careful with this parameter
+* `--wg.cache.update-interval=60` - Cache update interval (seconds). it is needed to track changes that have occurred bypassing WireRest. 
+A shorter interval can increase CPU usage. Be careful with this parameter.
 * `--logging.api.max-elements=1000` - The maximum number of logs that will be saved for access to them through the API
 
+### Token authentication
+Each request to the API must contain a token. 
+The token is set in the `--security.token` parameter. 
+If you want to disable token authentication, set it to empty.
 
+Token can be passed in two ways:
+1. As a query parameter like `/v1/peers?token=TOKEN` (For POST requests, the token must be passed in the body)
+2. As a header (basic access authentication): `Authorization: Basic TOKEN`
+
+
+### Caching
+WireRest has built-in caching. It is enabled by default.
+Caching greatly improves performance on large configurations.
+The cache is updated every `--wg.cache.update-interval` seconds (default 60 seconds). \
+Quick overview: 
+* `transferRx`, `transferTx` and `latestHandshake` fields are updated after every sync
+* Peer creation, deletion, and update operations work instantly.
+* If you update the wireguard configuration bypassing WireRest, the changes will appear in WireRest during the next sync
+
+It's recommended to use caching, but if you want to disable it, set `--wg.cache.enabled=false`
+
+
+### How to install Java 20
+
+---
+
+#### For x64 systems:
+```shell
+sudo apt-get update
+wget https://download.oracle.com/java/20/latest/jdk-20_linux-x64_bin.deb
+sudo dpkg -i jdk-20_linux-x64_bin.deb
+```
+\
+If you get an error `dpkg: error processing package jdk-20` \
+Run this command:
+```shell
+apt --fix-broken install
+```
+And then run dpkg again ```sudo dpkg -i jdk-20_linux-x64_bin.deb```
+
+#### For arm64 systems:
+```shell
+wget https://download.oracle.com/java/20/latest/jdk-20_linux-aarch64_bin.rpm
+sudo rpm -i jdk-20_linux-aarch64_bin.rpm
+```
+
+#### Add JAVA_HOME to your environment variables (for all systems):
+If you're not root:
+```shell
+sudo nano /etc/profile
+```
+If you're root:
+```shell
+nano ~/.bashrc
+```
+
+Add this lines to the end of the file:
+```shell
+export JAVA_HOME="/usr/lib/jvm/jdk-20/"
+export PATH=$JAVA_HOME/bin:$PATH
+```
+Save and exit the file, then **relogin**
+
+Then check if java is installed:
+```shell
+java -version
+```
+[Continue installation](#how-to-run)
+
+
+You can find the tar archive with Java 20 [here](https://www.oracle.com/java/technologies/downloads/)
 
 ## Examples:
 
@@ -229,8 +304,5 @@ mvn clean package
 
 ### TODO:
 
-___
-- Metrics for Prometheus
-- Oauth2 authorization
-- Authorization key rate limits & scopes
+
 - Callback API 
