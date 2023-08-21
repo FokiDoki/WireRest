@@ -23,11 +23,11 @@ WireRest is a powerful, restful stateless API for Wireguard. With built-in cachi
 
 Syntax:
 ```shell
-java -jar wirerest-0.4.jar --parameter=value --parameter2=value2 ...
+java -jar wirerest-0.5.jar --parameter=value --parameter2=value2 ...
 ```
 Simple run:
 ```shell
-java -jar wirerest-0.4.jar --wg.interface.name=wg0
+java -jar wirerest-0.5.jar --wg.interface.name=wg0
 ```
 Default port is 8081.
 
