@@ -23,13 +23,14 @@ WireRest is a powerful, restful stateless API for Wireguard. With built-in cachi
 ---
 **[!!] Java 20 is required** ([how to install](#how-to-install-java-20))
 
+Simple run:
+```shell
+wget https://github.com/FokiDoki/WireRest/releases/download/0.5-BETTA/wirerest-0.5.jar
+java -jar wirerest-0.5.jar --wg.interface.name=wg0
+```
 Syntax:
 ```shell
 java -jar wirerest-0.5.jar --parameter=value --parameter2=value2 ...
-```
-Simple run:
-```shell
-java -jar wirerest-0.5.jar --wg.interface.name=wg0
 ```
 The default port is 8081.
 
@@ -117,7 +118,11 @@ Save and exit the file, then **relogin**
 Then check if java is installed:
 ```shell
 java -version
+> java version "20.0.1" 2023-04-18
+> Java(TM) SE Runtime Environment (build 20.0.1+9-29)
+> Java HotSpot(TM) 64-Bit Server VM (build 20.0.1+9-29, mixed mode, sharing)
 ```
+
 [Continue installation](#how-to-run)
 
 
