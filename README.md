@@ -9,17 +9,18 @@ WireRest is a powerful, restful stateless API for Wireguard. With built-in cachi
 --- 
 
 - Get all peers (Sorting available)
-- Automaticly create and add peer
+- Automatically create and add peer
 - Manually create and add peer
 - Delete peer
 - Update peer
 - Get peer by public key
 - Get interface configuration
+- Token aut
 
 ### How to run:
 
 ---
-**[!!] Java 20 required**
+**[!!] Java 20 required** ([How to install](#how-to-install-java-20))
 
 Syntax:
 ```shell
@@ -227,10 +228,55 @@ mvn clean package
 ```
 
 
+### How to install Java 20
+
+---
+
+#### For x64 systems:
+```shell
+sudo apt-get update
+wget https://download.oracle.com/java/20/latest/jdk-20_linux-x64_bin.deb
+sudo dpkg -i jdk-20_linux-x64_bin.deb
+```
+\
+If you get an error `dpkg: error processing package jdk-20` \
+Run this command:
+```shell
+apt --fix-broken install
+```
+And then run dpkg again ```sudo dpkg -i jdk-20_linux-x64_bin.deb``` 
+
+#### For arm64 systems:
+```shell
+wget https://download.oracle.com/java/20/latest/jdk-20_linux-aarch64_bin.rpm
+sudo rpm -i jdk-20_linux-aarch64_bin.rpm
+```
+
+#### Add JAVA_HOME to your environment variables (for all systems):
+If you're not root:
+```shell
+sudo nano /etc/profile
+```
+If you're root:
+```shell
+nano ~/.bashrc
+```
+
+Add this lines to the end of the file:
+```shell
+export JAVA_HOME="/usr/lib/jvm/jdk-20/"
+export PATH=$JAVA_HOME/bin:$PATH
+```
+Save and exit the file, then **relogin**
+
+Then check if java is installed:
+```shell
+java -version
+```
+
+
+You can found tar archive with java 20 [here](https://www.oracle.com/java/technologies/downloads/)
 ### TODO:
 
-___
-- Metrics for Prometheus
-- Oauth2 authorization
-- Authorization key rate limits & scopes
+
 - Callback API 
