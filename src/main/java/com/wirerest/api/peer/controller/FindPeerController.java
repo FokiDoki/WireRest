@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,6 +37,7 @@ public class FindPeerController {
     @Operation(summary = "Find by public key",
             description = "",
             tags = {"Peers"},
+            security = @SecurityRequirement(name = "Token"),
             responses = {
                     @ApiResponse(responseCode = "200", description = "OK",
                             content = {

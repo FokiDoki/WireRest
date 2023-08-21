@@ -1,4 +1,4 @@
-package com.wirerest.api;
+package com.wirerest.api.openAPI;
 
 import java.util.HashMap;
 import java.util.Map;

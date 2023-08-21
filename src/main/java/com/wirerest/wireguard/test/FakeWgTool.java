@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 
-@Profile("test")
+@Profile("dev")
 @Component
 public class FakeWgTool extends WgTool {
     private final HashMap<String, WgPeer> peers = new HashMap<>();

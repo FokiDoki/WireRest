@@ -94,7 +94,7 @@ public class Config {
         return networkInterfaceData;
     }
 
-    @Profile("test")
+    @Profile("dev")
     @Bean
     public NetworkInterfaceData wgInterfaceTest(
             @Value("${wg.interface.name}") String interfaceName,

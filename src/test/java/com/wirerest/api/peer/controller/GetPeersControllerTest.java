@@ -11,6 +11,7 @@ import com.wirerest.wireguard.peer.WgPeerService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.reactive.ReactiveSecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
@@ -24,7 +25,7 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.containsString;
 
-@WebFluxTest(GetPeersController.class)
+@WebFluxTest(controllers = GetPeersController.class,  excludeAutoConfiguration = {ReactiveSecurityAutoConfiguration.class})
 class GetPeersControllerTest {
 
     @MockBean

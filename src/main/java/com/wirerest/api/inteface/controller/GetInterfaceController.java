@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,6 +26,7 @@ public class GetInterfaceController {
     @Operation(summary = "Get interface configuration",
             description = "If caching is enabled, the interface configuration is updated every 300 seconds",
             tags = {"Interface"},
+            security = @SecurityRequirement(name = "Token"),
             responses = {
                     @ApiResponse(responseCode = "200", description = "OK",
                             content = {@Content(mediaType = "application/json",

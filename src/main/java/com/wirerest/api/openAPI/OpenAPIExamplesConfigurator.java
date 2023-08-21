@@ -1,18 +1,17 @@
-package com.wirerest.api;
+package com.wirerest.api.openAPI;
 
+import com.wirerest.api.AppError;
 import com.wirerest.api.dto.PageDTO;
 import com.wirerest.api.inteface.WgInterfaceDTO;
 import com.wirerest.api.peer.CreatedPeerDTO;
 import com.wirerest.api.peer.WgPeerDTO;
+import com.wirerest.api.security.InvalidTokenAppError;
 import com.wirerest.api.service.StatsSnapshotDto;
 import com.wirerest.logs.LoggingEventDto;
 import com.wirerest.network.AlreadyUsedException;
 import com.wirerest.network.Subnet;
 import com.wirerest.wireguard.PageOutOfRangeException;
 import com.wirerest.wireguard.peer.PeerNotFoundException;
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
-import io.swagger.v3.oas.annotations.info.Contact;
-import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.models.examples.Example;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
@@ -27,25 +26,12 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.*;
 
-@OpenAPIDefinition(
-
-        info = @Info(
-                title = "WireRest",
-                description = "Docs for Wireguard API",
-                version = "1",
-                contact = @Contact(
-                        name = "FokiDoki",
-                        url = "https://github.com/FokiDoki/"
-                )
-        )
-)
-
 @Configuration
-public class OpenAPIConfigurator {
+public class OpenAPIExamplesConfigurator {
     private final ExamplesCustomizer examplesCustomizer;
 
     @Autowired
-    public OpenAPIConfigurator(ExamplesCustomizer examplesCustomizer) {
+    public OpenAPIExamplesConfigurator(ExamplesCustomizer examplesCustomizer) {
         this.examplesCustomizer = examplesCustomizer;
     }
 
@@ -98,6 +84,12 @@ public class OpenAPIConfigurator {
                         createApiResponse("Server Error",
                                 schemas.get(AppError.class.getSimpleName()),
                                 Map.of("UnexpectedError500", examplesCustomizer.getMap().get("UnexpectedError500"))
+                        )
+                );
+                addApiResponseNoOverride(apiResponses, "403",
+                        createApiResponse("Invalid Token",
+                                schemas.get(AppError.class.getSimpleName()),
+                                Map.of("InvalidToken", examplesCustomizer.getMap().get("InvalidToken"))
                         )
                 );
 
@@ -242,4 +234,9 @@ public class OpenAPIConfigurator {
         addObject("stats", "Stats", statsSnapshotDto);
     }
 
+    @PostConstruct
+    public void InvalidToken() {
+        addObject("InvalidToken", "Authorization token is invalid or not provided",
+                new InvalidTokenAppError());
+    }
 }

@@ -1,5 +1,4 @@
 package com.wirerest.wireguard.peer;
-
 import com.wirerest.network.ISubnet;
 import com.wirerest.wireguard.*;
 import com.wirerest.wireguard.peer.spec.FindByPublicKey;

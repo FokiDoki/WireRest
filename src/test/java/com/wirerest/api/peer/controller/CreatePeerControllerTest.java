@@ -4,13 +4,14 @@ import com.wirerest.api.peer.CreatedPeerDTO;
 import com.wirerest.api.peer.testData;
 import com.wirerest.network.NoFreeIpException;
 import com.wirerest.network.Subnet;
-import com.wirerest.wireguard.peer.requests.IpAllocationRequestOneIfNullSubnets;
-import com.wirerest.wireguard.peer.requests.PeerCreationRequest;
 import com.wirerest.wireguard.peer.CreatedPeer;
 import com.wirerest.wireguard.peer.WgPeerService;
+import com.wirerest.wireguard.peer.requests.IpAllocationRequestOneIfNullSubnets;
+import com.wirerest.wireguard.peer.requests.PeerCreationRequest;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.reactive.ReactiveSecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -19,7 +20,7 @@ import java.util.Set;
 
 import static org.hamcrest.Matchers.containsString;
 
-@WebFluxTest(CreatePeerController.class)
+@WebFluxTest(controllers = CreatePeerController.class,  excludeAutoConfiguration = {ReactiveSecurityAutoConfiguration.class})
 class CreatePeerControllerTest {
 
     @MockBean

@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -45,6 +46,7 @@ public class GetPeersController {
                     " Warning, caching is enabled by default, any changes made NOT with wirerest will not appear " +
                     "immediately, but during the next synchronization (60s by default)",
             tags = {"Peers"},
+            security = @SecurityRequirement(name = "Token"),
             responses = {
                     @ApiResponse(responseCode = "200", description = "OK",
                             content = {

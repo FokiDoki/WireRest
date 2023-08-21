@@ -1,4 +1,4 @@
-package com.wirerest.api;
+package com.wirerest.api.openAPI;
 
 import io.swagger.v3.oas.models.examples.Example;
 import org.springframework.stereotype.Component;
