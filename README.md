@@ -70,6 +70,58 @@ Quick overview:
 * If you update the wireguard configuration bypassing WireRest, the changes will appear in WireRest during the next sync
 
 It's recommended to use caching, but if you want to disable it, set `--wg.cache.enabled=false`
+
+
+### How to install Java 20
+
+---
+
+#### For x64 systems:
+```shell
+sudo apt-get update
+wget https://download.oracle.com/java/20/latest/jdk-20_linux-x64_bin.deb
+sudo dpkg -i jdk-20_linux-x64_bin.deb
+```
+\
+If you get an error `dpkg: error processing package jdk-20` \
+Run this command:
+```shell
+apt --fix-broken install
+```
+And then run dpkg again ```sudo dpkg -i jdk-20_linux-x64_bin.deb```
+
+#### For arm64 systems:
+```shell
+wget https://download.oracle.com/java/20/latest/jdk-20_linux-aarch64_bin.rpm
+sudo rpm -i jdk-20_linux-aarch64_bin.rpm
+```
+
+#### Add JAVA_HOME to your environment variables (for all systems):
+If you're not root:
+```shell
+sudo nano /etc/profile
+```
+If you're root:
+```shell
+nano ~/.bashrc
+```
+
+Add this lines to the end of the file:
+```shell
+export JAVA_HOME="/usr/lib/jvm/jdk-20/"
+export PATH=$JAVA_HOME/bin:$PATH
+```
+Save and exit the file, then **relogin**
+
+Then check if java is installed:
+```shell
+java -version
+```
+[Continue installation](#how-to-run)
+
+
+You can find tar archive with java 20 [here](https://www.oracle.com/java/technologies/downloads/)
+
 ## Examples:
 
 ### Get all peers:
@@ -249,54 +301,6 @@ mvn clean package
 ```
 
 
-### How to install Java 20
-
----
-
-#### For x64 systems:
-```shell
-sudo apt-get update
-wget https://download.oracle.com/java/20/latest/jdk-20_linux-x64_bin.deb
-sudo dpkg -i jdk-20_linux-x64_bin.deb
-```
-\
-If you get an error `dpkg: error processing package jdk-20` \
-Run this command:
-```shell
-apt --fix-broken install
-```
-And then run dpkg again ```sudo dpkg -i jdk-20_linux-x64_bin.deb``` 
-
-#### For arm64 systems:
-```shell
-wget https://download.oracle.com/java/20/latest/jdk-20_linux-aarch64_bin.rpm
-sudo rpm -i jdk-20_linux-aarch64_bin.rpm
-```
-
-#### Add JAVA_HOME to your environment variables (for all systems):
-If you're not root:
-```shell
-sudo nano /etc/profile
-```
-If you're root:
-```shell
-nano ~/.bashrc
-```
-
-Add this lines to the end of the file:
-```shell
-export JAVA_HOME="/usr/lib/jvm/jdk-20/"
-export PATH=$JAVA_HOME/bin:$PATH
-```
-Save and exit the file, then **relogin**
-
-Then check if java is installed:
-```shell
-java -version
-```
-
-
-You can find tar archive with java 20 [here](https://www.oracle.com/java/technologies/downloads/)
 ### TODO:
 
 
