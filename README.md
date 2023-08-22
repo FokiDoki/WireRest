@@ -99,11 +99,7 @@ sudo rpm -i jdk-20_linux-aarch64_bin.rpm
 ```
 
 #### Add JAVA_HOME to your environment variables (for all systems):
-If you're not root:
-```shell
-sudo nano /etc/profile
-```
-If you're root:
+Open `.bashrc` file
 ```shell
 nano ~/.bashrc
 ```
