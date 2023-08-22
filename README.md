@@ -4,6 +4,8 @@
 ---
 WireRest is a powerful, restful stateless API for Wireguard. With built-in caching, it is optimized to work with large configurations. You can use it both for your small private server and for high-load public applications. It is written in Java using Spring Boot and Spring WebFlux.
 
+DEMO: http://wr-demo.fokidoki.su:8081/swagger-ui
+
 ### Features:
 
 --- 
