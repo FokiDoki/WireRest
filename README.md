@@ -28,11 +28,11 @@ DEMO: http://wr-demo.fokidoki.su:8081/swagger-ui
 Simple run:
 ```shell
 wget https://github.com/FokiDoki/WireRest/releases/download/0.5-BETTA/wirerest-0.5.jar
-java -jar wirerest-0.5.jar --wg.interface.name=wg0
+sudo java -jar wirerest-0.5.jar --wg.interface.name=wg0
 ```
 Syntax:
 ```shell
-java -jar wirerest-0.5.jar --parameter=value --parameter2=value2 ...
+sudo java -jar wirerest-0.5.jar --parameter=value --parameter2=value2 ...
 ```
 The default port is 8081.
 
