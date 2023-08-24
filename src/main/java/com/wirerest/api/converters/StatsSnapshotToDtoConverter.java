@@ -1,7 +1,7 @@
 package com.wirerest.api.converters;
 
 import com.wirerest.api.service.StatsSnapshotDto;
-import com.wirerest.stats.StatsSnapshot;
+import com.wirerest.metrics.StatsSnapshot;
 import org.springframework.core.convert.converter.Converter;
 
 public class StatsSnapshotToDtoConverter implements Converter<StatsSnapshot, StatsSnapshotDto> {

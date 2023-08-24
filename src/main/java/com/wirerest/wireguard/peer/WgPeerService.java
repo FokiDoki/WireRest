@@ -1,16 +1,22 @@
 package com.wirerest.wireguard.peer;
+
 import com.wirerest.network.ISubnet;
-import com.wirerest.wireguard.*;
-import com.wirerest.wireguard.peer.spec.FindByPublicKey;
+import com.wirerest.wireguard.ParsingException;
+import com.wirerest.wireguard.RepositoryPageable;
+import com.wirerest.wireguard.SubnetService;
+import com.wirerest.wireguard.events.PeerCreatedEvent;
+import com.wirerest.wireguard.events.PeerDeletedEvent;
 import com.wirerest.wireguard.peer.requests.EmptyPeerCreationRequest;
 import com.wirerest.wireguard.peer.requests.IpAllocationRequest;
 import com.wirerest.wireguard.peer.requests.PeerCreationRequest;
 import com.wirerest.wireguard.peer.requests.PeerUpdateRequest;
+import com.wirerest.wireguard.peer.spec.FindByPublicKey;
 import com.wirerest.wireguard.tools.BlockingByHashAsyncExecutor;
 import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,14 +41,16 @@ public class WgPeerService {
     private final SubnetService subnetService;
     private final BlockingByHashAsyncExecutor<WgPeer> blockingByHashAsyncExecutor = new BlockingByHashAsyncExecutor<>();
 
+    ApplicationEventPublisher applicationEventPublisher;
 
 
     @Autowired
     public WgPeerService(WgPeerGenerator peerGenerator, RepositoryPageable<WgPeer> wgPeerRepository,
-                         SubnetService subnetService) {
+                         SubnetService subnetService, ApplicationEventPublisher applicationEventPublisher) {
         this.peerGenerator = peerGenerator;
         this.wgPeerRepository = wgPeerRepository;
         this.subnetService = subnetService;
+        this.applicationEventPublisher = applicationEventPublisher;
     }
 
 
@@ -76,6 +84,7 @@ public class WgPeerService {
 
         CreatedPeer createdPeer = peerGenerator.createPeerGenerateNulls(peerCreationRequest);
         wgPeerRepository.add(createdPeerToWgPeer(createdPeer));
+        applicationEventPublisher.publishEvent(new PeerCreatedEvent(this, createdPeer));
         return createdPeer;
     }
 
@@ -142,6 +151,7 @@ public class WgPeerService {
         WgPeer peer = getPeerByPublicKeyOrThrow(publicKey);
         wgPeerRepository.remove(peer);
         subnetService.release(peer.getAllowedSubnets().getAll());
+        applicationEventPublisher.publishEvent(new PeerDeletedEvent(this, peer));
         return peer;
     }
 
