@@ -8,7 +8,6 @@ import com.wirerest.wireguard.peer.PeerCreationRules;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
@@ -25,13 +24,10 @@ public class SubnetService {
     private final PeerCreationRules peerCreationRules;
     private final IV4SubnetSolver v4SubnetSolver;
 
-    private final ApplicationEventPublisher applicationEventPublisher;
     @Autowired
-    public SubnetService(PeerCreationRules peerCreationRules, IV4SubnetSolver v4SubnetSolver,
-                         ApplicationEventPublisher applicationEventPublisher) {
+    public SubnetService(PeerCreationRules peerCreationRules, IV4SubnetSolver v4SubnetSolver) {
         this.peerCreationRules = peerCreationRules;
         this.v4SubnetSolver = v4SubnetSolver;
-        this.applicationEventPublisher = applicationEventPublisher;
     }
 
     public Set<Subnet> generateV4(int countOfIpsToGenerate, int mask) {

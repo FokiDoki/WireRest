@@ -7,10 +7,13 @@ import com.wirerest.network.NetworkInterfaceData;
 import com.wirerest.wireguard.RepositoryPageable;
 import com.wirerest.wireguard.Specification;
 import com.wirerest.wireguard.WgTool;
+import com.wirerest.wireguard.events.PeerCreatedEvent;
+import com.wirerest.wireguard.events.SyncTransferUpdatedEvent;
 import com.wirerest.wireguard.peer.spec.FindByPublicKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -31,10 +34,12 @@ public class CachedWgPeerRepository extends WgPeerRepository implements Reposito
     private final Cache<String, WgPeer> wgPeerCache;
     private final ScheduledExecutorService cacheUpdateScheduler = Executors.newSingleThreadScheduledExecutor();
 
+
     @Autowired
-    public CachedWgPeerRepository(WgTool wgTool, NetworkInterfaceData wgInterface, IV4SubnetSolver subnetSolver,
+    public CachedWgPeerRepository(WgTool wgTool, NetworkInterfaceData wgInterface,
+                                  IV4SubnetSolver subnetSolver, ApplicationEventPublisher applicationEventPublisher,
                                   @Value("${wg.cache.update-interval}") int cacheUpdateIntervalSeconds) {
-        super(wgTool, wgInterface);
+        super(wgTool, wgInterface, applicationEventPublisher);
         wgPeerCache = Caffeine.newBuilder().build();
         cacheUpdateScheduler.scheduleAtFixedRate(() -> updateCache(subnetSolver),
                 0, cacheUpdateIntervalSeconds, TimeUnit.SECONDS);
@@ -98,12 +103,18 @@ public class CachedWgPeerRepository extends WgPeerRepository implements Reposito
         writeLock.lock();
         try {
             List<WgPeer> newPeers = super.getAll();
+            Transfer.Builder transfer = new Transfer.Builder();
             newPeers.forEach(wgPeer -> {
+                transfer.addTx(wgPeer.getTransferTx());
+                transfer.addRx(wgPeer.getTransferRx());
+                if (wgPeerCache.getIfPresent(wgPeer.getPublicKey()) == null)
+                    applicationEventPublisher.publishEvent(new PeerCreatedEvent(this, wgPeer));
                 wgPeerCache.put(wgPeer.getPublicKey(), wgPeer);
                 wgPeer.getAllowedSubnets().getIPv4Subnets().stream()
                         .filter(subnet -> !subnetSolver.isUsed(subnet))
                         .forEach(subnetSolver::obtain);
             });
+            applicationEventPublisher.publishEvent(new SyncTransferUpdatedEvent(this, transfer.build()));
         } finally {
             writeLock.unlock();
         }

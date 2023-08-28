@@ -4,7 +4,6 @@ import com.wirerest.network.ISubnet;
 import com.wirerest.wireguard.ParsingException;
 import com.wirerest.wireguard.RepositoryPageable;
 import com.wirerest.wireguard.SubnetService;
-import com.wirerest.wireguard.events.PeerCreatedEvent;
 import com.wirerest.wireguard.events.PeerDeletedEvent;
 import com.wirerest.wireguard.peer.requests.EmptyPeerCreationRequest;
 import com.wirerest.wireguard.peer.requests.IpAllocationRequest;
@@ -84,7 +83,7 @@ public class WgPeerService {
 
         CreatedPeer createdPeer = peerGenerator.createPeerGenerateNulls(peerCreationRequest);
         wgPeerRepository.add(createdPeerToWgPeer(createdPeer));
-        applicationEventPublisher.publishEvent(new PeerCreatedEvent(this, createdPeer));
+
         return createdPeer;
     }
 
@@ -112,7 +111,7 @@ public class WgPeerService {
     }
 
     private WgPeer updatePeerTask(PeerUpdateRequest updateRequest) {
-        WgPeer oldPeer = getPeerByPublicKeyOrThrow(updateRequest.getCurrentPublicKey());
+        WgPeer oldPeer = getPeerByPublicKeyOrThrow(updateRequest.getCurrentPublicKey()).clone();
         if (isUpdateRequestHasNewPublicKey(updateRequest)) throwIfPeerExists(updateRequest.getNewPublicKey());
         WgPeer.Builder newPeerBuilder = WgPeer.from(oldPeer);
         newPeerBuilder.publicKey(

@@ -14,7 +14,7 @@ import java.util.Set;
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @EqualsAndHashCode(of = "publicKey")
-public class WgPeer implements Comparable<WgPeer> {
+public class WgPeer implements Comparable<WgPeer>, Cloneable{
     private final String publicKey;
     private String presharedKey;
     private String endpoint;
@@ -51,11 +51,31 @@ public class WgPeer implements Comparable<WgPeer> {
         return this.publicKey.compareTo(o.publicKey);
     }
 
+    @Override
+    public WgPeer clone() {
+        WgPeer clonePeer = null;
+        try {
+            clonePeer = (WgPeer) super.clone();
+            clonePeer.allowedSubnets = this.allowedSubnets.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
+        return clonePeer;
+    }
+
     @Data
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public static class AllowedSubnets implements Comparable<AllowedSubnets> {
+    public static class AllowedSubnets implements Comparable<AllowedSubnets>, Cloneable {
         private Set<Subnet> IPv4Subnets = new HashSet<>();
         private Set<SubnetV6> IPv6Subnets = new HashSet<>();
+
+        @SneakyThrows
+        public AllowedSubnets clone() {
+            AllowedSubnets clone = (AllowedSubnets) super.clone();
+            clone.IPv4Subnets = new HashSet<>(IPv4Subnets);
+            clone.IPv6Subnets = new HashSet<>(IPv6Subnets);
+            return clone;
+        }
 
         public void addIpv4(String allowedIPv4Ip) {
             IPv4Subnets.add(Subnet.valueOf(allowedIPv4Ip));

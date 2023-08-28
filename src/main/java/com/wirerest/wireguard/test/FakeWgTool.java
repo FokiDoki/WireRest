@@ -19,7 +19,7 @@ public class FakeWgTool extends WgTool {
     private final WgInterface wgInterface;
     private final Base64.Encoder base64Encoder = Base64.getEncoder();
     private int keyCounter;
-
+    Random random = new Random();
     public FakeWgTool() {
         super(1);
         wgInterface = new WgInterface(generatePrivateKey(), genPubKey(), 16666, 0);
@@ -36,7 +36,7 @@ public class FakeWgTool extends WgTool {
                 WgPeer.publicKey(genPubKey()).presharedKey(generatePresharedKey()).allowedIps(Set.of(Subnet.valueOf("10.0.0.7/32"), SubnetV6.valueOf("::1/128")))
                         .latestHandshake(200000).transferRx(12345).transferTx(54321).build()
         ).forEach(peer -> peers.put(peer.getPublicKey(), peer));
-        Random random = new Random();
+
         for (int i = 0; i < 60000; i++) {
             String pubkey = genPubKey();
             peers.put(pubkey, WgPeer.publicKey(pubkey).presharedKey(generatePresharedKey())
@@ -50,6 +50,15 @@ public class FakeWgTool extends WgTool {
     @SneakyThrows
     @Override
     public WgShowDump showDump(String interfaceName) {
+        for (int i = 0; i < 100; i++) {
+            WgPeer peer = peers.values().stream().skip(random.nextInt(peers.size())).findFirst().get();
+            if (random.nextBoolean()) {
+                peer = WgPeer.from(peer).transferRx(peer.getTransferRx()+random.nextInt(10000000)).build();
+            } else {
+                peer = WgPeer.from(peer).transferTx(peer.getTransferTx()+random.nextInt(10000000)).build();
+            }
+            peers.put(peer.getPublicKey(), peer);
+        }
         return new WgShowDump(wgInterface, peers.values().stream().toList());
     }
 
@@ -69,6 +78,7 @@ public class FakeWgTool extends WgTool {
         WgPeer.Builder peerBuilder = WgPeer.from(peers.getOrDefault(newPeer.getPublicKey(), newPeer));
         if (newPeer.getPresharedKey() != null) peerBuilder.presharedKey(newPeer.getPresharedKey());
         peerBuilder.allowedIPv4Subnets(newPeer.getAllowedSubnets().getIPv4Subnets());
+        peerBuilder.allowedIPv6Subnets(newPeer.getAllowedSubnets().getIPv6Subnets());
         if (newPeer.getEndpoint() != null) peerBuilder.endpoint(newPeer.getEndpoint());
         peerBuilder.persistentKeepalive(newPeer.getPersistentKeepalive());
         peers.put(newPeer.getPublicKey(), peerBuilder.build());
