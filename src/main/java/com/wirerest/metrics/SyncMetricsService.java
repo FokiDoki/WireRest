@@ -10,15 +10,15 @@ import java.time.Instant;
 import java.util.List;
 
 @Component
-@ConditionalOnProperty(value = "wg.cache.enabled", havingValue = "false")
-public class MetricsService {
+@ConditionalOnProperty(value = "wg.cache.enabled", havingValue = "true")
+public class SyncMetricsService {
 
     IV4SubnetSolver subnetSolver;
     WgPeerService wgPeerService;
 
     public WireRestMetrics metrics = new WireRestMetrics();
 
-    public MetricsService(IV4SubnetSolver subnetSolver, WgPeerService wgPeerService) {
+    public SyncMetricsService(IV4SubnetSolver subnetSolver, WgPeerService wgPeerService) {
         this.subnetSolver = subnetSolver;
         this.wgPeerService = wgPeerService;
         metrics.freeV4Ips.set(subnetSolver.getAvailableIpsCount());
