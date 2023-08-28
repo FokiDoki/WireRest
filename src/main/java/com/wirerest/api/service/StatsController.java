@@ -1,7 +1,7 @@
 package com.wirerest.api.service;
 
 import com.wirerest.api.converters.StatsSnapshotToDtoConverter;
-import com.wirerest.metrics.MetricsService;
+import com.wirerest.metrics.IMetricsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -18,10 +18,10 @@ import org.springframework.web.bind.annotation.RestController;
 @Validated
 public class StatsController {
 
-    MetricsService metricsService;
+    IMetricsService metricsService;
     StatsSnapshotToDtoConverter statsSnapshotToDtoConverter = new StatsSnapshotToDtoConverter();
     @Autowired
-    public StatsController(MetricsService metricsService) {
+    public StatsController(IMetricsService metricsService) {
         this.metricsService = metricsService;
     }
 

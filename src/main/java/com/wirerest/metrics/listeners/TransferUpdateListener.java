@@ -1,6 +1,6 @@
 package com.wirerest.metrics.listeners;
 
-import com.wirerest.metrics.MetricsService;
+import com.wirerest.metrics.SyncMetricsService;
 import com.wirerest.wireguard.events.SyncTransferUpdatedEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
@@ -8,10 +8,10 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class TransferUpdateListener implements ApplicationListener<SyncTransferUpdatedEvent> {
-    private final MetricsService metricsService;
+    private final SyncMetricsService metricsService;
 
     @Autowired
-    public TransferUpdateListener(MetricsService metricsService) {
+    public TransferUpdateListener(SyncMetricsService metricsService) {
         this.metricsService = metricsService;
     }
     

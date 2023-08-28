@@ -11,34 +11,25 @@ import java.util.List;
 
 @Component
 @ConditionalOnProperty(value = "wg.cache.enabled", havingValue = "false")
-public class MetricsService {
+public class MetricsService implements IMetricsService{
 
     IV4SubnetSolver subnetSolver;
     WgPeerService wgPeerService;
 
-    public WireRestMetrics metrics = new WireRestMetrics();
-
     public MetricsService(IV4SubnetSolver subnetSolver, WgPeerService wgPeerService) {
         this.subnetSolver = subnetSolver;
         this.wgPeerService = wgPeerService;
-        metrics.freeV4Ips.set(subnetSolver.getAvailableIpsCount());
-        metrics.totalV4Ips.set(subnetSolver.getTotalIpsCount());
-        List<WgPeer> peers = wgPeerService.getPeers();
-        metrics.totalPeers.set(peers.size());
-        Utils.Transfer transfer = new Utils().calculateTransfer(peers);
-        metrics.transferTxTotal.set(transfer.getTx());
-        metrics.transferRxTotal.set(transfer.getRx());
-
     }
 
     public StatsSnapshot snapshot() {
+        List<WgPeer> peers = wgPeerService.getPeers();
         return new StatsSnapshot.Builder()
                 .timestamp(Instant.now())
-                .freeV4Ips(metrics.freeV4Ips.get())
-                .totalV4Ips(metrics.totalV4Ips.get())
-                .totalPeers(metrics.totalPeers.get())
-                .transferRxTotal(metrics.transferRxTotal.get())
-                .transferTxTotal(metrics.transferTxTotal.get())
+                .freeV4Ips(subnetSolver.getAvailableIpsCount())
+                .totalV4Ips(subnetSolver.getTotalIpsCount())
+                .totalPeers(peers.size())
+                .transferRxTotal(peers.stream().mapToLong(WgPeer::getTransferRx).sum())
+                .transferTxTotal(peers.stream().mapToLong(WgPeer::getTransferTx).sum())
                 .build();
     }
 }

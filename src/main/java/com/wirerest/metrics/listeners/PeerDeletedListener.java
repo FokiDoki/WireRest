@@ -1,6 +1,6 @@
 package com.wirerest.metrics.listeners;
 
-import com.wirerest.metrics.MetricsService;
+import com.wirerest.metrics.SyncMetricsService;
 import com.wirerest.wireguard.events.PeerDeletedEvent;
 import com.wirerest.wireguard.peer.WgPeer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,10 +9,10 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class PeerDeletedListener implements ApplicationListener<PeerDeletedEvent> {
-    private final MetricsService metricsService;
+    private final SyncMetricsService metricsService;
     
     @Autowired
-    public PeerDeletedListener(MetricsService metricsService) {
+    public PeerDeletedListener(SyncMetricsService metricsService) {
         this.metricsService = metricsService;
     }
     
