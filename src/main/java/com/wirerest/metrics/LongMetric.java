@@ -4,7 +4,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 
 public class LongMetric {
-    private AtomicLong value = new AtomicLong(0);
+    private final AtomicLong value = new AtomicLong(0);
 
     public void increment(){
         value.incrementAndGet();

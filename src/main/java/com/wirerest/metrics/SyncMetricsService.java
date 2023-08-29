@@ -3,24 +3,22 @@ package com.wirerest.metrics;
 import com.wirerest.network.IV4SubnetSolver;
 import com.wirerest.wireguard.peer.WgPeer;
 import com.wirerest.wireguard.peer.WgPeerService;
+import lombok.Getter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.List;
 
+
+@Getter
 @Component
 @ConditionalOnProperty(value = "wg.cache.enabled", havingValue = "true")
 public class SyncMetricsService implements IMetricsService{
 
-    IV4SubnetSolver subnetSolver;
-    WgPeerService wgPeerService;
-
-    public WireRestMetrics metrics = new WireRestMetrics();
+    public final WireRestMetrics metrics = new WireRestMetrics();
 
     public SyncMetricsService(IV4SubnetSolver subnetSolver, WgPeerService wgPeerService) {
-        this.subnetSolver = subnetSolver;
-        this.wgPeerService = wgPeerService;
         metrics.freeV4Ips.set(subnetSolver.getAvailableIpsCount());
         metrics.totalV4Ips.set(subnetSolver.getTotalIpsCount());
         List<WgPeer> peers = wgPeerService.getPeers();
