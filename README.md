@@ -1,7 +1,21 @@
-## WireRest - REST API for Wireguard
-![Jenkins JaCoCo Building status](https://img.shields.io/jenkins/build?jobUrl=http%3A%2F%2Fs2.fokidoki.su%2Fjob%2Fwg_controller_master&style=flat-square&t=1)
-![Jenkins JaCoCo Tests Coverage](https://img.shields.io/jenkins/coverage/apiv4?jobUrl=http%3A%2F%2Fs2.fokidoki.su%2Fjob%2Fwg_controller_master&style=flat-square)
----
+<div align="center">
+<!-- Title: -->
+  <a href="https://github.com/FokiDoki/WireRest">
+    <img src="https://github.com/FokiDoki/WireRest/assets/23121394/206a5ab0-674b-418f-9a0b-5c8cf6b92fc1" height="100">
+  </a>
+
+  <h1><a href="https://github.com/FokiDoki/WireRest">WireRest</a> - REST API for Wireguard</h1>
+<!-- Labels: -->
+  <!-- First row: -->
+  <a href="https://github.com/FokiDoki/WireRest">
+    <img src="https://img.shields.io/jenkins/build?jobUrl=http%3A%2F%2Fs2.fokidoki.su%2Fjob%2Fwg_controller_master&style=flat-square&t=1" height="20" alt="Build status">
+  </a>
+  <a href="https://github.com/FokiDoki/WireRest">
+    <img src="https://img.shields.io/jenkins/coverage/apiv4?jobUrl=http%3A%2F%2Fs2.fokidoki.su%2Fjob%2Fwg_controller_master&style=flat-square" height="20" alt="Tests coverage">
+  </a>
+</div>
+
+
 WireRest is a powerful, restful stateless API for Wireguard. With built-in caching, it is optimized to work with large configurations. You can use it both for your small private server and for high-load public applications. It is written in Java using Spring Boot and Spring WebFlux.
 
 DEMO: http://wr-demo.fokidoki.su:8081/swagger-ui
