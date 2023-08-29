@@ -4,7 +4,6 @@ import com.wirerest.network.ISubnet;
 import com.wirerest.wireguard.ParsingException;
 import com.wirerest.wireguard.RepositoryPageable;
 import com.wirerest.wireguard.SubnetService;
-import com.wirerest.wireguard.events.PeerDeletedEvent;
 import com.wirerest.wireguard.peer.requests.EmptyPeerCreationRequest;
 import com.wirerest.wireguard.peer.requests.IpAllocationRequest;
 import com.wirerest.wireguard.peer.requests.PeerCreationRequest;
@@ -15,7 +14,6 @@ import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -40,16 +38,14 @@ public class WgPeerService {
     private final SubnetService subnetService;
     private final BlockingByHashAsyncExecutor<WgPeer> blockingByHashAsyncExecutor = new BlockingByHashAsyncExecutor<>();
 
-    ApplicationEventPublisher applicationEventPublisher;
 
 
     @Autowired
     public WgPeerService(WgPeerGenerator peerGenerator, RepositoryPageable<WgPeer> wgPeerRepository,
-                         SubnetService subnetService, ApplicationEventPublisher applicationEventPublisher) {
+                         SubnetService subnetService) {
         this.peerGenerator = peerGenerator;
         this.wgPeerRepository = wgPeerRepository;
         this.subnetService = subnetService;
-        this.applicationEventPublisher = applicationEventPublisher;
     }
 
 
@@ -150,7 +146,6 @@ public class WgPeerService {
         WgPeer peer = getPeerByPublicKeyOrThrow(publicKey);
         wgPeerRepository.remove(peer);
         subnetService.release(peer.getAllowedSubnets().getAll());
-        applicationEventPublisher.publishEvent(new PeerDeletedEvent(this, peer));
         return peer;
     }
 

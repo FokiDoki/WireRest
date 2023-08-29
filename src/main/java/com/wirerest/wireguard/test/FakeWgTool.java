@@ -41,7 +41,7 @@ public class FakeWgTool extends WgTool {
             String pubkey = genPubKey();
             peers.put(pubkey, WgPeer.publicKey(pubkey).presharedKey(generatePresharedKey())
                     .transferRx(random.nextInt(10000000))
-                    .transferTx(random.nextInt(10000000))
+                    .transferTx(random.nextInt(2400000))
                     .build());
         }
         keyCounter = peers.size() + 1;
@@ -55,7 +55,7 @@ public class FakeWgTool extends WgTool {
             if (random.nextBoolean()) {
                 peer = WgPeer.from(peer).transferRx(peer.getTransferRx()+random.nextInt(10000000)).build();
             } else {
-                peer = WgPeer.from(peer).transferTx(peer.getTransferTx()+random.nextInt(10000000)).build();
+                peer = WgPeer.from(peer).transferTx(peer.getTransferTx()+random.nextInt(2400000)).build();
             }
             peers.put(peer.getPublicKey(), peer);
         }
