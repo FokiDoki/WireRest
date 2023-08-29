@@ -1,9 +1,8 @@
 <div align="center">
 <!-- Title: -->
   <a href="https://github.com/FokiDoki/WireRest">
-    <img src="https://github.com/FokiDoki/WireRest/assets/23121394/206a5ab0-674b-418f-9a0b-5c8cf6b92fc1" height="100">
+    <img src="https://github.com/FokiDoki/WireRest/assets/23121394/3258af4b-8858-4f0b-a58d-605eff162bc7" height="200">
   </a>
-
   <h1><a href="https://github.com/FokiDoki/WireRest">WireRest</a> - REST API for Wireguard</h1>
 <!-- Labels: -->
   <!-- First row: -->
