@@ -11,11 +11,12 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Profile("dev")
 @Component
 public class FakeWgTool extends WgTool {
-    private final HashMap<String, WgPeer> peers = new HashMap<>();
+    private final ConcurrentHashMap<String, WgPeer> peers = new ConcurrentHashMap<>();
     private final WgInterface wgInterface;
     private final Base64.Encoder base64Encoder = Base64.getEncoder();
     private int keyCounter;
