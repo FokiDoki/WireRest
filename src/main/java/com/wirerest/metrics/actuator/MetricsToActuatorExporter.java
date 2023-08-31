@@ -37,13 +37,22 @@ public class MetricsToActuatorExporter {
     }
 
     private void buildMetrics(MeterRegistry registry) {
-        Gauge.builder("wirerest_net_transfer", metrics, metrics -> metrics.transferTxTotal.get())
-                        .tag("type", "transfer").register(registry);
-        Gauge.builder("wirerest_net_transfer", metrics, metrics -> metrics.transferRxTotal.get())
+        Gauge.builder("wirerest_network_transmit_bytes_total", metrics, metrics -> metrics.transferTxTotal.get())
+                .tag("type", "transfer")
+                .description("Total transferred bytes").register(registry);
+
+        Gauge.builder("wirerest_network_transmit_bytes_total", metrics, metrics -> metrics.transferRxTotal.get())
+                .description("Total received bytes")
                 .tag("type", "receive").register(registry);
-        registry.gauge("wirerest_peers_total", metrics, metrics -> metrics.totalPeers.get());
-        registry.gauge("wirerest_iface_ipv4_free",  metrics, metrics -> metrics.freeV4Ips.get());
-        registry.gauge("wirerest_iface_ipv4_total",  metrics, metrics -> metrics.totalV4Ips.get());
+
+        Gauge.builder("wirerest_peers_total", metrics, metrics -> metrics.totalPeers.get())
+                .description("Total peers in wg interface").register(registry);
+
+        Gauge.builder("wirerest_iface_ipv4_free", metrics, metrics -> metrics.freeV4Ips.get())
+                .description("The number of IP addresses that new clients can use").register(registry);
+
+        Gauge.builder("wirerest_iface_ipv4_total", metrics, metrics -> metrics.totalV4Ips.get())
+                .description("Number of IPs in current wg interface").register(registry);
     }
 
 
