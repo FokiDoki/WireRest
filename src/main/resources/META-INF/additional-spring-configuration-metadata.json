@@ -39,6 +39,11 @@
       "name": "security.token",
       "type": "java.lang.String",
       "description": "Token for access to API."
+    },
+    {
+      "name": "wirerest.version",
+      "type": "java.lang.String",
+      "description": "Version of WireRest."
     }
   ]
 }
