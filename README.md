@@ -43,6 +43,8 @@ Simple run:
 wget https://github.com/FokiDoki/WireRest/releases/download/0.5-BETTA/wirerest-0.5.jar
 sudo java -jar wirerest-0.5.jar --wg.interface.name=wg0
 ```
+Replace `wg0` with the name of your Wireguard interface.  Use `sudo wg show` to list all active Wireguard interfaces if you don't know your interface name. 
+
 Syntax:
 ```shell
 sudo java -jar wirerest-0.5.jar --parameter=value --parameter2=value2 ...
