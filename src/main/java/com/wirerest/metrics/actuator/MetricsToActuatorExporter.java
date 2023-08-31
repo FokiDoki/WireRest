@@ -22,19 +22,20 @@ public class MetricsToActuatorExporter {
 
     private final ScheduledExecutorService metricsUpdateScheduler = Executors.newSingleThreadScheduledExecutor();
 
-    private final WireRestMetrics metrics;
+    private WireRestMetrics metrics;
     private AtomicLong lastTotalPeers = new AtomicLong();
 
     @Autowired
     public MetricsToActuatorExporter(IMetricsService metricsService, MeterRegistry registry) {
         this.registry = registry;
         this.metricsService = metricsService;
-        metrics = metricsService.getMetrics();
+
         metricsUpdateScheduler.scheduleAtFixedRate(this::updateMetrics,
                 2, 1, java.util.concurrent.TimeUnit.SECONDS);
     }
 
     private void updateMetrics(){
+        metrics = metricsService.getMetrics();
         Gauge.builder("wirerest_net_transfer", metrics, metrics -> metrics.transferTxTotal.get())
                         .tag("type", "transfer").register(registry);
         Gauge.builder("wirerest_net_transfer", metrics, metrics -> metrics.transferRxTotal.get())

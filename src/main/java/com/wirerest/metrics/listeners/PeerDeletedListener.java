@@ -4,10 +4,12 @@ import com.wirerest.metrics.SyncMetricsService;
 import com.wirerest.wireguard.events.PeerDeletedEvent;
 import com.wirerest.wireguard.peer.WgPeer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
 @Component
+@ConditionalOnProperty(value = "wg.cache.enabled", havingValue = "true")
 public class PeerDeletedListener implements ApplicationListener<PeerDeletedEvent> {
     private final SyncMetricsService metricsService;
     

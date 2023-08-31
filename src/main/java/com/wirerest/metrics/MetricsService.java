@@ -3,7 +3,6 @@ package com.wirerest.metrics;
 import com.wirerest.network.IV4SubnetSolver;
 import com.wirerest.wireguard.peer.WgPeer;
 import com.wirerest.wireguard.peer.WgPeerService;
-import lombok.Getter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +16,6 @@ public class MetricsService implements IMetricsService{
     IV4SubnetSolver subnetSolver;
     WgPeerService wgPeerService;
 
-    @Getter
     WireRestMetrics metrics = new WireRestMetrics();
 
     public MetricsService(IV4SubnetSolver subnetSolver, WgPeerService wgPeerService) {
@@ -36,6 +34,13 @@ public class MetricsService implements IMetricsService{
                 .transferTxTotal(metrics.transferTxTotal.get())
                 .build();
     }
+
+    @Override
+    public WireRestMetrics getMetrics() {
+        updateMetrics();
+        return metrics;
+    }
+
 
     private void updateMetrics() {
         List<WgPeer> peers = wgPeerService.getPeers();
