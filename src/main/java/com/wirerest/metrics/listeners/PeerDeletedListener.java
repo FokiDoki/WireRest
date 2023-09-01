@@ -12,12 +12,12 @@ import org.springframework.stereotype.Component;
 @ConditionalOnProperty(value = "wg.cache.enabled", havingValue = "true")
 public class PeerDeletedListener implements ApplicationListener<PeerDeletedEvent> {
     private final SyncMetricsService metricsService;
-    
+
     @Autowired
     public PeerDeletedListener(SyncMetricsService metricsService) {
         this.metricsService = metricsService;
     }
-    
+
     @Override
     public void onApplicationEvent(PeerDeletedEvent event) {
         WgPeer deletedPeer = event.getPeer();

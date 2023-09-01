@@ -8,8 +8,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+@Getter
 public class NetworkInterfaceData {
-    @Getter
     private final String name;
 
 

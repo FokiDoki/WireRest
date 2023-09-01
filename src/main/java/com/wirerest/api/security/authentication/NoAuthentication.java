@@ -9,6 +9,7 @@ import java.util.Set;
 
 public class NoAuthentication implements Authentication {
     Boolean isAuthenticated = false;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Set.of(new AdminAuthority());

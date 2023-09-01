@@ -14,7 +14,7 @@ import java.util.Set;
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @EqualsAndHashCode(of = "publicKey")
-public class WgPeer implements Comparable<WgPeer>, Cloneable{
+public class WgPeer implements Comparable<WgPeer>, Cloneable {
     private final String publicKey;
     private String presharedKey;
     private String endpoint;

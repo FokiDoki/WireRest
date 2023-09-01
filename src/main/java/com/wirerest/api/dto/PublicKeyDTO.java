@@ -5,10 +5,10 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+@Getter
 @AllArgsConstructor
 public class PublicKeyDTO {
     @Valid
-    @Getter
     @NotNull
     private final RequiredWgKey publicKey;
 

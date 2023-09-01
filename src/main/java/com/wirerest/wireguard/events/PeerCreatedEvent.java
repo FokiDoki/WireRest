@@ -8,6 +8,7 @@ import org.springframework.context.ApplicationEvent;
 public class PeerCreatedEvent extends ApplicationEvent {
 
     private final WgPeer peer;
+
     public PeerCreatedEvent(Object source, WgPeer peer) {
         super(source);
         this.peer = peer;
