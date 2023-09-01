@@ -9,7 +9,7 @@ public class AlreadyUsedExample extends IdentifiedExample{
 
     @Autowired
     public AlreadyUsedExample(SampleAlreadyUsed alreadyUsedSample) {
-        super("alreadyUsed");
+        super("alreadyUsed409");
         summary("Already Used");
         setValue(alreadyUsedSample);
     }
