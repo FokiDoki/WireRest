@@ -4,7 +4,7 @@ import com.wirerest.api.openAPI.examples.samples.exceptions.SampleUnexpectedErro
 import org.springframework.stereotype.Component;
 
 @Component
-public class UnexpectedErrorExample extends IdentifiedExample{
+public class UnexpectedErrorExample extends IdentifiedExample implements DefaultExample{
     public UnexpectedErrorExample() {
         super("UnexpectedError500");
         summary("Unexpected error");
