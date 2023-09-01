@@ -5,8 +5,8 @@ import com.wirerest.api.peer.WgPeerDTO;
 
 import java.util.Set;
 
-public class ExamplePeerDTO extends WgPeerDTO {
-    public ExamplePeerDTO() {
+public class PeerDTOSample extends WgPeerDTO {
+    public PeerDTOSample() {
         super();
         setPublicKey("ALD3x7qWP0W/4zC26jFozxw28vXJsazA33KnHF+AfHw=");
         setPresharedKey("3hFqZXqzO+YkVL4nX2siavxK1Z3h5lRLkEQz1qf3giI=");

@@ -6,8 +6,6 @@ import com.wirerest.shell.CommandExecutionException;
 import com.wirerest.wireguard.ParsingException;
 import com.wirerest.wireguard.peer.PeerAlreadyExistsException;
 import jakarta.validation.ConstraintViolationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -23,7 +21,7 @@ import java.util.NoSuchElementException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
-    Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
 
     @ExceptionHandler
     public ResponseEntity<AppError> catchResourceNotFoundException(ResourceNotFoundException e) {
@@ -32,32 +30,27 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler
     public ResponseEntity<AppError> catchException(Exception e) {
-        logger.error(e.getMessage(), e);
         return getAppErrorResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, e);
     }
 
     @ExceptionHandler
     public ResponseEntity<AppError> catchNoSuchElementException(NoSuchElementException e) {
-        logger.error(e.getMessage(), e);
         return getAppErrorResponseEntity(HttpStatus.NOT_FOUND, e);
     }
 
     @ExceptionHandler
     public ResponseEntity<AppError> catchIllegalArgumentException(IllegalArgumentException e) {
-        logger.error(e.getMessage(), e);
         return getAppErrorResponseEntity(HttpStatus.BAD_REQUEST, e);
     }
 
     @ExceptionHandler
     public ResponseEntity<AppError> catchResponseStatusException(ResponseStatusException e) {
-        logger.info(e.getMessage());
         return getAppErrorResponseEntity(e.getStatusCode(), e);
     }
 
 
     @ExceptionHandler
     public ResponseEntity<AppError> badRequestException(BadRequestException e) {
-        logger.error(e.getMessage(), e);
         return getAppErrorResponseEntity(HttpStatus.BAD_REQUEST, e);
     }
 
@@ -68,7 +61,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler
     public ResponseEntity<AppError> serverWebInputException(ServerWebInputException e) {
-        logger.warn("ServerWebInputException: %s".formatted(e.getCause().getMessage()));
         return getAppErrorResponseEntity(e.getStatusCode(), e.getCause());
     }
 
@@ -79,14 +71,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler
     public ResponseEntity<AppError> webExchangeBindException(WebExchangeBindException e) {
-        logger.debug("Validation error: %s".formatted(e.getMessage()));
         List<String> errors = getValidationErrorStrings(e);
         return getAppErrorResponseEntity(e.getStatusCode(), String.join(", ", errors));
     }
 
     @ExceptionHandler
     public ResponseEntity<AppError> constraintViolationException(ConstraintViolationException e) {
-        logger.debug("Validation error: %s".formatted(e.getMessage()));
         return getAppErrorResponseEntity(HttpStatus.BAD_REQUEST, e);
     }
 
@@ -110,19 +100,16 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler
     public ResponseEntity<AppError> alreadyUsed(AlreadyUsedException e) {
-        logger.error(e.getMessage(), e);
         return getAppErrorResponseEntity(HttpStatus.CONFLICT, e);
     }
 
     @ExceptionHandler
     public ResponseEntity<AppError> commandExecutionException(CommandExecutionException e) {
-        logger.error(e.getMessage(), e);
         return getAppErrorResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, e);
     }
 
     @ExceptionHandler
     public ResponseEntity<AppError> parsingException(ParsingException e) {
-        logger.error(e.getMessage(), e);
         return getAppErrorResponseEntity(HttpStatus.BAD_REQUEST, e);
     }
 }

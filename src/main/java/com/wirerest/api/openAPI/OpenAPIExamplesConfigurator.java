@@ -2,8 +2,9 @@ package com.wirerest.api.openAPI;
 
 import com.wirerest.api.openAPI.examples.IdentifiedExample;
 import io.swagger.v3.oas.models.examples.Example;
-import jakarta.annotation.PostConstruct;
 import org.springdoc.core.customizers.OpenApiCustomizer;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.HashMap;
@@ -12,10 +13,12 @@ import java.util.Map;
 
 @Configuration
 public class OpenAPIExamplesConfigurator {
+
+    @Autowired
     private List<? extends IdentifiedExample> examples;
 
 
-    @PostConstruct
+    @Bean
     public OpenApiCustomizer applyExamples() {
         return openApi -> {
             Map<String, Example> examplesMap = new HashMap<>();
