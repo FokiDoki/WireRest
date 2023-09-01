@@ -40,14 +40,14 @@ DEMO: http://wr-demo.fokidoki.su:8081/swagger-ui
 
 Simple run:
 ```shell
-wget https://github.com/FokiDoki/WireRest/releases/download/0.5-BETTA/wirerest-0.5.jar
-sudo java -jar wirerest-0.5.jar --wg.interface.name=wg0
+wget https://github.com/FokiDoki/WireRest/releases/download/0.5-BETTA/wirerest-0.6.jar
+sudo java -jar wirerest-0.6.jar --wg.interface.name=wg0
 ```
 Replace `wg0` with the name of your Wireguard interface.  Use `sudo wg show` to list all active Wireguard interfaces if you don't know your interface name. 
 
 Syntax:
 ```shell
-sudo java -jar wirerest-0.5.jar --parameter=value --parameter2=value2 ...
+sudo java -jar wirerest-0.6.jar --parameter=value --parameter2=value2 ...
 ```
 The default port is 8081.
 
@@ -68,6 +68,7 @@ All parameters that are set as an example are the default values
 * `--wg.cache.update-interval=60` - Cache update interval (seconds). it is needed to track changes that have occurred bypassing WireRest. 
 A shorter interval can increase CPU usage. Be careful with this parameter.
 * `--logging.api.max-elements=1000` - The maximum number of logs that will be saved for access to them through the API
+
 
 ### Token authentication
 Each request to the API must contain a token. 
@@ -90,6 +91,24 @@ Quick overview:
 
 It's recommended to use caching, but if you want to disable it, set `--wg.cache.enabled=false`
 
+### Monitoring
+
+You can monitoring Wireguard and WIreRest with prometheus.
+
+WireGuard metrics:
+- Number of peers
+- Number of avaliable/total IPs
+- Network TX/RX for all clients in config
+  
+WireRest metrics:
+- WireRest CPU/RAM usage
+- Uptime
+- Endpoints requests
+- RPS 
+- etc.
+
+You also can download grafana dashboard. Guide how to install and dashboard avaliable [here](
+https://grafana.com/grafana/dashboards/19458)
 
 ### How to install Java 20
 
