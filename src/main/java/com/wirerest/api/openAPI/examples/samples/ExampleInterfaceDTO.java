@@ -1,4 +1,4 @@
-package com.wirerest.api.openAPI;
+package com.wirerest.api.openAPI.examples.samples;
 
 import com.wirerest.api.inteface.WgInterfaceDTO;
 

@@ -27,7 +27,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler
     public ResponseEntity<AppError> catchResourceNotFoundException(ResourceNotFoundException e) {
-        logger.error(e.getMessage(), e);
         return getAppErrorResponseEntity(HttpStatus.NOT_FOUND, e);
     }
 
@@ -64,7 +63,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler
     public ResponseEntity<AppError> peerAlreadyExistsException(PeerAlreadyExistsException e) {
-        logger.info(e.getMessage(), e);
         return getAppErrorResponseEntity(HttpStatus.CONFLICT, e);
     }
 
