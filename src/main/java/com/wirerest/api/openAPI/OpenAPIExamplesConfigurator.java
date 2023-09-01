@@ -1,7 +1,14 @@
 package com.wirerest.api.openAPI;
 
+import com.wirerest.api.AppError;
+import com.wirerest.api.openAPI.examples.DefaultIdentifiedExample;
 import com.wirerest.api.openAPI.examples.IdentifiedExample;
 import io.swagger.v3.oas.models.examples.Example;
+import io.swagger.v3.oas.models.media.Content;
+import io.swagger.v3.oas.models.media.MediaType;
+import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.responses.ApiResponse;
+import io.swagger.v3.oas.models.responses.ApiResponses;
 import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -10,12 +17,16 @@ import org.springframework.context.annotation.Configuration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Configuration
 public class OpenAPIExamplesConfigurator {
 
     @Autowired
     private List<? extends IdentifiedExample> examples;
+
+    @Autowired
+    private List<? extends DefaultIdentifiedExample> defaultExamples;
 
 
     @Bean
@@ -27,25 +38,20 @@ public class OpenAPIExamplesConfigurator {
         };
     }
 
-    /*
     @Bean
-    public OpenApiCustomizer openApiDefaultCodes() {
+    public OpenApiCustomizer applyDefaultErrorExamples() {
         return openApi -> {
             Map<String, Schema> schemas = openApi.getComponents().getSchemas();
             openApi.getPaths().values().forEach(pathItem -> pathItem.readOperations().forEach(operation -> {
                 ApiResponses apiResponses = operation.getResponses();
-                addApiResponseNoOverride(apiResponses, "500",
-                        createApiResponse("Server Error",
-                                schemas.get(AppError.class.getSimpleName()),
-                                Map.of("UnexpectedError500", examplesCustomizer.getMap().get("UnexpectedError500"))
-                        )
-                );
-                addApiResponseNoOverride(apiResponses, "403",
-                        createApiResponse("Invalid Token",
-                                schemas.get(AppError.class.getSimpleName()),
-                                Map.of("InvalidToken", examplesCustomizer.getMap().get("InvalidToken"))
-                        )
-                );
+                for (IdentifiedExample identifiedExample: defaultExamples){
+                    AppError error = (AppError) identifiedExample.getValue();
+                    addApiResponseNoOverride(apiResponses, String.valueOf(error.getCode()),
+                            createApiResponse(identifiedExample.getSummary(),
+                                    schemas.get(AppError.class.getSimpleName()),
+                                    Map.of(identifiedExample.getKey(), identifiedExample)
+                            ));
+                }
 
             }));
         };
@@ -83,5 +89,5 @@ public class OpenAPIExamplesConfigurator {
     private void setExamples(ApiResponse apiResponse, Map<String, Example> examples) {
         apiResponse.getContent()
                 .get(org.springframework.http.MediaType.APPLICATION_JSON_VALUE).setExamples(examples);
-    }*/
+    }
 }

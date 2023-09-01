@@ -4,7 +4,7 @@ import com.wirerest.api.security.InvalidTokenAppError;
 import org.springframework.stereotype.Component;
 
 @Component
-public class InvalidTokenExample extends IdentifiedExample implements DefaultExample{
+public class InvalidTokenExample extends DefaultIdentifiedExample{
 
     public InvalidTokenExample() {
         super("InvalidToken");
