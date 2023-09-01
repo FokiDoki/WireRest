@@ -23,6 +23,7 @@ public class OpenApiConfig {
 
     @Value("${wirerest.version}")
     private String wirerestVersion;
+
     @Bean
     public OpenAPI openAPI() {
         return new OpenAPI().addSecurityItem(new SecurityRequirement().

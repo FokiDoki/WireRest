@@ -8,6 +8,7 @@ import org.springframework.context.ApplicationEvent;
 public class PeerDeletedEvent extends ApplicationEvent {
 
     private final WgPeer peer;
+
     public PeerDeletedEvent(Object source, WgPeer peer) {
         super(source);
         this.peer = peer;

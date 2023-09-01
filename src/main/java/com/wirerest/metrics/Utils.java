@@ -21,18 +21,20 @@ public class Utils {
     public static class Transfer {
         private final long tx;
         private final long rx;
-        public static class Builder{
+
+        public static class Builder {
             private long tx = 0;
             private long rx = 0;
 
-            public void addTx(long tx){
+            public void addTx(long tx) {
                 this.tx += tx;
             }
 
-            public void addRx(long rx){
+            public void addRx(long rx) {
                 this.rx += rx;
             }
-            public Transfer build(){
+
+            public Transfer build() {
                 return new Transfer(tx, rx);
             }
         }

@@ -25,14 +25,14 @@ public class MetricsToActuatorExporter {
         this.metricsService = metricsService;
         this.metrics = metricsService.getMetrics();
         buildMetrics(registry);
-        if (metricsService instanceof MetricsService){
+        if (metricsService instanceof MetricsService) {
             ScheduledExecutorService metricsUpdateScheduler = Executors.newSingleThreadScheduledExecutor();
             metricsUpdateScheduler.scheduleAtFixedRate(this::triggerUpdateMetrics,
                     0, 1, java.util.concurrent.TimeUnit.SECONDS);
         }
     }
 
-    private void triggerUpdateMetrics(){
+    private void triggerUpdateMetrics() {
         ((MetricsService) metricsService).updateMetrics();
     }
 

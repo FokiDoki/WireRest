@@ -14,7 +14,7 @@ import java.util.List;
 @Getter
 @Component
 @ConditionalOnProperty(value = "wg.cache.enabled", havingValue = "true")
-public class SyncMetricsService implements IMetricsService{
+public class SyncMetricsService implements IMetricsService {
 
     public final WireRestMetrics metrics = new WireRestMetrics();
 

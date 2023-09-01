@@ -8,6 +8,7 @@ import org.springframework.context.ApplicationEvent;
 public class SyncTransferUpdatedEvent extends ApplicationEvent {
 
     private final Transfer transfer;
+
     public SyncTransferUpdatedEvent(Object source, Transfer transfer) {
         super(source);
         this.transfer = transfer;

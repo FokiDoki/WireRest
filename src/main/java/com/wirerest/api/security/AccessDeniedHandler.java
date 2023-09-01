@@ -13,11 +13,13 @@ public class AccessDeniedHandler implements ServerAccessDeniedHandler {
 
     private final AppError error = new InvalidTokenAppError();
     private final byte[] errorJson;
+
     @SneakyThrows
     public AccessDeniedHandler() {
         ObjectMapper jsonMapper = new JsonMapper();
         errorJson = jsonMapper.writeValueAsBytes(error);
     }
+
     @Override
     public Mono<Void> handle(ServerWebExchange exchange, AccessDeniedException ex) {
 

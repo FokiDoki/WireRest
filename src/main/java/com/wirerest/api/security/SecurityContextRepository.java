@@ -19,7 +19,7 @@ public class SecurityContextRepository implements ServerSecurityContextRepositor
     TokenRepository tokenRepository;
 
     @Autowired
-    public SecurityContextRepository(TokenRepository tokenRepository){
+    public SecurityContextRepository(TokenRepository tokenRepository) {
         this.tokenRepository = tokenRepository;
     }
 
@@ -48,22 +48,22 @@ public class SecurityContextRepository implements ServerSecurityContextRepositor
         return Mono.just(new SecurityContextImpl(authentication));
     }
 
-    private String getTokenFromRequest(ServerWebExchange exchange){
+    private String getTokenFromRequest(ServerWebExchange exchange) {
         Object tokenObj = exchange.getRequest().getQueryParams().get("token");
         if (tokenObj == null) {
             return "";
         }
         String token = String.valueOf(tokenObj);
-        token = token.substring(1, token.length()-1);
+        token = token.substring(1, token.length() - 1);
         return token;
     }
 
-    private String getTokenFromAuthorizationHeader(ServerWebExchange exchange){
+    private String getTokenFromAuthorizationHeader(ServerWebExchange exchange) {
         String token = String.valueOf(exchange.getRequest().getHeaders().get("Authorization"));
         if (token == null || token.length() < 9) {
             return "";
         }
-        token = token.substring(8, token.length()-1);
+        token = token.substring(8, token.length() - 1);
         return token;
     }
 }

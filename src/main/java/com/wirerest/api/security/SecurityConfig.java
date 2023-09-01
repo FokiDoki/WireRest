@@ -23,8 +23,6 @@ public class SecurityConfig {
     private SecurityContextRepository securityContextRepository;
 
 
-
-
     @Order
     @Bean
     SecurityWebFilterChain apiHttpSecurity(ServerHttpSecurity http) {
@@ -38,7 +36,7 @@ public class SecurityConfig {
                 .authorizeExchange((exchanges) -> exchanges
                         .anyExchange().authenticated()
                 ).exceptionHandling()
-                    .accessDeniedHandler(new AccessDeniedHandler());
+                .accessDeniedHandler(new AccessDeniedHandler());
         return http.build();
     }
 
@@ -47,12 +45,12 @@ public class SecurityConfig {
     SecurityWebFilterChain swaggerSecurity(ServerHttpSecurity http) {
         http
                 .securityMatcher(new OrServerWebExchangeMatcher(
-                        List.of(new PathPatternParserServerWebExchangeMatcher("/webjars/swagger-ui/**"),
-                                new PathPatternParserServerWebExchangeMatcher("/swagger-ui"),
-                                new PathPatternParserServerWebExchangeMatcher("/v3/api-docs/swagger-config"),
-                                new PathPatternParserServerWebExchangeMatcher("/v3/api-docs")
+                                List.of(new PathPatternParserServerWebExchangeMatcher("/webjars/swagger-ui/**"),
+                                        new PathPatternParserServerWebExchangeMatcher("/swagger-ui"),
+                                        new PathPatternParserServerWebExchangeMatcher("/v3/api-docs/swagger-config"),
+                                        new PathPatternParserServerWebExchangeMatcher("/v3/api-docs")
+                                )
                         )
-                    )
                 ).authorizeExchange((exchanges) -> exchanges.anyExchange().permitAll());
         return http.build();
     }

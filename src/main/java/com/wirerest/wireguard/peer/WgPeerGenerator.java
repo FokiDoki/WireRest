@@ -1,8 +1,8 @@
 package com.wirerest.wireguard.peer;
 
 import com.wirerest.network.ISubnet;
-import com.wirerest.wireguard.peer.requests.PeerCreationRequest;
 import com.wirerest.wireguard.WgTool;
+import com.wirerest.wireguard.peer.requests.PeerCreationRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

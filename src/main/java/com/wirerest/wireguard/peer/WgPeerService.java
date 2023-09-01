@@ -39,7 +39,6 @@ public class WgPeerService {
     private final BlockingByHashAsyncExecutor<WgPeer> blockingByHashAsyncExecutor = new BlockingByHashAsyncExecutor<>();
 
 
-
     @Autowired
     public WgPeerService(WgPeerGenerator peerGenerator, RepositoryPageable<WgPeer> wgPeerRepository,
                          SubnetService subnetService) {

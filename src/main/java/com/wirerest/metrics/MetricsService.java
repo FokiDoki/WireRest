@@ -12,7 +12,7 @@ import java.util.List;
 
 @Component
 @ConditionalOnProperty(value = "wg.cache.enabled", havingValue = "false")
-public class MetricsService implements IMetricsService{
+public class MetricsService implements IMetricsService {
 
     IV4SubnetSolver subnetSolver;
     WgPeerService wgPeerService;

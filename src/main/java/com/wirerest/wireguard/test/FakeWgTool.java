@@ -10,7 +10,10 @@ import lombok.SneakyThrows;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.Base64;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Profile("dev")
@@ -21,6 +24,7 @@ public class FakeWgTool extends WgTool {
     private final Base64.Encoder base64Encoder = Base64.getEncoder();
     private int keyCounter;
     Random random = new Random();
+
     public FakeWgTool() {
         super(1);
         wgInterface = new WgInterface(generatePrivateKey(), genPubKey(), 16666, 0);
@@ -54,9 +58,9 @@ public class FakeWgTool extends WgTool {
         for (int i = 0; i < 100; i++) {
             WgPeer peer = peers.values().stream().skip(random.nextInt(peers.size())).findFirst().get();
             if (random.nextBoolean()) {
-                peer = WgPeer.from(peer).transferRx(peer.getTransferRx()+random.nextInt(10000000)).build();
+                peer = WgPeer.from(peer).transferRx(peer.getTransferRx() + random.nextInt(10000000)).build();
             } else {
-                peer = WgPeer.from(peer).transferTx(peer.getTransferTx()+random.nextInt(2400000)).build();
+                peer = WgPeer.from(peer).transferTx(peer.getTransferTx() + random.nextInt(2400000)).build();
             }
             peers.put(peer.getPublicKey(), peer);
         }
