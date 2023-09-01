@@ -1,8 +1,7 @@
-package com.wirerest.stats;
+package com.wirerest.metrics;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import java.time.Instant;
 

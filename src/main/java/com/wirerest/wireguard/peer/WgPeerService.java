@@ -1,11 +1,14 @@
 package com.wirerest.wireguard.peer;
+
 import com.wirerest.network.ISubnet;
-import com.wirerest.wireguard.*;
-import com.wirerest.wireguard.peer.spec.FindByPublicKey;
+import com.wirerest.wireguard.ParsingException;
+import com.wirerest.wireguard.RepositoryPageable;
+import com.wirerest.wireguard.SubnetService;
 import com.wirerest.wireguard.peer.requests.EmptyPeerCreationRequest;
 import com.wirerest.wireguard.peer.requests.IpAllocationRequest;
 import com.wirerest.wireguard.peer.requests.PeerCreationRequest;
 import com.wirerest.wireguard.peer.requests.PeerUpdateRequest;
+import com.wirerest.wireguard.peer.spec.FindByPublicKey;
 import com.wirerest.wireguard.tools.BlockingByHashAsyncExecutor;
 import lombok.SneakyThrows;
 import org.slf4j.Logger;
@@ -76,6 +79,7 @@ public class WgPeerService {
 
         CreatedPeer createdPeer = peerGenerator.createPeerGenerateNulls(peerCreationRequest);
         wgPeerRepository.add(createdPeerToWgPeer(createdPeer));
+
         return createdPeer;
     }
 
@@ -103,7 +107,7 @@ public class WgPeerService {
     }
 
     private WgPeer updatePeerTask(PeerUpdateRequest updateRequest) {
-        WgPeer oldPeer = getPeerByPublicKeyOrThrow(updateRequest.getCurrentPublicKey());
+        WgPeer oldPeer = getPeerByPublicKeyOrThrow(updateRequest.getCurrentPublicKey()).clone();
         if (isUpdateRequestHasNewPublicKey(updateRequest)) throwIfPeerExists(updateRequest.getNewPublicKey());
         WgPeer.Builder newPeerBuilder = WgPeer.from(oldPeer);
         newPeerBuilder.publicKey(

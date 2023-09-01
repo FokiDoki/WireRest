@@ -10,7 +10,7 @@
     </parent>
     <groupId>wireguard</groupId>
     <artifactId>wirerest</artifactId>
-    <version>0.5</version>
+    <version>0.6</version>
     <name>WireRest</name>
     <description>WireRest - REST api for Wireguard</description>
     <properties>
@@ -39,6 +39,15 @@
             <groupId>com.github.ben-manes.caffeine</groupId>
             <artifactId>caffeine</artifactId>
             <version>3.1.5</version>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

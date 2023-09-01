@@ -1,7 +1,7 @@
 package com.wirerest.api.service;
 
 import com.wirerest.api.converters.StatsSnapshotToDtoConverter;
-import com.wirerest.stats.StatsService;
+import com.wirerest.metrics.IMetricsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -18,11 +18,11 @@ import org.springframework.web.bind.annotation.RestController;
 @Validated
 public class StatsController {
 
-    StatsService statsService;
+    IMetricsService metricsService;
     StatsSnapshotToDtoConverter statsSnapshotToDtoConverter = new StatsSnapshotToDtoConverter();
     @Autowired
-    public StatsController(StatsService statsService) {
-        this.statsService = statsService;
+    public StatsController(IMetricsService metricsService) {
+        this.metricsService = metricsService;
     }
 
     @Operation(summary = "Get application statistics",
@@ -51,7 +51,7 @@ public class StatsController {
             })
     @GetMapping("/v1/service/stats")
     public StatsSnapshotDto getStats() {
-        return statsSnapshotToDtoConverter.convert(statsService.snapshot());
+        return statsSnapshotToDtoConverter.convert(metricsService.snapshot());
     }
 
 

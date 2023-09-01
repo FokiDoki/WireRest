@@ -17,7 +17,6 @@ public class AccessDeniedHandler implements ServerAccessDeniedHandler {
     public AccessDeniedHandler() {
         ObjectMapper jsonMapper = new JsonMapper();
         errorJson = jsonMapper.writeValueAsBytes(error);
-        System.out.println("Created Json Error ");
     }
     @Override
     public Mono<Void> handle(ServerWebExchange exchange, AccessDeniedException ex) {

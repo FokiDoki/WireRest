@@ -8,6 +8,7 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -19,6 +20,9 @@ public class OpenApiConfig {
                 .scheme("Bearer")
                 .in(SecurityScheme.In.QUERY);
     }
+
+    @Value("${wirerest.version}")
+    private String wirerestVersion;
     @Bean
     public OpenAPI openAPI() {
         return new OpenAPI().addSecurityItem(new SecurityRequirement().
@@ -28,7 +32,7 @@ public class OpenApiConfig {
                 .info(new Info().title("WireRest")
                         .description("WireRest is a powerful, restful stateless API for Wireguard.\n" +
                                 "Default token is 'admin'")
-                        .version("0.5").contact(new Contact().name("FokiDoki - GitHub")
+                        .version(wirerestVersion).contact(new Contact().name("FokiDoki - GitHub")
                                 .url("https://github.com/FokiDoki/WireRest"))
                         .license(new License().name("License")
                                 .url("https://github.com/FokiDoki/WireRest/blob/master/LICENSE")));
