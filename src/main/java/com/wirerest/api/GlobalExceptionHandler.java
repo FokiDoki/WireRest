@@ -5,7 +5,6 @@ import com.wirerest.network.AlreadyUsedException;
 import com.wirerest.shell.CommandExecutionException;
 import com.wirerest.wireguard.ParsingException;
 import com.wirerest.wireguard.peer.PeerAlreadyExistsException;
-import com.wirerest.wireguard.peer.PeerNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,12 +27,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler
     public ResponseEntity<AppError> catchResourceNotFoundException(ResourceNotFoundException e) {
-        logger.error(e.getMessage(), e);
-        return getAppErrorResponseEntity(HttpStatus.NOT_FOUND, e);
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<AppError> catchPeerNotFoundException(PeerNotFoundException e) {
         logger.error(e.getMessage(), e);
         return getAppErrorResponseEntity(HttpStatus.NOT_FOUND, e);
     }

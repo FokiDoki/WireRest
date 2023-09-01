@@ -1,10 +1,7 @@
 package com.wirerest.api.openAPI;
 
 import com.wirerest.api.AppError;
-import com.wirerest.api.dto.PageDTO;
 import com.wirerest.api.inteface.WgInterfaceDTO;
-import com.wirerest.api.peer.CreatedPeerDTO;
-import com.wirerest.api.peer.WgPeerDTO;
 import com.wirerest.api.security.InvalidTokenAppError;
 import com.wirerest.api.service.StatsSnapshotDto;
 import com.wirerest.logs.LoggingEventDto;
@@ -24,7 +21,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 @Configuration
 public class OpenAPIExamplesConfigurator {
@@ -33,29 +33,6 @@ public class OpenAPIExamplesConfigurator {
     @Autowired
     public OpenAPIExamplesConfigurator(ExamplesCustomizer examplesCustomizer) {
         this.examplesCustomizer = examplesCustomizer;
-    }
-
-    private WgPeerDTO constructPeerWithAllFields() {
-        WgPeerDTO peer = new WgPeerDTO();
-        peer.setPublicKey("ALD3x7qWP0W/4zC26jFozxw28vXJsazA33KnHF+AfHw=");
-        peer.setPresharedKey("3hFqZXqzO+YkVL4nX2siavxK1Z3h5lRLkEQz1qf3giI=");
-        peer.setEndpoint("123.23.2.3:55412");
-        peer.setAllowedSubnets(Set.of("2002:0:0:1234::/64", "10.1.142.196/32"));
-        peer.setLatestHandshake(1690200786);
-        peer.setTransferRx(12345);
-        peer.setTransferTx(54321);
-        peer.setPersistentKeepalive(25);
-        return peer;
-    }
-
-    private CreatedPeerDTO createdPeerDTO() {
-        return new CreatedPeerDTO(
-                "AhM4WLR7ETzLYDQ0zEq/0pvbYAxsbLwzzlIAdWhR7yg=",
-                "q2MpyyqfAarG+zoVztTJk9ykQCVmOdBePtcmwZEc2iY=",
-                "+EWn9NeR2pVuFHihYMC6LKreccd5VIW4prUkzHLy0nw=",
-                Set.of("10.1.21.235/32"),
-                0
-        );
     }
 
     private WgInterfaceDTO getInterfaceDTO() {
@@ -172,14 +149,12 @@ public class OpenAPIExamplesConfigurator {
 
     @PostConstruct
     public void pageWithPeers() {
-        addObject("PageWithPeers", "Page with limit 1",
-                new PageDTO<>(100, 0, List.of(constructPeerWithAllFields()))
-        );
+        addObject("PageWithPeers", "Page with limit 1", new ExamplePageWithOnePeer());
     }
 
     @PostConstruct
     public void peer() {
-        addObject("peer", "Peer", constructPeerWithAllFields());
+        addObject("peer", "Peer", new ExamplePeerDTO());
     }
 
     @PostConstruct
@@ -190,7 +165,7 @@ public class OpenAPIExamplesConfigurator {
 
     @PostConstruct
     public void peerCreated() {
-        addObject("createdPeer", "Created peer", createdPeerDTO());
+        addObject("createdPeer", "Created peer", new ExampleCreatedPeerDTO());
     }
 
     @PostConstruct
