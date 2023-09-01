@@ -2,7 +2,6 @@ package com.wirerest.api.service;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.springframework.web.bind.annotation.GetMapping;
 
 @AllArgsConstructor
 @Data

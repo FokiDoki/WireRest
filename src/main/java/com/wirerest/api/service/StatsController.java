@@ -20,6 +20,7 @@ public class StatsController {
 
     IMetricsService metricsService;
     StatsSnapshotToDtoConverter statsSnapshotToDtoConverter = new StatsSnapshotToDtoConverter();
+
     @Autowired
     public StatsController(IMetricsService metricsService) {
         this.metricsService = metricsService;
@@ -30,13 +31,13 @@ public class StatsController {
                     Timestamp - Unix milliseconds timestamp of the stats snapshot
                                         
                     peers - number of peers in the interface
-                    
+                                        
                     totalV4Ips - number of IPv4 addresses (/32) in the interface
-                    
+                                        
                     freeV4Ips - number of addresses (/32) that are not in use
-                    
+                                        
                     transferTx - total transmitted bytes for all peers
-                    
+                                        
                     transferRx - total received bytes for all peers""",
             tags = {"Service"},
             security = @SecurityRequirement(name = "Token"),

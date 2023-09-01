@@ -17,14 +17,14 @@ public class PeerUpdatedListener implements ApplicationListener<PeerUpdatedEvent
     public PeerUpdatedListener(SyncMetricsService metricsService) {
         this.metricsService = metricsService;
     }
-    
+
     @Override
     public void onApplicationEvent(PeerUpdatedEvent event) {
         WgPeer oldPeer = event.getOldPeer();
         WgPeer newPeer = event.getNewPeer();
         metricsService.metrics.freeV4Ips.add(
-                newPeer.getAllowedSubnets().getIPv4Subnets().size()-
-                oldPeer.getAllowedSubnets().getIPv4Subnets().size()
+                newPeer.getAllowedSubnets().getIPv4Subnets().size() -
+                        oldPeer.getAllowedSubnets().getIPv4Subnets().size()
         );
 
     }

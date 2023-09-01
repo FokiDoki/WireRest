@@ -27,7 +27,7 @@ public class QueuedSubnetSolver implements IV4SubnetSolver {
         try {
             return subnetFuture.get();
         } catch (ExecutionException e) {
-            throw e.getCause();    
+            throw e.getCause();
         }
     }
 

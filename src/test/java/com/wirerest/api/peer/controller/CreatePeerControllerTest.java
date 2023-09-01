@@ -2,7 +2,7 @@ package com.wirerest.api.peer.controller;
 
 import com.wirerest.api.peer.CreatedPeerDTO;
 import com.wirerest.api.peer.testData;
-import com.wirerest.network.NoFreeIpException;
+import com.wirerest.network.NoFreeIpInRange;
 import com.wirerest.network.Subnet;
 import com.wirerest.wireguard.peer.CreatedPeer;
 import com.wirerest.wireguard.peer.WgPeerService;
@@ -75,7 +75,7 @@ class CreatePeerControllerTest {
 
     @Test
     void createPeerWhenNoFreeIps() {
-        Mockito.when(wgPeerService.createPeerGenerateNulls(Mockito.any())).thenThrow(new NoFreeIpException("No free ip"));
+        Mockito.when(wgPeerService.createPeerGenerateNulls(Mockito.any())).thenThrow(new NoFreeIpInRange("1","1"));
         webClient.post().uri(BASE_URL).exchange()
                 .expectStatus().is5xxServerError()
                 .expectBody()

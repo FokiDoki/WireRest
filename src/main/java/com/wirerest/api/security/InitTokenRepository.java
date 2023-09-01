@@ -12,7 +12,7 @@ public class InitTokenRepository implements TokenRepository {
     private final Token INIT_TOKEN;
 
 
-    public InitTokenRepository(@Value("${security.token}") String InitToken){
+    public InitTokenRepository(@Value("${security.token}") String InitToken) {
         INIT_TOKEN = new Token(InitToken);
     }
 

@@ -16,7 +16,7 @@ public class TransferUpdateListener implements ApplicationListener<SyncTransferU
     public TransferUpdateListener(SyncMetricsService metricsService) {
         this.metricsService = metricsService;
     }
-    
+
     @Override
     public void onApplicationEvent(SyncTransferUpdatedEvent event) {
         metricsService.metrics.transferTxTotal.set(event.getTransfer().getTx());

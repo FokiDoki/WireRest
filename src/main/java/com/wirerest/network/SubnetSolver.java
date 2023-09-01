@@ -44,7 +44,7 @@ public class SubnetSolver implements IV4SubnetSolver {
             logger.debug("Obtained free subnet " + requestedSubnet + " from range " + subnetAndRange.getRight());
             return requestedSubnet;
         } else {
-            throw new NoFreeIpException("Cannot find free subnet with mask " + mask);
+            throw new NoFreeIpWithThatMask(mask);
         }
     }
 
@@ -79,7 +79,7 @@ public class SubnetSolver implements IV4SubnetSolver {
                     .formatted(subnet, totalAvailableRange.getLeastString(), totalAvailableRange.getBiggestString()));
         }
         if (getAvailableIpsCount() == 0L) {
-            throw new NoFreeIpException("The range %s has no free ip that can be assigned".formatted(totalAvailableRange.toString()));
+            throw new NoFreeIpInRange(totalAvailableRange);
         }
 
         int firstGreater = findFirstGreater(firstAddress);

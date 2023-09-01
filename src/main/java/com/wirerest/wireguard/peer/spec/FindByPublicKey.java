@@ -5,10 +5,10 @@ import com.wirerest.wireguard.peer.WgPeer;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
+@Getter
 @EqualsAndHashCode
 public class FindByPublicKey implements Specification<WgPeer> {
 
-    @Getter
     private final String publicKey;
 
     public FindByPublicKey(String publicKey) {
