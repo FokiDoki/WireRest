@@ -108,7 +108,7 @@ WireRest metrics:
 - etc.
 
 You also can download grafana dashboard. Guide how to install and dashboard avaliable [here](
-https://grafana.com/grafana/dashboards/19458)
+https://grafana.com/grafana/dashboards/19458) or [here](https://github.com/FokiDoki/WireRest/blob/master/grafana/grafana_guide.md)
 
 ### How to install Java 20
 
