@@ -35,8 +35,10 @@ public class OpenAPIExamplesConfigurator {
             Map<String, Example> examplesMap = new HashMap<>();
             examples.forEach(example -> examplesMap.put(example.getKey(), example));
             openApi.getComponents().setExamples(examplesMap);
+
         };
     }
+
 
     @Bean
     public OpenApiCustomizer applyDefaultErrorExamples() {

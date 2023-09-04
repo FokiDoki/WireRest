@@ -2,6 +2,7 @@ package com.wirerest.api.peer.controller;
 
 import com.wirerest.api.AppError;
 import com.wirerest.api.converters.PeerCreationRequestFromDTOConverter;
+import com.wirerest.api.openAPI.schemas.samples.PeerCreationRequestSchema;
 import com.wirerest.api.peer.CreatedPeerDTO;
 import com.wirerest.api.peer.PeerCreationRequestDTO;
 import com.wirerest.wireguard.peer.CreatedPeer;
@@ -19,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -38,8 +40,16 @@ public class CreatePeerController {
     }
 
     @Operation(summary = "Create peer",
-            description = "Create peer. Data that is not provided will be generated automatically (Even the ip address!)." +
-                    "Generation of some fields (For example, Preshared key) can be disabled by sending an empty value.",
+            description = """ 
+                    Create peer. Data that is not provided will be generated automatically (Even the ip address!).
+                    Generation of some fields (For example, Preshared key) can be disabled by sending an empty value.
+                    Available parameters:
+                    - publicKey - Public key of the peer (Will be generated if not provided)
+                    - presharedKey - Preshared key or empty if no psk required (Will be generated if not provided)
+                    - privateKey - Private key of the peer (Will be generated if not provided)
+                    - allowedIps - Ip of new peer in wireguard network interface, or empty if no address is required (Will be generated if not provided). Example: 10.0.0.11/32
+                    - persistentKeepalive - Persistent keepalive interval in seconds (0 is default)
+                    """,
             tags = {"Peers"},
             security = @SecurityRequirement(name = "Token"),
             responses = {
@@ -84,16 +94,9 @@ public class CreatePeerController {
             }
     )
     @PostMapping
-    @Parameter(name = "publicKey", description = "Public key of the peer (Will be generated if not provided)")
-    @Parameter(name = "presharedKey", description = "Preshared key or empty if no psk required (Will be generated if not provided)", allowEmptyValue = true)
-    @Parameter(name = "privateKey", description = "Private key of the peer " +
-            "(Will be generated if not provided. " +
-            "If provided public key, empty string will be returned)")
-    @Parameter(name = "allowedIps", description = "Ip of new peer in wireguard network interface, or empty if no" +
-            " address is required (Will be generated if not provided). Example: 10.0.0.11/32", array = @ArraySchema(arraySchema = @Schema(implementation = String.class), uniqueItems = true), allowEmptyValue = true)
-    @Parameter(name = "persistentKeepalive", description = "Persistent keepalive interval in seconds (0 if not provided)", schema = @Schema(implementation = Integer.class, defaultValue = "0", example = "0", minimum = "0", maximum = "65535"))
-    @Parameter(name = "peerCreationRequestDTO", hidden = true)
-    public ResponseEntity<CreatedPeerDTO> createPeer(
+    public ResponseEntity<CreatedPeerDTO> createPeer(@RequestBody(required = false)
+                                                         @Parameter(description = "Peer creation request", schema = @Schema(implementation = PeerCreationRequestSchema.class,
+                                                                 ref = "#/components/schemas/PeerCreationRequestExample") )
             @Valid PeerCreationRequestDTO peerCreationRequestDTO
     ) {
         CreatedPeer createdPeer = wgPeerService.createPeerGenerateNulls(

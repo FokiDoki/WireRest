@@ -6,6 +6,8 @@ import com.wirerest.shell.CommandExecutionException;
 import com.wirerest.wireguard.ParsingException;
 import com.wirerest.wireguard.peer.PeerAlreadyExistsException;
 import jakarta.validation.ConstraintViolationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -22,6 +24,7 @@ import java.util.NoSuchElementException;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    private final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler
     public ResponseEntity<AppError> catchResourceNotFoundException(ResourceNotFoundException e) {
@@ -30,6 +33,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler
     public ResponseEntity<AppError> catchException(Exception e) {
+        logger.error("Unhandled exception", e);
         return getAppErrorResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, e);
     }
 
