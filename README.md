@@ -76,7 +76,7 @@ The token is set in the `--security.token` parameter.
 If you want to disable token authentication, set it to empty.
 
 Token can be passed in two ways:
-1. As a query parameter like `/v1/peers?token=TOKEN` (For POST requests, the token must be passed in the body)
+1. As a query parameter like `/v1/peers?token=TOKEN`
 2. As a header (basic access authentication): `Authorization: Basic TOKEN`
 
 
