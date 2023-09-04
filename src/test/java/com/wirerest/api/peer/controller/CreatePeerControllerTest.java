@@ -1,5 +1,6 @@
 package com.wirerest.api.peer.controller;
 
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.wirerest.api.peer.CreatedPeerDTO;
 import com.wirerest.api.peer.testData;
 import com.wirerest.network.NoFreeIpInRange;
@@ -8,14 +9,17 @@ import com.wirerest.wireguard.peer.CreatedPeer;
 import com.wirerest.wireguard.peer.WgPeerService;
 import com.wirerest.wireguard.peer.requests.IpAllocationRequestOneIfNullSubnets;
 import com.wirerest.wireguard.peer.requests.PeerCreationRequest;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.reactive.ReactiveSecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import java.util.Map;
 import java.util.Set;
 
 import static org.hamcrest.Matchers.containsString;
@@ -46,14 +50,22 @@ class CreatePeerControllerTest {
                 .isEqualTo(CreatedPeerDTO.from(newPeer));
     }
 
+    @SneakyThrows
     @Test
     void createPeerWithParams() {
+        JsonMapper jsonMapper = new JsonMapper();
         CreatedPeer newPeer = new CreatedPeer(
                 testData.getFakePubKey(),
                 testData.getFakePubKey(),
                 testData.getFakePubKey(),
                 Set.of(Subnet.valueOf("10.0.0.10/32")),
                 25);
+        Map<String, Object> request = Map.of(
+                "publicKey", newPeer.getPublicKey(),
+                "presharedKey", newPeer.getPresharedKey(),
+                "privateKey", newPeer.getPrivateKey(),
+                "allowedIps", newPeer.getAllowedSubnets().stream().map(Object::toString).toArray(),
+                "persistentKeepalive", newPeer.getPersistentKeepalive());
         Mockito.when(wgPeerService.createPeerGenerateNulls(new PeerCreationRequest(newPeer.getPublicKey(),
                 newPeer.getPresharedKey(),
                 newPeer.getPrivateKey(),
@@ -61,12 +73,9 @@ class CreatePeerControllerTest {
                 25))).thenReturn(newPeer);
         webClient.post().uri(uriBuilder -> uriBuilder
                         .path(BASE_URL)
-                        .queryParam("publicKey", newPeer.getPublicKey())
-                        .queryParam("presharedKey", newPeer.getPresharedKey())
-                        .queryParam("privateKey", newPeer.getPrivateKey())
-                        .queryParam("allowedIps", newPeer.getAllowedSubnets())
-                        .queryParam("persistentKeepalive", 25)
                         .build())
+                .bodyValue(request)
+                .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody(CreatedPeerDTO.class)

@@ -13,9 +13,7 @@ public class SampleNoFreeIpInRange extends AppError {
     public SampleNoFreeIpInRange(GlobalExceptionHandler exceptionHandler) {
         super();
         NoFreeIpInRange noFreeIpInRange = new NoFreeIpInRange("10.0.0.0", "10.0.0.255");
-        AppError notFoundError = exceptionHandler.catchException(
-                noFreeIpInRange
-        ).getBody();
+        AppError notFoundError = new AppError(500, noFreeIpInRange.getMessage());
         setCode(notFoundError.getCode());
         setMessage(notFoundError.getMessage());
     }
