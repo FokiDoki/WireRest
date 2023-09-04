@@ -1,3 +1,5 @@
+
+
 This is a dashboard that will allow you to view:
 - Number of peers
 - How many peers are created in a period of time
@@ -26,8 +28,7 @@ Do not forget create file with access token or disable it. Default token is "adm
 You can check the availability of WireRest as follows:
 `curl http://127.0.0.1:8081/actuator/prometheus?token=<YOUR_TOKEN>`
 
-3. Install dashboard 
-
+3. Install dashboard ([Download dashboard json](https://raw.githubusercontent.com/FokiDoki/WireRest/master/grafana/grafana_dashboard.json))
 
 Done!
 
