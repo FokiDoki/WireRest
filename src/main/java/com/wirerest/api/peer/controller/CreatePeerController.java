@@ -4,6 +4,7 @@ import com.wirerest.api.AppError;
 import com.wirerest.api.converters.PeerCreationRequestFromDTOConverter;
 import com.wirerest.api.openAPI.schemas.samples.PeerCreationRequestSchema;
 import com.wirerest.api.peer.CreatedPeerDTO;
+import com.wirerest.api.peer.EmptyPeerCreationRequestDTO;
 import com.wirerest.api.peer.PeerCreationRequestDTO;
 import com.wirerest.wireguard.peer.CreatedPeer;
 import com.wirerest.wireguard.peer.WgPeerService;
@@ -99,6 +100,7 @@ public class CreatePeerController {
                                                                  ref = "#/components/schemas/PeerCreationRequestExample") )
             @Valid PeerCreationRequestDTO peerCreationRequestDTO
     ) {
+        peerCreationRequestDTO = Objects.requireNonNullElse(peerCreationRequestDTO, new EmptyPeerCreationRequestDTO());
         CreatedPeer createdPeer = wgPeerService.createPeerGenerateNulls(
                 Objects.requireNonNull(creationRequestConverter.convert(peerCreationRequestDTO))
         );
