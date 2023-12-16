@@ -5,6 +5,7 @@ import com.wirerest.shell.ShellRunner;
 import com.wirerest.wireguard.parser.WgShowDump;
 import com.wirerest.wireguard.peer.WgPeer;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 
@@ -16,7 +17,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-@EnabledOnOs(OS.LINUX)
+@EnabledIfSystemProperty(named = "integration-tests", matches = "true")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class WgToolIntegrationTests {
     private final static ShellRunner shellRunner = new ShellRunner();

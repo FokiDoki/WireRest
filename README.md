@@ -40,14 +40,14 @@ DEMO: http://wr-demo.fokidoki.su:8081/swagger-ui
 
 Simple run:
 ```shell
-wget https://github.com/FokiDoki/WireRest/releases/download/0.6-BETTA/wirerest-0.6.jar
-sudo java -jar wirerest-0.6.jar --wg.interface.name=wg0
+wget https://github.com/FokiDoki/WireRest/releases/download/0.7-BETTA/wirerest-0.7.jar
+sudo java -jar wirerest-0.7.jar --wg.interface.name=wg0
 ```
 Replace `wg0` with the name of your Wireguard interface.  Use `sudo wg show` to list all active Wireguard interfaces if you don't know your interface name. 
 
 Syntax:
 ```shell
-sudo java -jar wirerest-0.6.jar --parameter=value --parameter2=value2 ...
+sudo java -jar wirerest-0.7.jar --parameter=value --parameter2=value2 ...
 ```
 The default port is 8081.
 
@@ -134,18 +134,6 @@ wget https://download.oracle.com/java/20/latest/jdk-21_linux-aarch64_bin.rpm
 sudo rpm -i jdk-21_linux-aarch64_bin.rpm
 ```
 ---
-#### Add JAVA_HOME to your environment variables (for all systems):
-Open `.bashrc` file
-```shell
-nano ~/.bashrc
-```
-
-Add this lines to the end of the file:
-```shell
-export JAVA_HOME="/usr/lib/jvm/jdk-21/"
-export PATH=$JAVA_HOME/bin:$PATH
-```
-Save and exit the file, then **relogin**
 
 Then check if java is installed:
 ```shell
