@@ -38,6 +38,17 @@ check_package() {
     fi
 }
 
+function ask_yes() {
+    while true; do
+        read -p "$1 (Y/N): " response
+        case $response in
+            [Yy]* ) return 0;;
+            [Nn]* ) return 1;;
+            * ) echo "Please, enter Y(es) or N(no)";;
+        esac
+    done
+}
+
 # Step 3: Check for WireGuard package
 check_package "/usr/bin/wg"
 
@@ -159,23 +170,15 @@ check_directory_for_java_version() {
             prompt_user_for_choice "${sub_directories[@]}"
         fi
     else
-        echo -e "${RED}Directory $dir does not exist.${NC} Looks like Java not found"
-        read -p "Do you want to install Java 21? (Yes/No): " user_response
-
-        # Convert the user response to lowercase for case-insensitive comparison
-        user_response_lower=$(echo -e "$user_response" | tr '[:upper:]' '[:lower:]')
-
+        echo -e "${YELLOW}Directory $dir does not exist.${NC} Looks like Java not found"
         # Check user response
-        if [ "$user_response_lower" == "yes" ]; then
+        if ask_yes "Do you want to install Java 21?"; then
             # Call the install_java_21 function
             install_java_21
             check_directory_for_java_version "${JAVA_DEFAULT_FOLDER}" "$JAVA_TARGET"
-        elif [ "$user_response_lower" == "no" ]; then
-            echo -e "Exiting script. No installation performed"
-            exit 0
         else
-            echo -e "${RED}Invalid response.${NC} Please enter Yes or No"
-            exit 1
+            echo -e "Can't install WireRest without java. Exiting"
+            exit 0
         fi
     fi
 }
@@ -224,21 +227,12 @@ cleanup() {
     rm -rf "${TMP_DIR}"
 }
 
-#!/bin/bash
 
-# Checks have passed, prompting to start the download
-read -e -p 'All checks  passed. Start installing? (Y/N): ' choice
-
-# Convert to uppercase
-choice=$(echo -e "$choice" | tr '[:lower:]' '[:upper:]')
-
-if [ "$choice" == "Y" ]; then
+if ask_yes "All checks passed. Start installing?"; then
     echo -e "Starting the download..."
-    # Add commands for starting the download here
-elif [ "$choice" == "N" ]; then
-    echo -e "Download canceled"
 else
-    echo -e "${RED}Invalid choice.${NC} Please enter ${GREEN}Y${NC} or ${RED}N${NC}"
+    echo -e "Installing canceled. Exiting"
+    exit 0
 fi
 
 # Step 6: Download WireRest files
@@ -292,12 +286,8 @@ SERVICE_NAME="wirerest@$INTERFACE"
 # Check if the service is running
 if systemctl is-active --quiet "$SERVICE_NAME"; then
     # Service is running
-    read -p "The service $SERVICE_NAME is currently running. Are you sure you want to recreate it? (Y/N): " choice
 
-    # Convert to uppercase
-    choice=$(echo "$choice" | tr '[:lower:]' '[:upper:]')
-
-    if [ "$choice" == "Y" ]; then
+    if ask_yes "The service $SERVICE_NAME is currently running. Are you sure you want to recreate it?";  then
         # Stop the service
         systemctl stop "$SERVICE_NAME"
 
@@ -310,13 +300,10 @@ if systemctl is-active --quiet "$SERVICE_NAME"; then
         # Add back to autostart
         systemctl enable "$SERVICE_NAME"
 
-        echo "Service $SERVICE_NAME recreated and added back to autostart ${GREEN}successfully${NC}"
-    elif [ "$choice" == "N" ]; then
+        echo -e "Service $SERVICE_NAME recreated and added back to autostart ${GREEN}successfully${NC}"
+    else
         echo "Recreation canceled. Exiting"
         exit 0
-    else
-        echo "Invalid choice. Please enter Y or N. Exiting"
-        exit 1
     fi
 else
     # Service is not running
