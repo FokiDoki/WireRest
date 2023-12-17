@@ -331,7 +331,7 @@ wait_for_service() {
     echo
 
     if is_service_running; then
-        external_ip=$(curl -s ifconfig.me)
+        external_ip=$(dig @resolver4.opendns.com myip.opendns.com +short -4)
         echo -e "${GREEN}Success!${NC} Service $SERVICE_NAME is running. Now you can visit http://${external_ip}:${WIREREST_PORT}/swagger-ui and see available methods"
     else
         echo -e "${RED}Error: Service $SERVICE_NAME did not start within the expected time.${NC}"
