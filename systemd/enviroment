@@ -1,0 +1,6 @@
+# Additional arguments to pass to the WireRest (See https://github.com/FokiDoki/WireRest#available-run-parameters for more details)
+ARGS=
+# Access token to use for the WireRest (See https://github.com/FokiDoki/WireRest#token-authentication for more details)
+ACCESS_TOKEN=
+# Port to use for the WireRest
+PORT=

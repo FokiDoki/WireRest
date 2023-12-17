@@ -17,7 +17,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-@EnabledIfSystemProperty(named = "integration-tests", matches = "true")
+@EnabledOnOs(OS.LINUX)
+@EnabledIfSystemProperty(named = "integration-tests-enabled", matches = "true")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class WgToolIntegrationTests {
     private final static ShellRunner shellRunner = new ShellRunner();

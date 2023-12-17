@@ -19,7 +19,7 @@ public class BlockingByHashAsyncExecutor<T> {
 
         return executor.submit(() -> {
             Queue<Callable<T>> queue = tasks.get(hash);
-            T taskResult = null;
+            T taskResult;
             synchronized (queue) {
                 Callable<T> tCallable = queue.poll();
                 assert tCallable != null;
