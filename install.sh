@@ -14,7 +14,8 @@ GREEN='\e[32m'
 YELLOW='\e[33m'
 NC='\e[0m' # No Color
 
-
+source /etc/os-release
+OS="${ID}"
 # Step 1: Check if the user is root
 if [ "$(id -u)" -ne 0 ]; then
     echo -e "${RED}Error: Please run the script as root.${NC}"
@@ -319,6 +320,41 @@ is_service_running() {
     fi
 }
 
+get_external_ip() {
+    # Method 1
+    if command -v dig >/dev/null 2>&1; then
+        external_ip=$(dig @resolver4.opendns.com myip.opendns.com +short -4)
+        is_valid_ipv4 "$external_ip" && return
+    else
+        echo "Warning: dig is not installed. " >&2
+    fi
+
+    # Method 2
+    if command -v curl >/dev/null 2>&1; then
+        external_ip=$(curl -s http://whatismyip.akamai.com/)
+        is_valid_ipv4 "$external_ip" && return
+    else
+        echo "Warning: curl is not installed. Can't detect your external ip." >&2
+        return
+    fi
+
+    # Method 3
+    external_ip=$(curl -s http://l2.io/ip/)
+    is_valid_ipv4 "$external_ip" && return
+
+    # Method 4
+    external_ip=$(curl -s http://icanhazip.com)
+    is_valid_ipv4 "$external_ip" && return
+
+    echo "Warning: Unable to determine external IP address." >&2
+}
+
+is_valid_ipv4() {
+    # Check if the given string is a valid IPv4 address
+    local ip=$1
+    [[ $ip =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]
+}
+
 # Function to wait for the service to start
 wait_for_service() {
     retries=0
@@ -330,8 +366,12 @@ wait_for_service() {
     echo
 
     if is_service_running; then
-        external_ip=$(dig @resolver4.opendns.com myip.opendns.com +short -4)
-        echo -e "${GREEN}Success!${NC} Service $SERVICE_NAME is running. Now you can visit http://${external_ip}:${WIREREST_PORT}/swagger-ui and see available methods"
+        get_external_ip
+        if is_valid_ipv4 "$external_ip"; then
+          echo -e "${GREEN}Success!${NC} Service $SERVICE_NAME is running. Now you can visit http://${external_ip}:${WIREREST_PORT}/swagger-ui and see available methods"
+        else
+          echo  -e "${GREEN}Success!${NC} Service $SERVICE_NAME is running. Now you can visit http://YOUR_SERVER_IP_ADDRESS:${WIREREST_PORT}/swagger-ui and see available methods"
+        fi
     else
         echo -e "${RED}Error: Service $SERVICE_NAME did not start within the expected time.${NC}"
         exit 1
