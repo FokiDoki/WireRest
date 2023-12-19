@@ -33,6 +33,25 @@ DEMO: http://wr-demo.fokidoki.su:8081/swagger-ui
 - Get general config (interface) information
 - Token authentication
 
+---
+### Install script
+
+You can use a bash script to install WireRest automatically.
+
+Script tested on 
+- Ubuntu >= 18.04
+- Debian >= 10
+- Fedora 16
+- CentOS 8
+
+Wireguard **should be** installed (You can use [this](https://github.com/angristan/wireguard-install) script to install & configure WG)
+```shell
+wget https://github.com/FokiDoki/WireRest/releases/download/0.7-BETTA/install.sh
+chmod +x install.sh
+./install.sh
+```
+
+
 ### How to run:
 
 ---
