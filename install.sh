@@ -106,33 +106,47 @@ display_numbered_list() {
 
 install_java_21() {
     # Update the package manager
-    sudo apt-get update
-
-    # Download JDK
     echo -e "Downloading JDK.."
-    wget -q https://download.oracle.com/java/21/latest/jdk-21_linux-x64_bin.deb
+    if [[ ${OS} == 'ubuntu' ]] || [[ ${OS} == 'debian' ]]; then
+      wget -q https://download.oracle.com/java/21/latest/jdk-21_linux-x64_bin.deb
+      if [[ ${OS} == 'debian' ]] && [[ ${VERSION_ID} -gt 10 ]]; then
+          if ! grep -rqs "^deb .* buster-backports" /etc/apt/; then
+            echo "deb http://deb.debian.org/debian buster-backports main" >/etc/apt/sources.list.d/backports.list
+            apt-get update
+          fi
+      else
+          apt-get update
+      fi
+      # Install JDK with error handling
+      if sudo dpkg -i jdk-21_linux-x64_bin.deb; then
+          echo -e "JDK installation ${GREEN}successful${NC}"
+      else
+          # If an error occurs during JDK installation, fix broken dependencies
+          echo -e "Error installing JDK. Fixing broken dependencies..."
+          sudo apt --fix-broken install
 
-    # Install JDK with error handling
-    if sudo dpkg -i jdk-21_linux-x64_bin.deb; then
-        echo -e "JDK installation ${GREEN}successful${NC}"
+          # Retry JDK installation
+          echo -e "Retrying JDK installation..."
+          sudo dpkg -i jdk-21_linux-x64_bin.deb
+
+          # Check the success of the installation
+          if [ $? -eq 0 ]; then
+              echo -e "JDK installation ${GREEN}successful${NC} after fixing broken dependencies"
+          else
+              echo -e "${RED}Failed${NC} to install JDK even after fixing broken dependencies. Please check the error messages"
+              exit 1
+          fi
+      fi
+      rm jdk-21_linux-x64_bin.deb
+    elif  [[ ${OS} == 'fedora' ]] || [[ ${OS} == 'centos' ]]; then
+      wget https://download.oracle.com/java/21/latest/jdk-21_linux-x64_bin.rpm
+      sudo rpm -i jdk-21_linux-x64_bin.rpm
     else
-        # If an error occurs during JDK installation, fix broken dependencies
-        echo -e "Error installing JDK. Fixing broken dependencies..."
-        sudo apt --fix-broken install
-
-        # Retry JDK installation
-        echo -e "Retrying JDK installation..."
-        sudo dpkg -i jdk-21_linux-x64_bin.deb
-
-        # Check the success of the installation
-        if [ $? -eq 0 ]; then
-            echo -e "JDK installation ${GREEN}successful${NC} after fixing broken dependencies"
-        else
-            echo -e "${RED}Failed${NC} to install JDK even after fixing broken dependencies. Please check the error messages"
-            exit 1
-        fi
+      echo "Your Linux distribution does not support automatic installation of Java. Please set Java-$JAVA_TARGET and rerun the script"
+      exit 1
     fi
-    rm jdk-21_linux-x64_bin.deb
+
+
 }
 
 # Function to prompt user for the desired directory
