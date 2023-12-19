@@ -12,7 +12,6 @@ HEALTHCHECK_RETRY_INTERVAL_SEC=2
 RED='\e[31m'
 GREEN='\e[32m'
 YELLOW='\e[33m'
-GRAY='\e[37m'
 NC='\e[0m' # No Color
 
 
