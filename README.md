@@ -46,13 +46,14 @@ Script tested on
 
 If your OS is not on this list, you can still try using this script, just [install Java-21](#how-to-install-java-21) before
 
-Wireguard **should be** installed (You can use [this](https://github.com/angristan/wireguard-install) script to install & configure WG)
+Wireguard **must be** installed in advance (You can use [this](https://github.com/angristan/wireguard-install) script to install & configure WG)
 ```shell
 wget https://github.com/FokiDoki/WireRest/releases/download/0.7-BETTA/install.sh
 chmod +x install.sh
 ./install.sh
 ```
 
+If you want to install WireRest for other WireGuard profiles just run this script again. Warning: WireRest and its service will be reinstalled.
 
 ### How to run:
 
@@ -106,7 +107,7 @@ WireRest has built-in caching. It is enabled by default.
 Caching greatly improves performance on large configurations.
 The cache is updated every `--wg.cache.update-interval` seconds (default 60 seconds). \
 Quick overview: 
-* `transferRx`, `transferTxSOAP` and `latestHandshake` fields are updated after every sync
+* `transferRx`, `transferTx` and `latestHandshake` fields are updated after every sync
 * Peer creation, deletion, and update operations work instantly.
 * If you update the wireguard configuration bypassing WireRest, the changes will appear in WireRest during the next sync
 
