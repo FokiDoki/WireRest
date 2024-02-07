@@ -46,13 +46,14 @@ Script tested on
 
 If your OS is not on this list, you can still try using this script, just [install Java-21](#how-to-install-java-21) before
 
-Wireguard **should be** installed (You can use [this](https://github.com/angristan/wireguard-install) script to install & configure WG)
+Wireguard **must be** installed in advance (You can use [this](https://github.com/angristan/wireguard-install) script to install & configure WG)
 ```shell
 wget https://github.com/FokiDoki/WireRest/releases/download/0.7-BETTA/install.sh
 chmod +x install.sh
 ./install.sh
 ```
 
+If you want to install WireRest for other WireGuard profiles just run this script again. Warning: WireRest and its service will be reinstalled.
 
 ### How to run:
 
