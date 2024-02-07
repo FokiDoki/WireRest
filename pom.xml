@@ -10,13 +10,13 @@
     </parent>
     <groupId>wireguard</groupId>
     <artifactId>wirerest</artifactId>
-    <version>0.6</version>
+    <version>0.7</version>
     <name>WireRest</name>
     <description>WireRest - REST api for Wireguard</description>
     <properties>
-        <java.version>20</java.version>
-        <maven.compiler.source>20</maven.compiler.source>
-        <maven.compiler.target>20</maven.compiler.target>
+        <java.version>21</java.version>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
     </properties>
     <dependencies>
         <dependency>
@@ -70,7 +70,7 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <scope>compile</scope>
-            <version>1.18.26</version>
+            <version>1.18.30</version>
             <optional>true</optional>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-security -->
@@ -107,6 +107,29 @@
                     </excludes>
                 </configuration>
             </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.6.0</version>
+                <executions>    
+                    <execution>
+                        <id>tar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>src/assembly/archive.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <outputDirectory>${project.build.directory}/</outputDirectory>
+                </configuration>
+            </plugin>
+
+
 
                 <plugin>
                     <groupId>org.jacoco</groupId>

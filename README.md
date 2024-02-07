@@ -33,21 +33,43 @@ DEMO: http://wr-demo.fokidoki.su:8081/swagger-ui
 - Get general config (interface) information
 - Token authentication
 
+---
+### Install script
+
+You can use a bash script to install WireRest automatically.
+
+Script tested on 
+- Ubuntu >= 18.04
+- Debian >= 10
+- Fedora 16
+- CentOS 8
+
+If your OS is not on this list, you can still try using this script, just [install Java-21](#how-to-install-java-21) before
+
+Wireguard **must be** installed in advance (You can use [this](https://github.com/angristan/wireguard-install) script to install & configure WG)
+```shell
+wget https://github.com/FokiDoki/WireRest/releases/download/0.7-BETTA/install.sh
+chmod +x install.sh
+./install.sh
+```
+
+If you want to install WireRest for other WireGuard profiles just run this script again. Warning: WireRest and its service will be reinstalled.
+
 ### How to run:
 
 ---
-**[!!] Java 20 is required** ([how to install](#how-to-install-java-20))
+**[!!] Java 21 is required** ([how to install](#how-to-install-java-21))
 
 Simple run:
 ```shell
-wget https://github.com/FokiDoki/WireRest/releases/download/0.6-BETTA/wirerest-0.6.jar
-sudo java -jar wirerest-0.6.jar --wg.interface.name=wg0
+wget https://github.com/FokiDoki/WireRest/releases/download/0.7-BETTA/wirerest-0.7.jar
+sudo java -jar wirerest-0.7.jar --wg.interface.name=wg0
 ```
 Replace `wg0` with the name of your Wireguard interface.  Use `sudo wg show` to list all active Wireguard interfaces if you don't know your interface name. 
 
 Syntax:
 ```shell
-sudo java -jar wirerest-0.6.jar --parameter=value --parameter2=value2 ...
+sudo java -jar wirerest-0.7.jar --parameter=value --parameter2=value2 ...
 ```
 The default port is 8081.
 
@@ -110,55 +132,43 @@ WireRest metrics:
 You also can download grafana dashboard. Guide how to install and dashboard avaliable [here](
 https://grafana.com/grafana/dashboards/19458) or [here](https://github.com/FokiDoki/WireRest/blob/master/grafana/grafana_guide.md)
 
-### How to install Java 20
+### How to install Java 21
 
 ---
 
-#### For x64 systems:
+#### For debian (ubuntu) x64 systems:
 ```shell
 sudo apt-get update
-wget https://download.oracle.com/java/20/latest/jdk-20_linux-x64_bin.deb
-sudo dpkg -i jdk-20_linux-x64_bin.deb
+wget https://download.oracle.com/java/21/latest/jdk-21_linux-x64_bin.deb
+sudo dpkg -i jdk-21_linux-x64_bin.deb
 ```
 \
-If you get an error `dpkg: error processing package jdk-20` \
+If you get an error `dpkg: error processing package jdk-21` \
 Run this command:
 ```shell
 apt --fix-broken install
 ```
-And then run dpkg again ```sudo dpkg -i jdk-20_linux-x64_bin.deb```
+And then run dpkg again ```sudo dpkg -i jdk-21_linux-x64_bin.deb```
 
 #### For arm64 systems:
 ```shell
-wget https://download.oracle.com/java/20/latest/jdk-20_linux-aarch64_bin.rpm
-sudo rpm -i jdk-20_linux-aarch64_bin.rpm
+wget https://download.oracle.com/java/20/latest/jdk-21_linux-aarch64_bin.rpm
+sudo rpm -i jdk-21_linux-aarch64_bin.rpm
 ```
-
-#### Add JAVA_HOME to your environment variables (for all systems):
-Open `.bashrc` file
-```shell
-nano ~/.bashrc
-```
-
-Add this lines to the end of the file:
-```shell
-export JAVA_HOME="/usr/lib/jvm/jdk-20/"
-export PATH=$JAVA_HOME/bin:$PATH
-```
-Save and exit the file, then **relogin**
+---
 
 Then check if java is installed:
 ```shell
-java -version
-> java version "20.0.1" 2023-04-18
-> Java(TM) SE Runtime Environment (build 20.0.1+9-29)
-> Java HotSpot(TM) 64-Bit Server VM (build 20.0.1+9-29, mixed mode, sharing)
+java --version
+> openjdk 21 2023-09-19
+> OpenJDK Runtime Environment (build 21+35)
+> OpenJDK 64-Bit Server VM (build 21+35, mixed mode, sharing)
 ```
 
 [Continue installation](#how-to-run)
 
 
-You can find the tar archive with Java 20 [here](https://www.oracle.com/java/technologies/downloads/)
+You can find the Java 21 package for you system [there](https://www.oracle.com/java/technologies/downloads/)
 
 ## Examples:
 
@@ -338,8 +348,3 @@ These are all just examples, more parameters and example responses can be found 
 mvn clean package
 ```
 
-
-### TODO:
-
-
-- Callback API 
