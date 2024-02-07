@@ -107,7 +107,7 @@ WireRest has built-in caching. It is enabled by default.
 Caching greatly improves performance on large configurations.
 The cache is updated every `--wg.cache.update-interval` seconds (default 60 seconds). \
 Quick overview: 
-* `transferRx`, `transferTxSOAP` and `latestHandshake` fields are updated after every sync
+* `transferRx`, `transferTx` and `latestHandshake` fields are updated after every sync
 * Peer creation, deletion, and update operations work instantly.
 * If you update the wireguard configuration bypassing WireRest, the changes will appear in WireRest during the next sync
 
