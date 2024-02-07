@@ -1,13 +1,13 @@
 [Unit]
-Description=Wireguard Controller for %I
+Description=Wireguard Controller for %i
 After=network.target wg-quick.target
 
 [Service]
 Type=simple
 User=root
 
-EnvironmentFile=/etc/default/wirerest-%I
-ExecStart=JAVA_HOME_DIR/bin/java -jar /usr/local/bin/wirerest.jar --security.token=${ACCESS_TOKEN} --server.port=${PORT} --wg.interface.name=%I $ARGS
+EnvironmentFile=/etc/default/wirerest-%i
+ExecStart=JAVA_HOME_DIR/bin/java -jar /usr/local/bin/wirerest.jar --security.token=${ACCESS_TOKEN} --server.port=${PORT} --wg.interface.name=%i $ARGS
 Restart=on-failure
 RestartSec=3
 
