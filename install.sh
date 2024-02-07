@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Step 0: Set variables
-WIREREST_ARCHIVE_URL="https://github.com/FokiDoki/WireRest/releases/download/0.7-BETTA/wirerest-0.7-archive.tar"
+WIREREST_ARCHIVE_URL="https://github.com/FokiDoki/WireRest/releases/download/0.7-BETA/wirerest-0.7-archive.tar"
 JAVA_TARGET="21"
 JAVA_DEFAULT_FOLDER="/usr/lib/jvm"
 DEFAULT_PORT=8081
