@@ -48,7 +48,7 @@ If your OS is not on this list, you can still try using this script, just [insta
 
 Wireguard **must be** installed in advance (You can use [this](https://github.com/angristan/wireguard-install) script to install & configure WG)
 ```shell
-wget https://github.com/FokiDoki/WireRest/releases/download/0.7-BETTA/install.sh
+wget https://github.com/FokiDoki/WireRest/releases/download/0.7-BETA/install.sh
 chmod +x install.sh
 ./install.sh
 ```
@@ -62,7 +62,7 @@ If you want to install WireRest for other WireGuard profiles just run this scrip
 
 Simple run:
 ```shell
-wget https://github.com/FokiDoki/WireRest/releases/download/0.7-BETTA/wirerest-0.7.jar
+wget https://github.com/FokiDoki/WireRest/releases/download/0.7-BETA/wirerest-0.7.jar
 sudo java -jar wirerest-0.7.jar --wg.interface.name=wg0
 ```
 Replace `wg0` with the name of your Wireguard interface.  Use `sudo wg show` to list all active Wireguard interfaces if you don't know your interface name. 
