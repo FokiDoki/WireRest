@@ -33,8 +33,10 @@ DEMO: http://wr-demo.fokidoki.su:8081/swagger-ui
 - Get general config (interface) information
 - Token authentication
 
----
+
 ### Install script
+
+---
 
 You can use this bash script to install WireRest automatically.
 
