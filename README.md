@@ -44,7 +44,7 @@ Script tested on
 - Fedora 16
 - CentOS 8
 
-If your OS is not on this list, you can still try using this script, just [install Java-21](#how-to-install-java-21) before
+If your OS is not on this list, you can still try using this script, just [install Java 21](#how-to-install-java-21) before
 
 Wireguard **must be** installed in advance (You can use [this](https://github.com/angristan/wireguard-install) script to install & configure WG)
 ```shell
