@@ -36,7 +36,7 @@ DEMO: http://wr-demo.fokidoki.su:8081/swagger-ui
 ---
 ### Install script
 
-You can use a bash script to install WireRest automatically.
+You can use this bash script to install WireRest automatically.
 
 Script tested on 
 - Ubuntu >= 18.04
