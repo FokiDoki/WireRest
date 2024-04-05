@@ -25,7 +25,7 @@ Example
       - targets: ['WIREREST_URL:8081']
 ```
 \
-Do not forget create file with access token or disable it. Default token is "admin" [About token](https://github.com/FokiDoki/WireRest#token-authentication) \
+Do not forget create file with access token or disable it. The file **must be accessible** by the user `prometheus`. Default token is "admin" [About token](https://github.com/FokiDoki/WireRest#token-authentication) \
 You can check the availability of WireRest as follows:
 `curl http://127.0.0.1:8081/actuator/prometheus?token=<YOUR_TOKEN>`
 
