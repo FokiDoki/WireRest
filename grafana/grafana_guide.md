@@ -16,12 +16,13 @@ How to install:
 
 Example
 ```yaml
-- job_name: 'wirerest-demo'
-  static_configs:
-    - metrics_path: '/actuator/prometheus'
-    - authorization:
-      credentials_file: '/etc/default/wirerest-demo-token'
-    - targets: ['10.0.0.3:8081']
+  - job_name: 'wirerest-demo'
+    scrape_interval: 5s
+    metrics_path: '/actuator/prometheus'
+    authorization:
+        credentials_file: '/PATH/TO/FILE/WITH/ACCESS_TOKEN'
+    static_configs:
+      - targets: ['WIREREST_URL:8081']
 ```
 \
 Do not forget create file with access token or disable it. Default token is "admin" [About token](https://github.com/FokiDoki/WireRest#token-authentication) \
