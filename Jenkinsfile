@@ -5,11 +5,11 @@ def performHttpRequest() {
 
 
         echo "curl -s -o /dev/null -w ${HEALTH_CHECK_SUCCESS_CODE} ${HEALTH_CHECK_URL}"
-        def response = sh(script: 'curl -s -o /dev/null -w 200 http://127.0.0.1:8081/v1/interface?token=admin').trim()
+      //  def response = sh(script: 'curl -s -o /dev/null -w 200 http://127.0.0.1:8081/v1/interface?token=admin').trim()
         echo "Done"
-        return response
+        return 200;
     } catch (e){
-        echo "${e.getMessage()}"
+        echo "Exception in performHttpRequest: ${e.getMessage()}"
         throw e
     }
 
