@@ -67,7 +67,7 @@ pipeline {
     stages {
         stage('Build/Test/Compile') {
             steps {
-               // sh '${MAVEN_BIN} clean validate compile package'
+                sh '${MAVEN_BIN} clean validate compile package'
                 jacoco(execPattern: '**/target/*.exec')
                 recordCoverage(tools: [[parser: 'JACOCO']])
             }
