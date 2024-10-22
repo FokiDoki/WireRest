@@ -154,7 +154,7 @@ And then run dpkg again ```sudo dpkg -i jdk-21_linux-x64_bin.deb```
 
 #### For arm64 systems:
 ```shell
-wget https://download.oracle.com/java/20/latest/jdk-21_linux-aarch64_bin.rpm
+wget https://download.oracle.com/java/21/latest/jdk-21_linux-aarch64_bin.rpm
 sudo rpm -i jdk-21_linux-aarch64_bin.rpm
 ```
 ---
@@ -170,7 +170,7 @@ java --version
 [Continue installation](#how-to-run)
 
 
-You can find the Java 21 package for you system [there](https://www.oracle.com/java/technologies/downloads/)
+You can find the Java 21 package for your system [there](https://www.oracle.com/java/technologies/downloads/)
 
 ## Examples:
 
